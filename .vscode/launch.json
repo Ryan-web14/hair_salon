@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "cwd": "c:/Users/user/AppData/Local/Temp/f8695c08-8c96-476b-94e7-df7343eb6e41_PIPEC.zip.e41/PIPEC/PIPEC/src",
+      "program": "c:/Users/user/AppData/Local/Temp/f8695c08-8c96-476b-94e7-df7343eb6e41_PIPEC.zip.e41/PIPEC/PIPEC/src/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}
