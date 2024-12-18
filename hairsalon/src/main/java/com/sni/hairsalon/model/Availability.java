@@ -2,8 +2,6 @@ package com.sni.hairsalon.model;
 
 import java.time.LocalDateTime;
 
-import org.springframework.cglib.core.Local;
-
 import com.sni.hairsalon.annotation.IdGeneration;
 
 import jakarta.persistence.Column;
@@ -12,6 +10,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,11 +30,13 @@ public class Availability{
 
     @ManyToOne
     @JoinColumn(name = "barber_id", nullable = false)
-    private long barber;
+    private Barber barber;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "start_time", nullable = false)
-    private LocalDateTime starTime;
+    private LocalDateTime startTime;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;
 

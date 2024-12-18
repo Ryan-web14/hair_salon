@@ -24,7 +24,7 @@ public class UserSession {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private long user; 
+    private User user; 
 
     @Column(name = "created_at",nullable = false)
     @JsonIgnore
@@ -34,18 +34,18 @@ public class UserSession {
     @JsonIgnore
     private LocalDateTime expired_at;
 
-    @Column(name = "token", nullable = false)
+    @Column(name = "token",nullable = false)
     private String token;
 
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "is_active",nullable = false)
     @JsonIgnore
     private boolean is_active;
 
-    @Column(name = "ip_address", nullable = false)
-    private String ipAdress;
+    @Column(name = "ip_address",nullable = false)
+    private String ipAddress;
 
     //Information on the browser and device the client is using or the admin
-    @Column(name = "user_agent", nullable = false)
+    @Column(name = "user_agent",nullable = false)
     private String userAgent;
     
     

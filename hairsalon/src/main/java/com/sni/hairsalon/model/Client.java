@@ -2,22 +2,27 @@ package com.sni.hairsalon.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.Builder;
 
 import com.sni.hairsalon.annotation.IdGeneration;
  
 @Data
-@NoArgsConstructor
+//@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
+@Builder
+@Entity
 @Table(name = "client")
-public class Client extends User {
+public class Client{
 
     @Id
     @IdGeneration
     @Column(name = "client_id")
     private long id;
 
-    @Column(name = "user_id", nullable = false)
-    private long user;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "client_lastname", nullable = false)
     private String lastname;
@@ -32,8 +37,9 @@ public class Client extends User {
     @Column(name = "no_show_count", nullable = false)
     private int noShowCount;
 
-    public Client (String email, String passwordHash, int role){
+    public Client(){};
+    /*public Client (String email, String passwordHash, UserRole role){
         super(email, passwordHash,role);
-    }
+    }*/
 
 }

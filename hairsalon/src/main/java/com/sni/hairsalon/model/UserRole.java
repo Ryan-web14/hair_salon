@@ -4,8 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor(staticName = "create")
-@RequiredArgsConstructor(staticName = "of")
+@Builder
 @Entity
 @Table(name = "role")
 public class UserRole{

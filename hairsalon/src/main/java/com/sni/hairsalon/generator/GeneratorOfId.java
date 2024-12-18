@@ -1,19 +1,13 @@
 package com.sni.hairsalon.generator;
 
 import java.io.Serializable;
-import java.security.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Random;
-import javax.swing.text.DateFormatter;
-
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;
 
 public class GeneratorOfId implements IdentifierGenerator{
-
-    private String prefix;
-   
     
     private long generationId(){
         LocalDateTime now; 
@@ -34,11 +28,9 @@ public class GeneratorOfId implements IdentifierGenerator{
     }
 
     
-
     @Override
     public Serializable generate(SharedSessionContractImplementor session, Object obj){
         return generationId();
       
-    }
-  
+    } 
 }

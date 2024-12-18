@@ -1,24 +1,28 @@
 package com.sni.hairsalon.model;
 
 
+import java.util.List;
+
 import com.sni.hairsalon.annotation.IdGeneration;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
+@Entity
 @Table(name = "barber")
-public class Barber extends User {
+public class Barber {
 
     @Id
     @IdGeneration
     @Column(name = "barber_id")
     private long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private long user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "barber_lastname", nullable = false)
     private String lastname;
@@ -34,8 +38,14 @@ public class Barber extends User {
     
     @Column(name = "available", nullable = false)
     private boolean available;
+    
+    @OneToMany(mappedBy = "barber")
+    private List<Appointment> appointments; 
 
-    public Barber (String email, String passwordHash, int role){
+    @OneToMany(mappedBy = "barber")
+    private List <Schedule> schedule;
+    
+    /*public Barber (String email, String passwordHash, UserRole role){
         super(email, passwordHash,role);
-    }
+    }*/
 }

@@ -6,15 +6,18 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sni.hairsalon.annotation.IdGeneration;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
+import lombok.AllArgsConstructor;
+
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor(staticName = "create")
-@RequiredArgsConstructor(staticName = "of")
+@AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "user")
+@Table(name =  "\"user\"")
 public class User {
 
     @Id
@@ -22,17 +25,15 @@ public class User {
     @Column(name ="user_id")
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+   @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
-    private int role;
+    private UserRole role;
 
     @Column(name = "user_email", nullable = false)
-    @NonNull
     private String email;
 
     @Column(name = "password", nullable = false)
     @JsonIgnore
-    @NonNull
     private String passwordHash;
 
     @Column(name = "last_login")
@@ -43,19 +44,19 @@ public class User {
     @JsonIgnore
     private LocalDateTime created_at;
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at")
     @JsonIgnore
     private LocalDateTime updated_at;
 
-    protected void creationTime(){
+    @PrePersist
+    public void onCreate(){
         created_at = LocalDateTime.now();
     }
 
-    public User(String email, String passwordHash, int role){
+    public User(String email, String passwordHash, UserRole role){
         this.email = email;
         this.passwordHash = passwordHash;
         this.role = role;
-        creationTime();
     }
 
     
