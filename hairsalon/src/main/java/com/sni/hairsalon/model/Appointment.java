@@ -15,12 +15,10 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-//import lombok.RequiredArgsConstructor;;
-
+//import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
+//@NoArgsConstructor
 @AllArgsConstructor(staticName = "create")
 @Entity
 @Table(name = "appointment")
@@ -54,6 +52,10 @@ public class Appointment {
     @Column(name = "status")
     private int status;
 
+    public Appointment(){
+        onCreate();
+    }
+
     public Appointment(Client client, Barber barber, Haircut haircut, LocalDateTime bookedTime) {
         this.client = client;
         this.barber = barber;
@@ -66,6 +68,8 @@ public class Appointment {
     protected void onCreate(){
         appointmentTime = LocalDateTime.now();
     }
-
    
+  
 }
+
+

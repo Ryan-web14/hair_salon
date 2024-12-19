@@ -1,7 +1,7 @@
 package com.sni.hairsalon.model;
 
 import java.sql.Date;
-import java.sql.Time;
+
 import java.time.LocalDateTime;
 
 import com.sni.hairsalon.annotation.IdGeneration;
