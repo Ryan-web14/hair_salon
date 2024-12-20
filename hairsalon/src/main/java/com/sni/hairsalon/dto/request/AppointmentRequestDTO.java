@@ -8,9 +8,11 @@ import com.sni.hairsalon.model.Haircut;
 import com.sni.hairsalon.model.Appointment;
 import com.sni.hairsalon.model.Status;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor(staticName = "create")
 public class AppointmentRequestDTO {
     private Client client;
     private Barber barber; 
