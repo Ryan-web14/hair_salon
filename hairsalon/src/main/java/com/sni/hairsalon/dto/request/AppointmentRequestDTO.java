@@ -14,6 +14,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor(staticName = "create")
 public class AppointmentRequestDTO {
+    private long id;
     private Client client;
     private Barber barber; 
     private Haircut haircut;

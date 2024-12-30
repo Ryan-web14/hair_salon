@@ -7,8 +7,7 @@ import lombok.Builder;
 import com.sni.hairsalon.annotation.IdGeneration;
  
 @Data
-//@NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
@@ -36,10 +35,4 @@ public class Client{
     //Number of time the client hasn't show themselve to an appointment
     @Column(name = "no_show_count", nullable = false)
     private int noShowCount;
-
-    public Client(){};
-    /*public Client (String email, String passwordHash, UserRole role){
-        super(email, passwordHash,role);
-    }*/
-
 }

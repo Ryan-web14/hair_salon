@@ -9,7 +9,7 @@ import com.sni.hairsalon.model.UserRole;
 
 @Repository
 public interface UserRoleRepository extends JpaRepository<UserRole, Long>{
-    List<UserRole>findUserRoleByName(String name);
+    UserRole findUserRoleByName(String name);
     UserRole findUserRoleById(long Id);
 
 }

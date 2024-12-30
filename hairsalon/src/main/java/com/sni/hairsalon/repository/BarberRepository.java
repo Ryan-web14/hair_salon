@@ -18,7 +18,7 @@ import com.sni.hairsalon.model.Barber;
 
 @Repository
 public interface BarberRepository extends JpaRepository<Barber, Long>{
-    Barber findBarberById(long id);
+    Optional<Barber> findBarberById(long id);
     Barber findBarberByLastname(String lastname);
     List<Barber> findBarberByFirstname(String firstname);
     Barber findBarberByPhoneNumber(int phoneNumber);
@@ -27,22 +27,6 @@ public interface BarberRepository extends JpaRepository<Barber, Long>{
     @NonNull
     List<Barber> findAll();
 
-
-     /* @Query("SELECT DISTINCT b FROM Barber b " +
-           "JOIN b.Schedules s " +
-           "WHERE s.dayOfWeek = :dayOfWeek " +
-           "AND s.startTime <= :time " +
-           "AND s.endTime >= :time " +
-           "AND s.effectiveFrom <= :date " +
-           "AND (s.effective_to IS NULL OR s.effective_to >= :date) " +
-           "AND s.isReccuring = true")
-    List<Barber> findBarbersBySchedule(
-        @Param("dayOfWeek") DayOfWeek dayOfWeek,
-        @Param("time") LocalTime time,
-        @Param("date") LocalDate date
-    );
-*/
-    //Find barbers by a specific time range
     @Query("""
         SELECT DISTINCT b FROM Barber b 
         JOIN Schedule s ON s.barber.id = b.id 

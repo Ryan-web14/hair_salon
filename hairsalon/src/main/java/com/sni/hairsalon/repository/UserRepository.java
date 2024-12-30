@@ -1,6 +1,7 @@
 package com.sni.hairsalon.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.lang.NonNull;
@@ -12,9 +13,11 @@ import jakarta.annotation.Nonnull;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>{
-    User findUserById(long userId);
+    Optional <User> findUserById(long userId);
+    User findById(long id);
     User findUserByEmail(String email);
-    
+    void deleteUser(long id);
+
     @Override
     @NonNull
     List<User> findAll();

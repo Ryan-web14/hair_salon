@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Data
-@RequiredArgsConstructor(staticName = "of")
+@NoArgsConstructor
 @AllArgsConstructor(staticName = "create")
 @Entity
 @Table(name = "haircut")

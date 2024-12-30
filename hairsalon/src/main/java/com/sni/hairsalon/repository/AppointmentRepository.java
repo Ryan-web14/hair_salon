@@ -2,6 +2,7 @@ package com.sni.hairsalon.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +13,7 @@ import com.sni.hairsalon.model.Appointment;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment,Long> {
-    Appointment findAppointmentById(long id);
+    Optional<Appointment> findAppointmentById(long id);
     List<Appointment> findAppointmentByStatus(int status);
 
     @Query("select a from Appointment a where a.bookedTime = :bookedTime")
