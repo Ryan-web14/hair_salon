@@ -1,7 +1,8 @@
 package com.sni.hairsalon.model;
 
 import java.sql.Date;
-import java.time.DayOfWeek;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.sni.hairsalon.annotation.IdGeneration;
@@ -16,12 +17,14 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "create")
+@Builder
 @Entity
 @Table(name = "schedule")
 public class Schedule {
@@ -36,7 +39,7 @@ public class Schedule {
     private Barber barber;
 
     @Column(name = "day_of_week", nullable = false)
-    private DayOfWeek dayOfWeek;
+    private int dayOfWeek;
 
     //Start time for the barber
     @Temporal(TemporalType.TIMESTAMP)

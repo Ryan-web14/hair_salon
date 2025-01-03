@@ -15,22 +15,11 @@ import lombok.Data;
 @AllArgsConstructor(staticName = "create")
 public class AppointmentRequestDTO {
     private long id;
-    private Client client;
-    private Barber barber; 
+    private long idClient;
+    private long idBarber; 
     private Haircut haircut;
     private LocalDateTime appointmentTime;
     private Status status = Status.PENDING;
     //private LocalDateTime bookedTime;
 
-
-    public Appointment toEntity(){
-        Appointment appointment = new Appointment();
-        appointment.setClient(client);
-        appointment.setBarber(barber);
-        appointment.setHaircut(haircut);
-        appointment.setAppointmentTime(appointmentTime);
-        appointment.setStatus(status.getCode());
-        return appointment;
-    }
-    
 }

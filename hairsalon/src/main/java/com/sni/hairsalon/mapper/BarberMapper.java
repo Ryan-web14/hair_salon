@@ -1,6 +1,7 @@
 package com.sni.hairsalon.mapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.sni.hairsalon.dto.request.BarberRequestDTO;
 import com.sni.hairsalon.dto.response.BarberResponseDTO;
@@ -9,6 +10,7 @@ import com.sni.hairsalon.model.User;
 import com.sni.hairsalon.repository.UserRepository;
 import com.sni.hairsalon.utils.ValidationUtils;
 
+@Component
 public class BarberMapper {
 
     @Autowired
