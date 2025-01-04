@@ -17,7 +17,7 @@ public class AppointmentRequestDTO {
     private long id;
     private long idClient;
     private long idBarber; 
-    private Haircut haircut;
+    private long idHaircut;
     private LocalDateTime appointmentTime;
     private Status status = Status.PENDING;
     //private LocalDateTime bookedTime;

@@ -26,10 +26,12 @@ public class UserSession {
     @JoinColumn(name = "user_id")
     private User user; 
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at",nullable = false)
     @JsonIgnore
     private LocalDateTime created_at;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "expired_at",nullable = false)
     @JsonIgnore
     private LocalDateTime expired_at;

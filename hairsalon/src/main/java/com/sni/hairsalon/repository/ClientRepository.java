@@ -1,6 +1,7 @@
 package com.sni.hairsalon.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.NativeQuery;
@@ -13,7 +14,7 @@ import com.sni.hairsalon.model.Client;
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long>{
-    Client findById(long id);
+   Optional<Client> findById(long id);
     Client findClientByFirstname(String name);
     Client findClientByLastname(String name);
     Client findClientByPhoneNumber(int phone);

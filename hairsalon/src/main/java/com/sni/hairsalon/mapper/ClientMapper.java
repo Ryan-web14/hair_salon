@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 
 import com.sni.hairsalon.dto.request.ClientRequestDTO;
 import com.sni.hairsalon.dto.response.ClientResponseDTO;
-import com.sni.hairsalon.dto.response.UserResponseDTO;
 import com.sni.hairsalon.model.Client;
 import com.sni.hairsalon.model.User;
 import com.sni.hairsalon.repository.ClientRepository;

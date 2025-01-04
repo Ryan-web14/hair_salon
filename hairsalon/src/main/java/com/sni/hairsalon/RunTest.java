@@ -19,7 +19,7 @@ public class RunTest {
 
             try{
 
-                Client foundClient = clientRepository.findById(id);
+                Client foundClient = clientRepository.findById(id).orElseThrow();
                 String clientString = foundClient.toString();
 
             System.out.println(clientString);

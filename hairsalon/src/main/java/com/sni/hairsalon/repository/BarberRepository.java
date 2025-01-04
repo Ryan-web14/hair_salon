@@ -19,7 +19,6 @@ import com.sni.hairsalon.model.Barber;
 @Repository
 public interface BarberRepository extends JpaRepository<Barber, Long>{
     Optional<Barber> findBarberById(long id);
-    Barber findById(long id);
     Barber findBarberByLastname(String lastname);
     List<Barber> findBarberByFirstname(String firstname);
     Barber findBarberByPhoneNumber(int phoneNumber);

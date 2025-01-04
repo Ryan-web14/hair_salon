@@ -14,12 +14,14 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 //import lombok.NoArgsConstructor;
 
 @Data
 //@NoArgsConstructor
 @AllArgsConstructor(staticName = "create")
+@Builder
 @Entity
 @Table(name = "appointment")
 public class Appointment {
@@ -53,14 +55,6 @@ public class Appointment {
     private int status;
 
     public Appointment(){
-        onCreate();
-    }
-
-    public Appointment(Client client, Barber barber, Haircut haircut, LocalDateTime bookedTime) {
-        this.client = client;
-        this.barber = barber;
-        this.haircut = haircut;
-        this.bookedTime = bookedTime;
         onCreate();
     }
     
