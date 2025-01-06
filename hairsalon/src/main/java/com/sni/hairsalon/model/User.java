@@ -1,6 +1,12 @@
 package com.sni.hairsalon.model;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sni.hairsalon.annotation.IdGeneration;
@@ -18,7 +24,7 @@ import lombok.AllArgsConstructor;
 @Builder
 @Entity
 @Table(name =  "\"user\"")
-public class User {
+public class User /*implements UserDetails */   {
 
     @Id
     @IdGeneration
@@ -53,11 +59,41 @@ public class User {
         created_at = LocalDateTime.now();
     }
 
-    public User(String email, String passwordHash, UserRole role){
-        this.email = email;
-        this.passwordHash = passwordHash;
-        this.role = role;
+  /*  @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Convert role to Spring Security authority
+        return List.of(new SimpleGrantedAuthority(role.getName()));
+    }
+    
+    @Override
+    public String getPassword() {
+        return passwordHash;
     }
 
+    @Override
+    public String getUsername() {
+        return email;  
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+*/
     
 }

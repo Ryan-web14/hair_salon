@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import com.sni.hairsalon.dto.request.ClientRequestDTO;
 import com.sni.hairsalon.dto.response.ClientResponseDTO;
+import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.model.Client;
 import com.sni.hairsalon.model.User;
 import com.sni.hairsalon.repository.ClientRepository;
@@ -32,7 +33,8 @@ public class ClientMapper{
 
     public Client toEntity(ClientRequestDTO request){
         validateField(request);
-        User user = userRepo.findUserByEmail(request.getEmail());
+        User user = userRepo.findUserByEmail(request.getEmail())
+        .orElseThrow(()-> new ResourceNotFoundException("Client not found"));
         Client newClient = new Client();
         newClient.setFirstname(request.getFirstname());
         newClient.setLastname(request.getLastname());

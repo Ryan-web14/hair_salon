@@ -15,7 +15,7 @@ import jakarta.annotation.Nonnull;
 public interface UserRepository extends JpaRepository<User, Long>{
     Optional <User> findUserById(long userId);
     User findById(long id);
-    User findUserByEmail(String email);
+    Optional <User> findUserByEmail(String email);
     void deleteUser(long id);
 
     @Override

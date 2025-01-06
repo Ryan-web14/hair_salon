@@ -10,6 +10,7 @@ import lombok.Data;
 public class SessionResponseDTO {
     private long id;
     private long userId;
+    private String token;
     private LocalDateTime createdAt;
     private LocalDateTime expiredAt;
     private boolean isActive;

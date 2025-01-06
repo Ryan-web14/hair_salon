@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import com.sni.hairsalon.dto.request.BarberRequestDTO;
 import com.sni.hairsalon.dto.response.BarberResponseDTO;
+import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.model.Barber;
 import com.sni.hairsalon.model.User;
 import com.sni.hairsalon.repository.UserRepository;
@@ -18,7 +19,8 @@ public class BarberMapper {
     
     public Barber toEntity(BarberRequestDTO dto){
         validateField(dto);
-        User user = userRepo.findUserByEmail(dto.getEmail());
+        User user = userRepo.findUserByEmail(dto.getEmail())
+        .orElseThrow(()-> new ResourceNotFoundException("Barber not found"));
         Barber barber = new Barber();
         barber.setUser(user);
         barber.setFirstname(dto.getFirstname());

@@ -90,8 +90,9 @@ public class UserServiceImpl implements UserService{
     }
 
     private boolean EmailAlreadyExist(String email){
-        User userAlreadyExist = userRepo.findUserByEmail(email);
-
+        User userAlreadyExist = userRepo.findUserByEmail(email)
+        .orElseThrow(()-> new ResourceNotFoundException("user not found with email: " + email));
+        
         if(userAlreadyExist.getEmail() != null){
             return true;
         }
