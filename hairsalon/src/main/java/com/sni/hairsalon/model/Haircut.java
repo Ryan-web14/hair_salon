@@ -6,6 +6,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "create")
+@Builder
 @Entity
 @Table(name = "haircut")
 public class Haircut {

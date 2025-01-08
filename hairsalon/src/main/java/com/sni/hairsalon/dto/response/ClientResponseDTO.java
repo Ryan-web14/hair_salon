@@ -1,7 +1,5 @@
 package com.sni.hairsalon.dto.response;
 
-import com.sni.hairsalon.model.Client;
-
 import lombok.Data;
 
 @Data

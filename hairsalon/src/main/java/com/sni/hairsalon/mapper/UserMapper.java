@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import com.sni.hairsalon.dto.request.UserRequestDTO;
 import com.sni.hairsalon.dto.response.UserResponseDTO;
 import com.sni.hairsalon.exception.BadRequestException;
+import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.model.User;
 import com.sni.hairsalon.model.UserRole;
 import com.sni.hairsalon.repository.UserRoleRepository;
@@ -23,7 +24,8 @@ public class UserMapper {
         user.setEmail(request.getEmail());
         user.setPasswordHash(request.getPassword());
         user.onCreate();
-        UserRole role = roleRepo.findUserRoleByName(roleName);
+        UserRole role = roleRepo.findUserRoleByName(roleName)
+        .orElseThrow(()-> new ResourceNotFoundException("Role not found"));
         user.setRole(role);
         return user;
     }

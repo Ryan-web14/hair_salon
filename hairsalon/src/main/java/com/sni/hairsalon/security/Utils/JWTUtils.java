@@ -6,12 +6,13 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.sni.hairsalon.dto.request.UserRequestDTO;
-import com.sni.hairsalon.dto.response.UserResponseDTO;
+import com.sni.hairsalon.model.User;
 
-import java.time.LocalDateTime;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwt;
+import io.jsonwebtoken.Jwts;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,9 +28,9 @@ public class JWTUtils {
     @Value("${jwt_expiration}")
     private long jwt_expiration;
 
-    public String generateToken(UserResponseDTO user) throws IllegalArgumentException, JWTCreationException{
+    public String generateToken(User user) throws IllegalArgumentException, JWTCreationException{
         Map<String,String> claims = new HashMap<>();
-        claims.put("role", user.getRole());
+        claims.put("role", user.getRole().getName());
 
         return JWT.create()
             .withClaim("user info", claims)

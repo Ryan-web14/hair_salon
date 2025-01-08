@@ -26,7 +26,7 @@ public class SessionMapper {
         UserSession session = UserSession.builder()
         .user(user)
         .created_at(LocalDateTime.now())
-        .is_active(true)
+        .isActive(true)
         .ipAddress(request.getIpAddress())
         .userAgent(request.getUserAgent())
         .build();
@@ -39,7 +39,8 @@ public class SessionMapper {
         .userId(session.getUser().getId())
         .createdAt(session.getCreated_at())
         .expiredAt(session.getExpired_at())
-        .isActive(session.is_active())
+        .token(session.getToken())
+        .isActive(session.isActive())
         .ipAddress(session.getIpAddress())
         .userAgent(session.getUserAgent())
         .build();

@@ -10,7 +10,6 @@ public interface UserService{
     UserResponseDTO updateUser(long id, UserRequestDTO dto);
     UserResponseDTO updatePassword(long id, String newPassword);
     UserResponseDTO getUserById(long id);
-    void deleteUser(long id);
     List<UserResponseDTO> getAllUsers();
 }
 

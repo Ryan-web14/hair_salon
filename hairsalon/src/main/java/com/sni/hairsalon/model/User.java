@@ -2,6 +2,7 @@ package com.sni.hairsalon.model;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -24,7 +25,7 @@ import lombok.AllArgsConstructor;
 @Builder
 @Entity
 @Table(name =  "\"user\"")
-public class User /*implements UserDetails */   {
+public class User  {
 
     @Id
     @IdGeneration
@@ -58,42 +59,5 @@ public class User /*implements UserDetails */   {
     public void onCreate(){
         created_at = LocalDateTime.now();
     }
-
-  /*  @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Convert role to Spring Security authority
-        return List.of(new SimpleGrantedAuthority(role.getName()));
-    }
-    
-    @Override
-    public String getPassword() {
-        return passwordHash;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;  
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-*/
     
 }

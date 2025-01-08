@@ -41,7 +41,7 @@ public class UserSession {
 
     @Column(name = "is_active",nullable = false)
     @JsonIgnore
-    private boolean is_active;
+    private boolean isActive;
 
     @Column(name = "ip_address",nullable = false)
     private String ipAddress;

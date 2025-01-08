@@ -18,7 +18,7 @@ public interface ClientRepository extends JpaRepository<Client, Long>{
     Client findClientByFirstname(String name);
     Client findClientByLastname(String name);
     Client findClientByPhoneNumber(int phone);
-    
+    Void deleteById(long id);
     @NativeQuery
     @Query("Select c from Client c where c.user.id = :userId")
     Client findClientByUserID(@Param("userId") long userId);

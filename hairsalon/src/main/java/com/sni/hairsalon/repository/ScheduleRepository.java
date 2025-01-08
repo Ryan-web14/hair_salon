@@ -52,6 +52,9 @@ public interface ScheduleRepository {
         @Param("date") Date date
     );
 
+    Void deleteById(long id);
+    Void deleteAll();
+
 }
 
 //Jsql

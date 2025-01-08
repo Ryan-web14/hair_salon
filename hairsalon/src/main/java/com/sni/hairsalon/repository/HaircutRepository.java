@@ -15,7 +15,7 @@ public interface HaircutRepository extends JpaRepository<Haircut,Long>{
     Haircut findHaircutByType(String type);
     List<Haircut> findHaircutByDuration(int duration);
     List<Haircut> findHaircutByPrice(int price);
-
+    Void deleteById(long id);
     @Override
     @NonNull
     List<Haircut> findAll();

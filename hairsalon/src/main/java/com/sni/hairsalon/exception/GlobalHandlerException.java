@@ -1,12 +1,19 @@
 package com.sni.hairsalon.exception;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.angus.mail.iap.ResponseInputStream;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
@@ -20,7 +27,8 @@ public class GlobalHandlerException {
                 e.getMessage(), 
                 HttpStatus.NOT_FOUND.value(),
                 "not found",
-                request.getRequestURI()
+                request.getRequestURI(),
+                getStackTrace(e)
                 );
 
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
@@ -34,10 +42,37 @@ public class GlobalHandlerException {
                 e.getMessage(), 
                 HttpStatus.NOT_FOUND.value(),
                 "already exist",
-                request.getRequestURI()
+                request.getRequestURI(),
+                getStackTrace(e)
                 );
             return new ResponseEntity<>(error, HttpStatus.PRECONDITION_FAILED);
         }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException e,
+    HttpServletRequest request ) {
+        ErrorResponse error = ErrorResponse.of(
+            e.getMessage(),
+            HttpStatus.BAD_REQUEST.value(),
+            "Invalid credential",
+            request.getRequestURI(),
+            getStackTrace(e));
+            
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    /*@ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+            errors.put(error.getField(), error.getDefaultMessage())
+        );
+        return new ValidationErrorResponse(HttpStatus.BAD_REQUEST.value(), errors);
+    }*/
+
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequesException(
@@ -47,7 +82,9 @@ public class GlobalHandlerException {
                 e.getMessage(),
                 HttpStatus.BAD_REQUEST.value(),
                 "Bad request",
-                request.getRequestURI());
+                request.getRequestURI(),
+                getStackTrace(e)
+                );
 
             return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
@@ -57,11 +94,20 @@ public class GlobalHandlerException {
         Exception e, HttpServletRequest request){
 
             ErrorResponse error = ErrorResponse.of(
-               "An unexpected error occurred",
+               "An unexpected error",
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Server side error occured",
-                request.getRequestURI());
+                request.getRequestURI(),
+                getStackTrace(e)
+                );
 
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         } 
+
+        private String getStackTrace(Exception e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        return sw.toString();
+    }
 }
