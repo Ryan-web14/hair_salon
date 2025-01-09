@@ -23,7 +23,7 @@ public class AvailabilityMapper {
         availability.setBarber(barber);
         availability.setStartTime(dto.getStarTime());
         availability.setEndTime(dto.getEndTime());
-        availability.set_available(dto.isAvailable());
+        availability.setAvailable(dto.isAvailable());
         
         if(dto.getNote() != null || !dto.getNote().isEmpty()){
             availability.setNote(dto.getNote());
@@ -36,6 +36,8 @@ public class AvailabilityMapper {
         AvailabilityResponseDTO dto = new AvailabilityResponseDTO();
         dto.setId(entity.getId());
         dto.setBarberId(entity.getBarber().getId());
+        dto.setFirstname(entity.getBarber().getFirstname());
+        dto.setLastName(entity.getBarber().getLastname());
         dto.setStarTime(entity.getStartTime());
         dto.setEndTime(entity.getEndTime());
         

@@ -2,6 +2,7 @@ package com.sni.hairsalon.repository;
 
 import java.sql.Date;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import com.sni.hairsalon.model.Schedule;
 
 @Repository
 public interface ScheduleRepository {
-    List<Schedule> findByBarberID(long id);
+    List<Schedule> findByBarberId(long id);
     List<Schedule> findByDayOfWeek(DayOfWeek dayOfWeek);
 
     @Query("select s from Schedule s where s.barber_id = :barberId" +
@@ -38,12 +39,12 @@ public interface ScheduleRepository {
     @Param("currentDate") Date currentDate
     );
 
-    @Query("select s from Schedule s WHERE s.barber_id = :barberId " +
-           "AND s.day_of_Week = :dayOfWeek " +
-           "AND ((s.startTime <= :endTime AND s.end_time >= :startTime) " +
-           "OR (s.startTime >= :startTime AND s.startTime <= :endTime)) " +
-           "AND s.effectiveFrom <= :date " +
-           "AND s.effectiveTo>= :date")
+    @Query("SELECT s FROM Schedule s WHERE s.barber.id = :barberId " +
+    "AND s.dayOfWeek = :dayOfWeek " +                           
+    "AND ((s.startTime <= :endTime AND s.endTime >= :startTime) " +
+    "OR (s.startTime >= :startTime AND s.startTime <= :endTime)) " +
+    "AND s.effectiveFrom <= :date " +
+    "AND s.effectiveTo >= :date")
     List<Schedule> findOverlappingSchedules(
         @Param("barberId") Long barberId,
         @Param("dayOfWeek") DayOfWeek dayOfWeek,
@@ -52,6 +53,14 @@ public interface ScheduleRepository {
         @Param("date") Date date
     );
 
+    @Query("SELECT s FROM Schedule s WHERE :date BETWEEN s.effectiveFrom AND s.effectiveTo")
+    List<Schedule> findCurrentSchedules(@Param("date") LocalDate date);
+
+    @Query("SELECT s FROM Schedule s WHERE s.barber.id = :barberId AND :date BETWEEN s.effectiveFrom AND s.effectiveTo")
+List<Schedule> findCurrentSchedulesForBaber(
+    @Param("barberId") Long barberId, 
+    @Param("date") LocalDate date
+);
     Void deleteById(long id);
     Void deleteAll();
 

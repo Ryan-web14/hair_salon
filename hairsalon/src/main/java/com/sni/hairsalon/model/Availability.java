@@ -13,12 +13,14 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "create")
+@Builder
 @Entity
 @Table(name = "availability")
 public class Availability{
@@ -41,7 +43,7 @@ public class Availability{
     private LocalDateTime endTime;
 
     @Column(name = "is_available", nullable = false)
-    private boolean is_available;
+    private boolean isAvailable;
 
     @Column(name = "note")
     private String note;

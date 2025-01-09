@@ -20,7 +20,7 @@ public class AvailabilityRequestDTO {
         availability.setBarber(availabilityRequest.getBarber());
         availability.setStartTime(availabilityRequest.getStartTime());
         availability.setEndTime(availabilityRequest.getEndTime());
-        availability.set_available(availabilityRequest.isAvailable());
+        availability.setAvailable(availabilityRequest.isAvailable());
         availability.setNote(availabilityRequest.getNote());
         return availability;
     }

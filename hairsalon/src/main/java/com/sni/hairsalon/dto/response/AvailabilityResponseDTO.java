@@ -8,6 +8,8 @@ import lombok.Data;
 public class AvailabilityResponseDTO {
     private long id;
     private long barberId;
+    private String firstname;
+    private String lastName;
     private LocalDateTime starTime;
     private LocalDateTime endTime;
     private boolean isAvailable;
