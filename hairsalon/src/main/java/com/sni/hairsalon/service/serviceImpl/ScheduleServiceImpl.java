@@ -1,14 +1,140 @@
 package com.sni.hairsalon.service.serviceImpl;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.time.LocalDate;
+
 import org.springframework.stereotype.Service;
 
+import com.sni.hairsalon.dto.request.ScheduleRequestDTO;
+import com.sni.hairsalon.dto.response.BarberResponseDTO;
+import com.sni.hairsalon.dto.response.ScheduleResponseDTO;
+import com.sni.hairsalon.exception.ResourceNotFoundException;
+import com.sni.hairsalon.mapper.ScheduleMapper;
+import com.sni.hairsalon.model.Barber;
+import com.sni.hairsalon.model.Schedule;
+import com.sni.hairsalon.repository.BarberRepository;
 import com.sni.hairsalon.repository.ScheduleRepository;
+import com.sni.hairsalon.service.ScheduleService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class ScheduleServiceImpl {
+public class ScheduleServiceImpl implements ScheduleService {
     
     private final ScheduleRepository scheduleRepo;
+    private final BarberRepository barberRepo;
+    private final ScheduleMapper mapper;
+
+    @Override
+    public ScheduleResponseDTO createSchedule(ScheduleRequestDTO request){
+       
+        Barber barber = barberRepo.findById(request.getBarberId())
+        .orElseThrow(()-> new ResourceNotFoundException("Barber not found"));
+
+        validateTimeRange(request.getStartTime(), request.getEndTime());
+
+        if(hasAnyOverlappingSchedule(request)){
+            throw new IllegalStateException("Schedule overlap with another");
+        }
+
+        Schedule schedule =  Schedule.builder()
+        .barber(barber)
+        .dayOfWeek(request.getDayOfWeek())
+        .startTime(request.getStartTime())
+        .endTime(request.getEndTime())
+        .is_recurring(request.isRecurring())
+        .effectiveFrom(Date.valueOf(request.getEffectiveFrom()))
+        .effectiveTo(Date.valueOf(request.getEffectiveTo()))
+        .build();
+        
+        scheduleRepo.save(schedule);  
+        return mapper.toDto(schedule);
+    }
+
+    @Override
+    public List<ScheduleResponseDTO> getBarberSchedule(long barberId){
+        
+        Barber barber = barberRepo.findById(barberId)
+        .orElseThrow(()-> new ResourceNotFoundException("Barber not found"));
+
+        List<Schedule> schedules = scheduleRepo.findByBarberId(barber.getId());
+
+        if(schedules.isEmpty()){
+            String.format("No schedule found for barber %d", barber.getId());
+        }
+
+        return schedules
+        .stream()
+        .map(schedule->mapper.toDto(schedule))
+        .collect(Collectors.toList());
+    }
+
+    @Override
+    public ScheduleResponseDTO updateSchedule(long id, ScheduleRequestDTO request){
+        
+        Schedule schedule = scheduleRepo.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Schedule not found"));
+
+        validateTimeRange(request.getStartTime(), request.getEndTime());
+
+        schedule.setDayOfWeek(request.getDayOfWeek());
+        schedule.setStartTime(request.getStartTime());
+        schedule.setEndTime(request.getEndTime());
+        schedule.set_recurring(request.isRecurring());
+        schedule.setEffectiveFrom(Date.valueOf(request.getEffectiveFrom()));
+        schedule.setEffectiveTo(Date.valueOf(request.getEffectiveTo()));
+        Schedule updatedSchedule = scheduleRepo.save(schedule);
+        return mapper.toDto(updatedSchedule);
+    }
+
+    @Override
+    public List<ScheduleResponseDTO> getCurrentSchedule(LocalDate date){
+        
+        List<Schedule> schedules = scheduleRepo.findCurrentSchedules(date);
+        return schedules
+        .stream()
+        .map(schedule->mapper.toDto(schedule))
+        .collect(Collectors.toList());
+    }
+
+
+
+    private void validateTimeRange(LocalDateTime startTime, LocalDateTime endTime){
+        
+        if(startTime.isAfter(endTime)){
+            throw new IllegalArgumentException("Start time must be before end time");
+        }
+        return;
+    }
+
+    private boolean hasAnyOverlappingSchedule(ScheduleRequestDTO request){
+       
+        Date effectiveFrom =  Date.valueOf(request.getEffectiveFrom());
+       Date effectiveTo =  Date.valueOf(request.getEffectiveTo());
+       
+       
+        return scheduleRepo.findOverlappingSchedules(
+            request.getBarberId(),
+            request.getDayOfWeek(),
+            request.getStartTime(),
+            request.getEndTime(),
+            effectiveFrom,
+            effectiveTo
+            ).size() > 0;
+    }
+
 }
+
+/*
+    ;
+    ;
+    public List<ScheduleResponseDTO> createTemplateSchedule(ScheduleTemplateRequestDTO request);
+    public List<ScheduleResponseDTO> createBulkSchedule(BulkScheduleRequestDTO request);
+    public List<ScheduleResponseDTO> resolveConflicts(Long barberId, LocalDate date);
+    public List<ScheduleResponseDTO> getBarberScheduleForDate(Long barberId, LocalDate date);
+    public List<ScheduleResponseDTO> getAllSchedule(); */

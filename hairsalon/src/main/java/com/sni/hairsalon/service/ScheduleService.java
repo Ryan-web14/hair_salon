@@ -17,5 +17,6 @@ public interface ScheduleService {
     public List<ScheduleResponseDTO> createBulkSchedule(BulkScheduleRequestDTO request);
     public List<ScheduleResponseDTO> resolveConflicts(Long barberId, LocalDate date);
     public List<ScheduleResponseDTO> getBarberScheduleForDate(Long barberId, LocalDate date);
-    public List<ScheduleResponseDTO> getAllSchedule();
+    public List<ScheduleResponseDTO> getCurrentSchedule(LocalDate date);
+    
 }
