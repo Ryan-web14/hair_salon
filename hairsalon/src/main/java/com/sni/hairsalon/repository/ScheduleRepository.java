@@ -77,9 +77,6 @@ List<Schedule> findCurrentSchedulesForBaber(
     @Param("barberId") Long barberId, 
     @Param("date") LocalDate date
 );
-    Void deleteById(long id);
-    Void deleteAll();
-
 }
 
 //Jsql
