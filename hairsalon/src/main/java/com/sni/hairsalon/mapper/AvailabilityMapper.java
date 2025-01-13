@@ -3,7 +3,7 @@ package com.sni.hairsalon.mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.sni.hairsalon.dto.request.AvailabilitRequestDTO;
+import com.sni.hairsalon.dto.request.AvailabilityRequestDTO;
 import com.sni.hairsalon.dto.response.AvailabilityResponseDTO;
 import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.model.Availability;
@@ -16,7 +16,7 @@ public class AvailabilityMapper {
     @Autowired
     BarberRepository barberRepo;
 
-    public Availability toEntity(AvailabilitRequestDTO dto){
+    public Availability toEntity(AvailabilityRequestDTO dto){
         Barber barber = barberRepo.findBarberById(dto.getBarberId())
         .orElseThrow(()-> new ResourceNotFoundException("Barber not found"));
         Availability availability = new Availability();

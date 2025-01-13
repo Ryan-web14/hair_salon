@@ -57,6 +57,8 @@ public class AuthentificationServiceImpl implements AuthentificationService{
         return new AuthResponse(createdSession.getToken(), userDto.getEmail(),userDto.getRole());
     }
 
+    
+
     @Override
     public void logout(String token) {
         sessionService.invalidateSession(token);

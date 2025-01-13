@@ -1,7 +1,8 @@
 package com.sni.hairsalon.model;
 
 import java.util.Collection;
-import java.util.Collections;
+
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,7 +20,7 @@ public class UserPrincipal implements UserDetails {
    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Convert role to Spring Security authority
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
     }
     
     @Override

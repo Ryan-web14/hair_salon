@@ -2,15 +2,16 @@ package com.sni.hairsalon.service.serviceImpl;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
 
 import org.springframework.stereotype.Service;
 
 import com.sni.hairsalon.dto.request.ScheduleRequestDTO;
-import com.sni.hairsalon.dto.response.BarberResponseDTO;
+import com.sni.hairsalon.dto.request.ScheduleTemplateRequestDTO;
 import com.sni.hairsalon.dto.response.ScheduleResponseDTO;
 import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.mapper.ScheduleMapper;
@@ -93,7 +94,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<ScheduleResponseDTO> getCurrentSchedule(LocalDate date){
+    public List<ScheduleResponseDTO> getAllCurrentSchedule(LocalDate date){
         
         List<Schedule> schedules = scheduleRepo.findCurrentSchedules(date);
         return schedules
@@ -102,6 +103,71 @@ public class ScheduleServiceImpl implements ScheduleService {
         .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ScheduleResponseDTO> createTemplateSchedule(ScheduleTemplateRequestDTO request){
+
+        Barber barber = barberRepo.findById(request.getBarberId())
+        .orElseThrow(()-> new ResourceNotFoundException("Barber not found"));
+
+        LocalTime startTime = request.getStartTime();
+        LocalTime endTime = request.getEndTime();
+        List<Schedule> schedules = new ArrayList<>();
+
+        for(Integer dayOfWeek : request.getWorkingDays()){
+            Schedule schedule = Schedule.builder()
+            .barber(barber)
+            .dayOfWeek(dayOfWeek)
+            .startTime(LocalDateTime.of(request.getEffectiveFrom(), startTime))
+            .endTime(LocalDateTime.of(request.getEffectiveFrom(), endTime))
+            .is_recurring(true)
+            .effectiveFrom(Date.valueOf(request.getEffectiveFrom()))
+            .effectiveTo(Date.valueOf(request.getEffectiveTo()))
+            .build();
+
+            schedules.add(schedule);
+        }
+
+        scheduleRepo.saveAll(schedules);
+
+        return schedules.stream()
+        .map(schedule->mapper.toDto(schedule))
+        .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ScheduleResponseDTO> getBarberScheduleForDate(Long barberId, LocalDate date){
+
+        Barber barber = barberRepo.findById(barberId)
+        .orElseThrow(()-> new ResourceNotFoundException("Barber not found"));
+
+        List<Schedule> specificSchedule = scheduleRepo.findNonRecurringSchedules(barber.getId(), date);
+
+        if(!specificSchedule.isEmpty()){
+            return specificSchedule
+            .stream()
+            .map(schedule->mapper.toDto(schedule))
+            .collect(Collectors.toList());
+        }
+
+        return scheduleRepo.findRecurringSchedules(barberId, date.getDayOfWeek().getValue(), date)
+        .stream()
+        .map(schedule->mapper.toDto(schedule))
+        .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ScheduleResponseDTO> getBarBerTodayCurrentSchedule(long barberId){
+        
+        Barber barber = barberRepo.findById(barberId)
+        .orElseThrow(()-> new ResourceNotFoundException("Barber not found"));
+
+        List<Schedule> barberSchedule = scheduleRepo.findCurrentSchedulesForBaber(barber.getId(), LocalDate.now());
+
+        return barberSchedule.stream()
+        .map(schedule->mapper.toDto(schedule))
+        .collect(Collectors.toList());
+
+    }
 
 
     private void validateTimeRange(LocalDateTime startTime, LocalDateTime endTime){
@@ -133,7 +199,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 /*
     ;
     ;
-    public List<ScheduleResponseDTO> createTemplateSchedule(ScheduleTemplateRequestDTO request);
+    
     public List<ScheduleResponseDTO> createBulkSchedule(BulkScheduleRequestDTO request);
     public List<ScheduleResponseDTO> resolveConflicts(Long barberId, LocalDate date);
     public List<ScheduleResponseDTO> getBarberScheduleForDate(Long barberId, LocalDate date);

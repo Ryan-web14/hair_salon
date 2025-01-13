@@ -18,9 +18,9 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long > {
     List<Schedule> findByBarberId(long id);
     List<Schedule> findByDayOfWeek(DayOfWeek dayOfWeek);
 
-    @Query("select s from Schedule s where s.barber_id = :barberId" +
-    "and day_of_week = :dayOfWeek" +
-    "and s.effectiveFrom <= :date"+
+    @Query("select s from Schedule s where s.barber.id = :barberId " +
+    "and s.dayOfWeek = :dayOfWeek " +
+    "and s.effectiveFrom <= :date "+
     "and s.effectiveTo>= :date" )
      List<Schedule> findActiveSchedulesByBarberAndDay(
         @Param("barberId") Long barberId,
@@ -33,7 +33,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long > {
     "AND s.effectiveTo>= :date")
     List<Schedule> findActiveRecurringSchedules(@Param("date") Date date);  
 
-    @Query("select s from Schedule s where s.barber_id = :barberId " +
+    @Query("select s from Schedule s where s.barber.id = :barberId " +
     "AND s.effectiveTo>= :currentDate")
     List<Schedule> findFutureSchedules(
     @Param("barberId") Long barberId,
@@ -69,17 +69,45 @@ List<Schedule> findOverlappingSchedules(
  @Param("effectiveTo") Date effectiveTo
 );
 
-    @Query("SELECT s FROM Schedule s WHERE :date BETWEEN s.effectiveFrom AND s.effectiveTo")
-    List<Schedule> findCurrentSchedules(@Param("date") LocalDate date);
+@Query("SELECT s FROM Schedule s WHERE :date BETWEEN s.effectiveFrom AND s.effectiveTo")
+List<Schedule> findCurrentSchedules(@Param("date") LocalDate date);    
 
     @Query("SELECT s FROM Schedule s WHERE s.barber.id = :barberId AND :date BETWEEN s.effectiveFrom AND s.effectiveTo")
 List<Schedule> findCurrentSchedulesForBaber(
     @Param("barberId") Long barberId, 
     @Param("date") LocalDate date
 );
+
+@Query("SELECT s FROM Schedule s WHERE s.barber.id = :barberId " +
+       "AND ((:date BETWEEN s.effectiveFrom AND s.effectiveTo) " +
+       "AND (s.dayOfWeek = :dayOfWeek OR s.is_recurring = true))")
+List<Schedule> findConflictingSchedules(
+    @Param("barberId") Long barberId,
+    @Param("date") LocalDate date
+);
+
+@Query("SELECT s FROM Schedule s WHERE s.barber.id = :barberId " +
+       "AND s.is_recurring = false " +
+       "AND :date BETWEEN s.effectiveFrom AND s.effectiveTo")
+List<Schedule> findNonRecurringSchedules(
+    @Param("barberId") Long barberId,
+    @Param("date") LocalDate date
+);
+
+@Query("SELECT s FROM Schedule s WHERE s.barber.id = :barberId " +
+       "AND s.is_recurring = true " +
+       "AND s.dayOfWeek = :dayOfWeek " +
+       "AND :date BETWEEN s.effectiveFrom AND s.effectiveTo")
+List<Schedule> findRecurringSchedules(
+    @Param("barberId") Long barberId,
+    @Param("dayOfWeek") int dayOfWeek,
+    @Param("date") LocalDate date
+);
+
+
 }
 
-//Jsql
+
   /*@Repository 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {    
     List<Schedule> findByBarberId(long id);

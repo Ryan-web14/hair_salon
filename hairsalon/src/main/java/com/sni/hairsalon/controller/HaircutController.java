@@ -27,14 +27,14 @@ public class HaircutController {
     
     private final HaircutService haircutService;
 
-    @PostMapping("/create-resource")
+    @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HaircutResponseDTO> createHaircut(@RequestBody HaircutRequestDTO dto){
         return ResponseEntity.status(HttpStatus.CREATED)
         .body(haircutService.createHaircut(dto));
     }
 
-    @PutMapping("update-resource/{id}")
+    @PutMapping("/{id}/update")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HaircutResponseDTO> updateHaircut(@PathVariable Long id, @RequestBody HaircutRequestDTO dto){
         return ResponseEntity.ok(haircutService.updateHaircut(id, dto));
@@ -45,7 +45,7 @@ public class HaircutController {
         return ResponseEntity.ok(haircutService.getAllHaircut());
     }
     
-    @DeleteMapping("/delete-resource/{id}")
+    @DeleteMapping("/{id}/delete")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteHaircut(@PathVariable Long id){
         haircutService.deleteHaircut(id);

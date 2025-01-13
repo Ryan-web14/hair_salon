@@ -2,9 +2,7 @@ package com.sni.hairsalon.repository;
 
 import java.sql.Date;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +35,7 @@ public interface BarberRepository extends JpaRepository<Barber, Long>{
         AND s.is_recurring = true 
         AND s.effectiveFrom <= :date 
         AND s.effectiveTo >= :date 
-        AND a.is_available = true 
+        AND a.isAvailable = true 
         AND a.startTime <= :time 
         AND a.endTime >= :time
     """)
@@ -59,7 +57,7 @@ public interface BarberRepository extends JpaRepository<Barber, Long>{
         AND s.is_recurring = true 
         AND s.effectiveFrom <= :date 
         AND s.effectiveTo >= :date 
-        AND a.is_available = true 
+        AND a.isAvailable = true 
         AND a.startTime <= :time 
         AND a.endTime >= :time
     """)
@@ -81,7 +79,7 @@ public interface BarberRepository extends JpaRepository<Barber, Long>{
         AND s.is_recurring = true 
         AND s.effectiveFrom <= :date 
         AND s.effectiveTo >= :date 
-        AND a.is_available = true 
+        AND a.isAvailable = true 
         AND a.startTime <= :endTime 
         AND a.endTime >= :startTime
     """)

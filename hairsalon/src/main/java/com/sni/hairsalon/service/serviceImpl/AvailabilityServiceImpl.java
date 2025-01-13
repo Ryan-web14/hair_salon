@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.sni.hairsalon.dto.request.AvailabilitRequestDTO;
+import com.sni.hairsalon.dto.request.AvailabilityRequestDTO;
 import com.sni.hairsalon.dto.response.AvailabilityResponseDTO;
 import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.mapper.AvailabilityMapper;
@@ -32,7 +32,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     private final AvailabilityMapper mapper;
 
     @Override
-    public List<AvailabilityResponseDTO> createAvailability(AvailabilitRequestDTO dto){
+    public List<AvailabilityResponseDTO> createAvailability(AvailabilityRequestDTO dto){
         log.debug("Creating availability slots for baber id {]", dto.getBarberId());
 
         Barber barber = barberRepo.findById(dto.getBarberId())
@@ -57,6 +57,25 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         return mapper.toDto(updatedavailability);
     }
 
+        @Override
+        public List<AvailabilityResponseDTO>getBarberAvailability(long barberId, LocalDate date) {
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+        
+        List<Availability> slots = availabilityRepo
+            .findByBarberIdAndStartTimeBetweenAndIsAvailableTrue(
+                barberId, 
+                startOfDay, 
+                endOfDay
+            );
+
+        return slots
+        .stream()
+        .map(availability->mapper.toDto(availability))
+        .collect(Collectors.toList());
+    }
+
+    
     private List<Availability> generateTimeSlot(Barber barber, 
     LocalDateTime startTime, LocalDateTime endTime){
         List<Availability> slots = new ArrayList<>();
@@ -76,22 +95,5 @@ public class AvailabilityServiceImpl implements AvailabilityService {
             currentSlotStart = currentSlotStart.plusMinutes(30);
         }
         return slots;
-    }
-        @Override
-        public List<AvailabilityResponseDTO>getBarberAvailability(long barberId, LocalDate date) {
-        LocalDateTime startOfDay = date.atStartOfDay();
-        LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
-        
-        List<Availability> slots = availabilityRepo
-            .findByBarberIdAndStartTimeBetweenAndIsAvailableTrue(
-                barberId, 
-                startOfDay, 
-                endOfDay
-            );
-
-        return slots
-        .stream()
-        .map(availability->mapper.toDto(availability))
-        .collect(Collectors.toList());
     }
 }
