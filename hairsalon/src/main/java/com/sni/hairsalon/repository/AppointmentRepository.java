@@ -1,5 +1,6 @@
 package com.sni.hairsalon.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -24,4 +25,13 @@ public interface AppointmentRepository extends JpaRepository<Appointment,Long> {
 
     @Query("select a from Appointment a where a.barber.id = :barberId")
     List<Appointment> findAppointmentByBarberId(@Param("barberId") long barberId);
+
+      @Query("SELECT a FROM Appointment a WHERE a.barber.id = :barberId " +
+           "AND DATE(a.appointmentTime) = :date " +
+           "AND a.status = :status")
+    List<Appointment> findByBarberAndDate(
+        @Param("barberId") Long barberId,
+        @Param("date") LocalDate date,
+        @Param("status") int status
+    );
 }

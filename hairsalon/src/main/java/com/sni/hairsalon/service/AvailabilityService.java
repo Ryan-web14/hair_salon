@@ -1,6 +1,7 @@
 package com.sni.hairsalon.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.sni.hairsalon.dto.request.AvailabilityRequestDTO;
@@ -10,5 +11,6 @@ public interface AvailabilityService {
     public List<AvailabilityResponseDTO> createAvailability(AvailabilityRequestDTO request);
     public AvailabilityResponseDTO updateAvailabilityStatus(long id, boolean status);
     public List<AvailabilityResponseDTO>getBarberAvailability(long barberId, LocalDate date);
+    public Boolean isAvailableSlot(long id, LocalDateTime appointmentTime);
 }
 

@@ -1,7 +1,9 @@
 package com.sni.hairsalon.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,6 +26,11 @@ public interface AvailabilityRepository extends JpaRepository<Availability,Long>
     @Query("select a from Availability a where a.barber.id = :baberId")
     List<Availability> findAvailabilityByBarberId(@Param("barberId") long barberId);
 
-
-    
+    @Query("Select a from Availability a where a.barber.id = :barberId " +
+    "and a.startTime = :startTime "+
+    "and a.endTime = :endTime")
+    Optional<Availability> findByStartAndEndTimeAndBarber(
+        @Param("barberId") long barberId,
+        @Param("startTime") LocalDateTime starTime,
+        @Param("endTime") LocalDateTime endTime);
 }

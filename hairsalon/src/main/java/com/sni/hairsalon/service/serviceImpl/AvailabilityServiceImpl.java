@@ -75,6 +75,12 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         .collect(Collectors.toList());
     }
 
+    @Override
+    public Boolean isAvailableSlot(long id, LocalDateTime appointmentTime){
+        
+    }
+
+
     
     private List<Availability> generateTimeSlot(Barber barber, 
     LocalDateTime startTime, LocalDateTime endTime){

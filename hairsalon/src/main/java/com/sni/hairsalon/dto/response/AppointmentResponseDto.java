@@ -7,14 +7,16 @@ import lombok.Data;
 
  @Data
  @Builder
-public class AppointmentResponseDto {
+public class AppointmentResponseDTO {
     private Long id;
     private long clientId;
     private String clientLastname;
     private String clientFirstname;
+    private String clientEmail;
     private long barberId;
     private String barberLastname;
     private String barberFirstname;
+    private String barberEmail;
    private LocalDateTime appointmentTime;
     private LocalDateTime bookedTime;
     private String haircutType;

@@ -10,6 +10,7 @@ import java.time.LocalDate;
 
 import org.springframework.stereotype.Service;
 
+import com.sni.hairsalon.dto.request.AvailabilityRequestDTO;
 import com.sni.hairsalon.dto.request.ScheduleRequestDTO;
 import com.sni.hairsalon.dto.request.ScheduleTemplateRequestDTO;
 import com.sni.hairsalon.dto.response.ScheduleResponseDTO;
@@ -30,6 +31,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepo;
     private final BarberRepository barberRepo;
     private final ScheduleMapper mapper;
+    private final AvailabilityServiceImpl availabilityService;
 
     @Override
     public ScheduleResponseDTO createSchedule(ScheduleRequestDTO request){
@@ -42,6 +44,15 @@ public class ScheduleServiceImpl implements ScheduleService {
         if(hasAnyOverlappingSchedule(request)){
             throw new IllegalStateException("Schedule overlap with another");
         }
+
+        AvailabilityRequestDTO dto = AvailabilityRequestDTO.builder()
+        .barberId(request.getBarberId())
+        .starTime(request.getStartTime())
+        .endTime(request.getEndTime())
+        .isAvailable(true)
+        .build();
+
+        availabilityService.createAvailability(dto);
 
         Schedule schedule =  Schedule.builder()
         .barber(barber)
@@ -135,12 +146,12 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<ScheduleResponseDTO> getBarberScheduleForDate(Long barberId, LocalDate date){
+    public ScheduleResponseDTO getBarberScheduleForDate(Long barberId, LocalDate date){
 
         Barber barber = barberRepo.findById(barberId)
         .orElseThrow(()-> new ResourceNotFoundException("Barber not found"));
 
-        List<Schedule> specificSchedule = scheduleRepo.findNonRecurringSchedules(barber.getId(), date);
+        /*List<Schedule> specificSchedule = scheduleRepo.findNonRecurringSchedules(barber.getId(), date);
 
         if(!specificSchedule.isEmpty()){
             return specificSchedule
@@ -148,11 +159,10 @@ public class ScheduleServiceImpl implements ScheduleService {
             .map(schedule->mapper.toDto(schedule))
             .collect(Collectors.toList());
         }
-
-        return scheduleRepo.findRecurringSchedules(barberId, date.getDayOfWeek().getValue(), date)
-        .stream()
-        .map(schedule->mapper.toDto(schedule))
-        .collect(Collectors.toList());
+*/
+        return mapper.toDto(
+            scheduleRepo.findRecurringSchedules(barber.getId(), date.getDayOfWeek().getValue(), 
+            date));
     }
 
     @Override

@@ -5,6 +5,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,7 +23,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long > {
     "and s.dayOfWeek = :dayOfWeek " +
     "and s.effectiveFrom <= :date "+
     "and s.effectiveTo>= :date" )
-     List<Schedule> findActiveSchedulesByBarberAndDay(
+     Optional<List<Schedule>> findActiveSchedulesByBarberAndDay(
         @Param("barberId") Long barberId,
         @Param("dayOfWeek") DayOfWeek dayOfWeek,
         @Param("date") Date date
@@ -98,7 +99,7 @@ List<Schedule> findNonRecurringSchedules(
        "AND s.is_recurring = true " +
        "AND s.dayOfWeek = :dayOfWeek " +
        "AND :date BETWEEN s.effectiveFrom AND s.effectiveTo")
-List<Schedule> findRecurringSchedules(
+Schedule findRecurringSchedules(
     @Param("barberId") Long barberId,
     @Param("dayOfWeek") int dayOfWeek,
     @Param("date") LocalDate date

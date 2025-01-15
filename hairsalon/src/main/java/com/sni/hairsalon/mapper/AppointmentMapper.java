@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.sni.hairsalon.dto.request.AppointmentRequestDTO;
-import com.sni.hairsalon.dto.response.AppointmentResponseDto;
+import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
 import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.model.Appointment;
 import com.sni.hairsalon.model.Client;
@@ -30,11 +30,11 @@ public class AppointmentMapper {
     private HaircutRepository haircutRepo;
 
     public Appointment toEntity(AppointmentRequestDTO request){
-        Client client = clientRepo.findById(request.getIdClient())
+        Client client = clientRepo.findById(request.getClientId())
         .orElseThrow(()-> new ResourceNotFoundException("client not found"));
-        Barber barber = barberRepo.findById(request.getIdBarber())
+        Barber barber = barberRepo.findById(request.getBarberId())
         .orElseThrow(()-> new ResourceNotFoundException("barber not found"));
-        Haircut haircut = haircutRepo.findHaircutById(request.getIdHaircut())
+        Haircut haircut = haircutRepo.findHaircutById(request.getHaircutId())
         .orElseThrow(()-> new ResourceNotFoundException("haircut not found")); 
         Appointment appointment = Appointment.builder()
         .client(client)
@@ -47,15 +47,17 @@ public class AppointmentMapper {
         return appointment;
     }
 
-    public AppointmentResponseDto toDto(Appointment appointment){
-        AppointmentResponseDto dto = AppointmentResponseDto.builder()
+    public AppointmentResponseDTO toDto(Appointment appointment){
+        AppointmentResponseDTO dto = AppointmentResponseDTO.builder()
         .id(appointment.getId())
         .clientId(appointment.getClient().getId())
         .clientFirstname(appointment.getClient().getFirstname())
         .clientFirstname(appointment.getClient().getLastname())
+        .clientEmail(appointment.getClient().getUser().getEmail())
         .barberId(appointment.getBarber().getId())
         .barberFirstname(appointment.getBarber().getFirstname())
         .barberFirstname(appointment.getBarber().getLastname())
+        .barberEmail(appointment.getBarber().getUser().getEmail())
         .appointmentTime(appointment.getAppointmentTime())
         .bookedTime(appointment.getBookedTime())
         .haircutType(appointment.getHaircut().getType())

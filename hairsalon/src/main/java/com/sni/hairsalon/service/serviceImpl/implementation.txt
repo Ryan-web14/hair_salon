@@ -1,0 +1,221 @@
+@Service
+@Slf4j
+@Transactional
+public class AppointmentService {
+
+   public AppointmentResponseDTO cancelAppointment(Long appointmentId, Long clientId) {
+       log.debug("Attempting to cancel appointment {} for client {}", appointmentId, clientId);
+
+       // Find appointment and verify it exists
+       Appointment appointment = appointmentRepository.findById(appointmentId)
+           .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+
+       // Verify it's the client's appointment
+       if (!appointment.getClient().getId().equals(clientId)) {
+           log.warn("Client {} attempted to cancel appointment {} belonging to client {}", 
+               clientId, appointmentId, appointment.getClient().getId());
+           throw new UnauthorizedAccessException("You can only cancel your own appointments");
+       }
+
+       // Verify appointment hasn't already happened
+       if (appointment.getAppointmentTime().isBefore(LocalDateTime.now())) {
+           log.warn("Client {} attempted to cancel past appointment {}", clientId, appointmentId);
+           throw new IllegalStateException("Cannot cancel past appointments");
+       }
+
+       // Update status
+       appointment.setStatus(AppointmentStatus.CANCELLED.getValue());
+       Appointment cancelledAppointment = appointmentRepository.save(appointment);
+
+       // Send cancellation confirmation email
+       emailService.sendCancellationConfirmation(
+           appointment.getClient().getEmail(), 
+           appointment
+       );
+
+       // Notify barber
+       emailService.sendCancellationNotificationToBarber(
+           appointment.getBarber().getEmail(),
+           appointment
+       );
+
+       log.info("Successfully cancelled appointment {} for client {}", appointmentId, clientId);
+       return toDTO(cancelledAppointment);
+   }
+}
+
+// Custom exception
+public class UnauthorizedAccessException extends RuntimeException {
+   public UnauthorizedAccessException(String message) {
+       super(message);
+   }
+}
+
+// Email service addition
+@Component
+public class EmailService {
+   public void sendCancellationConfirmation(String to, Appointment appointment) {
+       String subject = "Appointment Cancellation Confirmation";
+       String text = String.format("""
+           Dear %s,
+           
+           Your appointment has been cancelled:
+           
+           Date: %s
+           Time: %s
+           Barber: %s
+           Service: %s
+           
+           If you would like to reschedule, please book a new appointment.
+           
+           Thank you for letting us know!
+           """,
+           appointment.getClient().getName(),
+           appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy")),
+           appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+           appointment.getBarber().getName(),
+           appointment.getHaircut().getName()
+       );
+       
+       sendEmail(to, subject, text);
+   }
+
+   public void sendCancellationNotificationToBarber(String to, Appointment appointment) {
+       String subject = "Appointment Cancellation Notice";
+       String text = String.format("""
+           The following appointment has been cancelled:
+           
+           Date: %s
+           Time: %s
+           Client: %s
+           Service: %s
+           
+           Your schedule has been updated accordingly.
+           """,
+           appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy")),
+           appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+           appointment.getClient().getName(),
+           appointment.getHaircut().getName()
+       );
+       
+       sendEmail(to, subject, text);
+   }
+}
+
+
+
+    @Scheduled(fixedRate = 300000) // Run every 5 minutes
+    public void monitorAppointments() {
+        LocalDateTime now = LocalDateTime.now();
+        List<Appointment> todaysAppointments = appointmentRepository
+            .findByAppointmentTimeBetweenAndStatus(
+                now.with(LocalTime.MIN),
+                now.with(LocalTime.MAX),
+                AppointmentStatus.CONFIRMED.getValue()
+            );
+
+        for (Appointment appointment : todaysAppointments) {
+            checkAppointmentTime(appointment, now);
+        }
+    }
+
+    private void checkAppointmentTime(Appointment appointment, LocalDateTime now) {
+        LocalDateTime appointmentTime = appointment.getAppointmentTime();
+        Duration difference = Duration.between(appointmentTime, now);
+        long minutesLate = difference.toMinutes();
+
+        if (minutesLate >= 5 && minutesLate < 10) {
+            // First reminder after 5 minutes
+            emailService.sendFirstReminder(appointment.getClient().getEmail(), appointment);
+            log.info("Sent first reminder for appointment: {}", appointment.getId());
+        } 
+        else if (minutesLate >= 10 && minutesLate < 15) {
+            // Second reminder after 10 minutes
+            emailService.sendSecondReminder(appointment.getClient().getEmail(), appointment);
+            log.info("Sent second reminder for appointment: {}", appointment.getId());
+        } 
+        else if (minutesLate >= 15) {
+            // Cancel appointment after 15 minutes
+            appointment.setStatus(AppointmentStatus.NO_SHOW.getValue());
+            appointmentRepository.save(appointment);
+            emailService.sendCancellationNotice(appointment.getClient().getEmail(), appointment);
+            log.info("Appointment {} marked as no-show", appointment.getId());
+        }
+    }
+
+    // Example email templates
+    @Component
+    public class EmailService {
+        @Autowired
+        private JavaMailSender emailSender;
+
+        public void sendFirstReminder(String to, Appointment appointment) {
+            String subject = "Appointment Reminder";
+            String text = String.format(
+                "Your appointment was scheduled for %s (5 minutes ago). " +
+                "Please arrive as soon as possible or contact us if you're running late.",
+                appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+            );
+            sendEmail(to, subject, text);
+        }
+
+        public void sendSecondReminder(String to, Appointment appointment) {
+            String subject = "Urgent Appointment Reminder";
+            String text = String.format(
+                "Your appointment was scheduled for %s (10 minutes ago). " +
+                "Please note that appointments will be cancelled after 15 minutes.",
+                appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+            );
+            sendEmail(to, subject, text);
+        }
+
+        public void sendCancellationNotice(String to, Appointment appointment) {
+            String subject = "Appointment Cancelled";
+            String text = String.format(
+                "Your appointment scheduled for %s has been cancelled due to late arrival. " +
+                "Please contact us to reschedule.",
+                appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+            );
+            sendEmail(to, subject, text);
+        }
+
+        private void sendEmail(String to, String subject, String text) {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(to);
+            message.setSubject(subject);
+            message.setText(text);
+            emailSender.send(message);
+        }
+    }
+
+
+    public void sendBarberDailySchedule(String barberEmail, List<Appointment> appointments) {
+        String subject = "Your Schedule for " + 
+            LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d"));
+
+        StringBuilder schedule = new StringBuilder();
+        schedule.append("Here is your schedule for today:\n\n");
+
+        appointments.stream()
+            .sorted(Comparator.comparing(Appointment::getAppointmentTime))
+            .forEach(apt -> {
+                schedule.append(String.format("""
+                    %s - %s
+                    Client: %s
+                    Service: %s
+                    Duration: %d minutes
+                    
+                    """,
+                    apt.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    apt.getAppointmentTime().plusMinutes(apt.getHaircut().getDuration())
+                        .format(DateTimeFormatter.ofPattern("HH:mm")),
+                    apt.getClient().getName(),
+                    apt.getHaircut().getName(),
+                    apt.getHaircut().getDuration()
+                ));
+            });
+
+        schedule.append("\nHave a great day!");
+        
+        sendEmail(barberEmail, subject, schedule.toString());
+    }
