@@ -6,6 +6,8 @@ import com.sni.hairsalon.annotation.IdGeneration;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -26,7 +28,7 @@ import lombok.NoArgsConstructor;
 public class Availability{
 
     @Id
-    @IdGeneration
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "availability_id")
     private long id;
 
@@ -45,7 +47,7 @@ public class Availability{
     @Column(name = "is_available", nullable = false)
     private boolean isAvailable;
 
-    @Column(name = "note")
+    @Column(name = "note", nullable = true)
     private String note;
     
 

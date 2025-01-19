@@ -11,12 +11,9 @@ import lombok.Data;
 @Data
 @AllArgsConstructor(staticName = "create")
 public class AppointmentRequestDTO {
-    private long id;
     private long clientId;
     private long barberId; 
     private long haircutId;
     private LocalDateTime appointmentTime;
     private Status status = Status.PENDING;
-    //private LocalDateTime bookedTime;
-
 }

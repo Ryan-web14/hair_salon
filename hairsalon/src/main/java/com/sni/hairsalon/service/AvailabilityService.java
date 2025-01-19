@@ -11,6 +11,7 @@ public interface AvailabilityService {
     public List<AvailabilityResponseDTO> createAvailability(AvailabilityRequestDTO request);
     public AvailabilityResponseDTO updateAvailabilityStatus(long id, boolean status);
     public List<AvailabilityResponseDTO>getBarberAvailability(long barberId, LocalDate date);
-    public Boolean isAvailableSlot(long id, LocalDateTime appointmentTime);
+    public Boolean isAvailableSlot(long id, LocalDateTime startTime, int duration);
+    public void makeSlotUnavailable(long barberId, LocalDateTime startTime, int duration);
 }
 

@@ -59,7 +59,6 @@ public class AppointmentMapper {
         .barberFirstname(appointment.getBarber().getLastname())
         .barberEmail(appointment.getBarber().getUser().getEmail())
         .appointmentTime(appointment.getAppointmentTime())
-        .bookedTime(appointment.getBookedTime())
         .haircutType(appointment.getHaircut().getType())
         .price(appointment.getHaircut().getPrice())
         .status(Status.toEnum(appointment.getStatus()).name())

@@ -4,8 +4,6 @@ import java.util.List;
 
 import com.sni.hairsalon.dto.request.AppointmentRequestDTO;
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
-import com.sni.hairsalon.model.Status;
-
 public interface AppointmentService {
     
     public AppointmentResponseDTO createAppointment(AppointmentRequestDTO request);
@@ -15,5 +13,5 @@ public interface AppointmentService {
     public List<AppointmentResponseDTO> getAllBarberAppointment();
     public List<AppointmentResponseDTO> getBarberAppointment(long barberId);
     public List<AppointmentResponseDTO> getClientAppointment(long clientId);*/
-    
+        
 }

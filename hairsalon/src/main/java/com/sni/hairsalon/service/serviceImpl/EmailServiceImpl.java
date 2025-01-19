@@ -3,6 +3,7 @@ package com.sni.hairsalon.service.serviceImpl;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.CompletableFuture;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -20,6 +21,9 @@ public class EmailServiceImpl implements EmailService{
     
     private final JavaMailSender mailSender;
     
+    @Value("${spring.mail.username}")
+    private String fromEmail;
+    
     @Override
     @Async
     public CompletableFuture<Boolean> sendAppointmentConfirmation(String to, AppointmentResponseDTO appointment ){
@@ -32,14 +36,19 @@ public class EmailServiceImpl implements EmailService{
         
         Date: %s
 
-        Heure: %
+        Heure: %s
+
+        Barbier: %s
+
+        ID de rendez-vous: %s
 
         Merci de nous faire confiance à très bientôt !
                 """,
                 appointment.getClientFirstname(),
                 appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("d MMMM yyyy ")),
-                appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm"))
-      
+                appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                appointment.getBarberFirstname(),
+                appointment.getId()
         );
         
         return sendEmail(appointment.getClientEmail(),
@@ -48,11 +57,11 @@ public class EmailServiceImpl implements EmailService{
     }
 
     @Async
-    private CompletableFuture<Boolean> sendEmail(String to, String subject, String body){
+    public CompletableFuture<Boolean> sendEmail(String to, String subject, String body){
 
         try{
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("contact@sni-cg.com");
+            message.setFrom(fromEmail);
             message.setTo(to);
             message.setSubject(subject);
             message.setText(body);
@@ -63,6 +72,7 @@ public class EmailServiceImpl implements EmailService{
             throw new RuntimeException("Failed to send mail");
         }
     }
+    
 
 }
 

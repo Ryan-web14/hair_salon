@@ -60,7 +60,7 @@ public class Appointment {
     
     @PrePersist
     protected void onCreate(){
-        appointmentTime = LocalDateTime.now();
+        this.bookedTime = LocalDateTime.now();
     }
    
   

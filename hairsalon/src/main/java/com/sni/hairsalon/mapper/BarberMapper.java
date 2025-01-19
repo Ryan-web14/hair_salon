@@ -25,7 +25,7 @@ public class BarberMapper {
         barber.setUser(user);
         barber.setFirstname(dto.getFirstname());
         barber.setLastname(dto.getLastname());
-        barber.setPhoneNumber(dto.getPhone());
+        barber.setPhoneNumber(Integer.parseInt(dto.getPhone()));
 
         if(dto.getDescription() != null){
             barber.setDescription(dto.getDescription());
@@ -55,7 +55,7 @@ public class BarberMapper {
           
         }
        
-        String phone = Integer.toString(barberRequest.getPhone()); 
+        String phone = barberRequest.getPhone(); 
         boolean verifiedPhone = ValidationUtils.isValidPhone(phone);
         if(!verifiedPhone || phone == null){
              throw new RuntimeException("Invalid phone number"+ phone);

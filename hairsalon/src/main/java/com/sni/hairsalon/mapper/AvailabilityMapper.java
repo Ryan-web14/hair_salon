@@ -40,6 +40,7 @@ public class AvailabilityMapper {
         dto.setLastName(entity.getBarber().getLastname());
         dto.setStarTime(entity.getStartTime());
         dto.setEndTime(entity.getEndTime());
+        dto.setAvailable(entity.isAvailable());
         
         if(entity.getNote() != null || !entity.getNote().isEmpty()){
             dto.setNote(entity.getNote());

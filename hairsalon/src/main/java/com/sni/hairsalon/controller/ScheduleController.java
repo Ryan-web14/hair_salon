@@ -55,16 +55,17 @@ public class ScheduleController {
 
     @PostMapping("/template")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-    public ResponseEntity<List<ScheduleResponseDTO>> createMultipleSchedules(ScheduleTemplateRequestDTO request){
+    public ResponseEntity<List<ScheduleResponseDTO>> createMultipleSchedules(
+        @RequestBody ScheduleTemplateRequestDTO request){
 
         return ResponseEntity.status(HttpStatus.CREATED)
         .body(scheduleService.createTemplateSchedule(request));
     }
 
-    @GetMapping("/{id}/barber")
+    @GetMapping("/specific-date/{id}/barber")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-    public ResponseEntity<List<ScheduleResponseDTO>> getBarberScheduleForDate(
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, Long barberId){
+    public ResponseEntity<ScheduleResponseDTO> getBarberScheduleForDate(
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,  @PathVariable Long barberId){
 
             return ResponseEntity.ok(scheduleService.getBarberScheduleForDate(barberId, date));
         }
@@ -79,7 +80,7 @@ public class ScheduleController {
 
     @GetMapping("/current/{id}/barber")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-    public ResponseEntity<List<ScheduleResponseDTO>> getTodayScheduleForBarber(Long barberId){
+    public ResponseEntity<List<ScheduleResponseDTO>> getTodayScheduleForBarber(@RequestParam  Long barberId){
         
         return ResponseEntity.ok(scheduleService.getBarBerTodayCurrentSchedule(barberId));
     }

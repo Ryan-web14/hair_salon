@@ -35,26 +35,32 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public ScheduleResponseDTO createSchedule(ScheduleRequestDTO request){
-       
         Barber barber = barberRepo.findById(request.getBarberId())
-        .orElseThrow(()-> new ResourceNotFoundException("Barber not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
 
-        validateTimeRange(request.getStartTime(), request.getEndTime());
+    validateTimeRange(request.getStartTime(), request.getEndTime());
 
-        if(hasAnyOverlappingSchedule(request)){
-            throw new IllegalStateException("Schedule overlap with another");
+    if (hasAnyOverlappingSchedule(request)) {
+        throw new IllegalStateException("Schedule overlap with another");
+    }
+
+
+    LocalDate currentDate = request.getEffectiveFrom();
+    while (!currentDate.isAfter(request.getEffectiveTo())) {
+        if (currentDate.getDayOfWeek().getValue() == request.getDayOfWeek()) {
+            AvailabilityRequestDTO dto = AvailabilityRequestDTO.builder()
+                .barberId(request.getBarberId())
+                .starTime(LocalDateTime.of(currentDate, request.getStartTime().toLocalTime()))
+                .endTime(LocalDateTime.of(currentDate, request.getEndTime().toLocalTime()))
+                .isAvailable(true)
+                .build();
+
+            availabilityService.createAvailability(dto);
         }
+        currentDate = currentDate.plusDays(1);
+    }
 
-        AvailabilityRequestDTO dto = AvailabilityRequestDTO.builder()
-        .barberId(request.getBarberId())
-        .starTime(request.getStartTime())
-        .endTime(request.getEndTime())
-        .isAvailable(true)
-        .build();
-
-        availabilityService.createAvailability(dto);
-
-        Schedule schedule =  Schedule.builder()
+    Schedule schedule = Schedule.builder()
         .barber(barber)
         .dayOfWeek(request.getDayOfWeek())
         .startTime(request.getStartTime())
@@ -63,10 +69,9 @@ public class ScheduleServiceImpl implements ScheduleService {
         .effectiveFrom(Date.valueOf(request.getEffectiveFrom()))
         .effectiveTo(Date.valueOf(request.getEffectiveTo()))
         .build();
-        
-        scheduleRepo.save(schedule);  
-        return mapper.toDto(schedule);
-    }
+
+    return mapper.toDto(scheduleRepo.save(schedule));
+}
 
     @Override
     public List<ScheduleResponseDTO> getBarberSchedule(long barberId){
