@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import com.sni.hairsalon.model.User;
 
-import jakarta.annotation.Nonnull;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>{

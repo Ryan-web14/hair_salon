@@ -1,8 +1,6 @@
 package com.sni.hairsalon.model;
 
 
-import java.util.List;
-
 import com.sni.hairsalon.annotation.IdGeneration;
 
 import jakarta.persistence.*;

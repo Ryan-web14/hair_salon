@@ -44,7 +44,7 @@ public class ClientMapper{
     
     }
 
-    public void validateField(ClientRequestDTO clientRequest){
+    private void validateField(ClientRequestDTO clientRequest){
         if(clientRequest.getFirstname().isEmpty() || clientRequest.getLastname().isEmpty()){
             throw new RuntimeException("Empty name");
         }   

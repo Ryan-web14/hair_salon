@@ -5,15 +5,17 @@ import java.time.LocalDateTime;
 
 import com.sni.hairsalon.model.Status;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor(staticName = "create")
+@Builder
 public class AppointmentRequestDTO {
     private long clientId;
     private long barberId; 
     private long haircutId;
     private LocalDateTime appointmentTime;
+    
+    @Builder.Default
     private Status status = Status.PENDING;
 }

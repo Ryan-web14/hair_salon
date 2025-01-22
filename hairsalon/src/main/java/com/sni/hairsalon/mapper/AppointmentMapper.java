@@ -2,7 +2,6 @@ package com.sni.hairsalon.mapper;
 
 import java.time.LocalDateTime;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.sni.hairsalon.dto.request.AppointmentRequestDTO;
@@ -17,17 +16,20 @@ import com.sni.hairsalon.repository.BarberRepository;
 import com.sni.hairsalon.repository.ClientRepository;
 import com.sni.hairsalon.repository.HaircutRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class AppointmentMapper {
 
-    @Autowired
-    private ClientRepository clientRepo;
+    
+    private final ClientRepository clientRepo;
 
-    @Autowired
-    private BarberRepository barberRepo;
+    
+    private final BarberRepository barberRepo;
 
-    @Autowired
-    private HaircutRepository haircutRepo;
+    
+    private final HaircutRepository haircutRepo;
 
     public Appointment toEntity(AppointmentRequestDTO request){
         Client client = clientRepo.findById(request.getClientId())

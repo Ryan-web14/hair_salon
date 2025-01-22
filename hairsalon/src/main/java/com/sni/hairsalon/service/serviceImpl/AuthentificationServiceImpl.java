@@ -10,11 +10,9 @@ import com.sni.hairsalon.dto.request.UserRequestDTO;
 import com.sni.hairsalon.dto.response.UserResponseDTO;    
 import com.sni.hairsalon.dto.response.AuthResponse;
 import com.sni.hairsalon.dto.response.SessionResponseDTO;
-import com.sni.hairsalon.exception.ResourceAlreadyExistException;
 import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.mapper.UserMapper;
 import com.sni.hairsalon.model.User;
-import com.sni.hairsalon.model.UserSession;
 import com.sni.hairsalon.repository.UserRepository;
 import com.sni.hairsalon.service.AuthentificationService;
 

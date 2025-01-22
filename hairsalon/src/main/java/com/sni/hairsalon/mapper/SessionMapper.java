@@ -3,7 +3,6 @@ package com.sni.hairsalon.mapper;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Component;
 
 import com.sni.hairsalon.dto.request.SessionRequestDTO;

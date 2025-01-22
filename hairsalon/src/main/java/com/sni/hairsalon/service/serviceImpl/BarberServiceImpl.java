@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 
 import com.sni.hairsalon.dto.request.BarberRequestDTO;
 import com.sni.hairsalon.dto.response.BarberResponseDTO;
-import com.sni.hairsalon.dto.response.UserResponseDTO;
 import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.mapper.BarberMapper;
 import com.sni.hairsalon.model.Barber;

@@ -5,8 +5,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import com.sni.hairsalon.dto.request.UserRequestDTO;
@@ -74,12 +72,12 @@ public class UserServiceImpl implements UserService{
      }
 
      @Override
-     public UserResponseDTO updateUser(long id, UserRequestDTO dto){
+     public UserResponseDTO updateUser(long id, String email){
         User user = userRepo.findUserById(id)
         .orElseThrow(()->new ResourceNotFoundException("user not found"));
         
-        if(ValidationUtils.isValidEmail(dto.getEmail())){
-            user.setEmail(dto.getEmail());
+        if(ValidationUtils.isValidEmail(email)){
+            user.setEmail(email);
         }
         userRepo.save(user);
         return userMapper.toDto(user);

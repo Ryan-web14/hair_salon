@@ -1,5 +1,7 @@
 package com.sni.hairsalon.mapper;
 
+import java.time.temporal.ChronoUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,8 +40,8 @@ public class AvailabilityMapper {
         dto.setBarberId(entity.getBarber().getId());
         dto.setFirstname(entity.getBarber().getFirstname());
         dto.setLastName(entity.getBarber().getLastname());
-        dto.setStarTime(entity.getStartTime());
-        dto.setEndTime(entity.getEndTime());
+        dto.setStarTime(entity.getStartTime().truncatedTo(ChronoUnit.MINUTES));
+        dto.setEndTime(entity.getEndTime().truncatedTo(ChronoUnit.MINUTES));
         dto.setAvailable(entity.isAvailable());
         
         if(entity.getNote() != null || !entity.getNote().isEmpty()){

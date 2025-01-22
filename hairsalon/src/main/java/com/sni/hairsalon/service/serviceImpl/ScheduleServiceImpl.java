@@ -3,6 +3,7 @@ package com.sni.hairsalon.service.serviceImpl;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,8 +51,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         if (currentDate.getDayOfWeek().getValue() == request.getDayOfWeek()) {
             AvailabilityRequestDTO dto = AvailabilityRequestDTO.builder()
                 .barberId(request.getBarberId())
-                .starTime(LocalDateTime.of(currentDate, request.getStartTime().toLocalTime()))
-                .endTime(LocalDateTime.of(currentDate, request.getEndTime().toLocalTime()))
+                .starTime(LocalDateTime.of(currentDate, request.getStartTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
+                .endTime(LocalDateTime.of(currentDate, request.getEndTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
                 .isAvailable(true)
                 .build();
 

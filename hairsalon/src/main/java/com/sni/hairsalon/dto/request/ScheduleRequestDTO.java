@@ -1,6 +1,5 @@
 package com.sni.hairsalon.dto.request;
 
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 

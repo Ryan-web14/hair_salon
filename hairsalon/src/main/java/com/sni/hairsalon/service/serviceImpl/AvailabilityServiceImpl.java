@@ -1,11 +1,11 @@
 package com.sni.hairsalon.service.serviceImpl;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -120,22 +120,77 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     private List<Availability> generateTimeSlot(Barber barber, 
     LocalDateTime startTime, LocalDateTime endTime){
         List<Availability> slots = new ArrayList<>();
-        LocalDateTime currentSlotStart = startTime;
+        LocalDateTime currentSlotStart = startTime.truncatedTo(ChronoUnit.MINUTES);
 
-        while(currentSlotStart.plusMinutes(30).isBefore(endTime) ||
-        currentSlotStart.plusMinutes(30).equals(endTime)){
-            Availability slot = Availability.builder()
-            .barber(barber)
-            .startTime(currentSlotStart)
-            .endTime(currentSlotStart.plusMinutes(30))
-            .isAvailable(true)
-            .note(" ")
-            .build();
-
-            slots.add(slot);
-            currentSlotStart = currentSlotStart.plusMinutes(30);
+        if (startTime == null || endTime == null || barber == null) {
+            throw new IllegalArgumentException("Start time, end time, and barber cannot be null");
         }
-        return slots;
+    
+        if (startTime.isAfter(endTime)) {
+            throw new IllegalArgumentException("Start time cannot be after end time");
+        }
+    
+        if (startTime.getHour() < 8 || endTime.getHour() > 20) {
+            throw new IllegalArgumentException("Slots must be within business hours (8AM-8PM)");
+        }
+    
+        // Validate minimum slot duration (30 minutes)
+        if (Duration.between(startTime, endTime).toMinutes() < 30) {
+            throw new IllegalArgumentException("Time range must be at least 30 minutes");
+        }
+
+        try {
+    
+            while(currentSlotStart.plusMinutes(30).isBefore(endTime) || 
+                  currentSlotStart.plusMinutes(30).equals(endTime)) {
+                
+                LocalDateTime slotStart = currentSlotStart;
+                LocalDateTime slotEnd = currentSlotStart.plusMinutes(30).truncatedTo(ChronoUnit.MINUTES);
+    
+                // Check for overlapping slots
+                boolean hasOverlap = slots.stream()
+                    .anyMatch(slot -> 
+                        !slot.getEndTime().isBefore(slotStart) && 
+                        !slot.getStartTime().isAfter(slotEnd));
+    
+                if (hasOverlap) {
+                    throw new IllegalStateException("Overlapping slots detected");
+                }
+
+                Availability slot = Availability.builder()
+                .barber(barber)
+                .startTime(slotStart)
+                .endTime(slotEnd)
+                .isAvailable(true)
+                .note(" ")
+                .build();
+    
+                slots.add(slot);
+                currentSlotStart = currentSlotStart.plusMinutes(30);
+
+            }
+         
+           return slots;
+        
+        }catch(Exception e ){
+            throw new RuntimeException("Failed to generate time slots", e);
+        }
     }
 
+
+    /* private void validateWorkingHours(LocalDateTime start, LocalDateTime end) {
+        int startHour = start.getHour();
+        int endHour = end.getHour();
+        
+        if (startHour < 8 || endHour > 20) {
+            throw new IllegalArgumentException("Slots must be within business hours (8AM-8PM)");
+        }
+    }
+
+    private void validateNoExistingSlots(Long barberId, LocalDateTime start, LocalDateTime end) {
+        boolean slotsExist = availabilityRepo.existsByBarberIdAndTimeRange(barberId, start, end);
+        if (slotsExist) {
+            throw new IllegalStateException("Slots already exist for this time range");
+        }
+    } */
 }

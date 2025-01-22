@@ -7,7 +7,7 @@ import com.sni.hairsalon.dto.response.UserResponseDTO;
 
 public interface UserService{
     UserResponseDTO createUser(UserRequestDTO dto);
-    UserResponseDTO updateUser(long id, UserRequestDTO dto);
+    UserResponseDTO updateUser(long id, String email);
     UserResponseDTO updatePassword(long id, String newPassword);
     UserResponseDTO getUserById(long id);
     List<UserResponseDTO> getAllUsers();

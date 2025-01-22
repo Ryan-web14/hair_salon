@@ -1,6 +1,5 @@
 package com.sni.hairsalon.dto.request;
 
-import com.sni.hairsalon.model.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

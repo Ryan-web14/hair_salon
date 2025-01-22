@@ -1,20 +1,23 @@
  package com.sni.hairsalon.service.serviceImpl;
 
-import java.io.ObjectInputFilter.Status;
-import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.sni.hairsalon.dto.request.AppointmentRequestDTO;
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
-import com.sni.hairsalon.dto.response.AvailabilityResponseDTO;
 import com.sni.hairsalon.dto.response.ScheduleResponseDTO;
 import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.mapper.AppointmentMapper;
 import com.sni.hairsalon.model.Appointment;
-import com.sni.hairsalon.model.Availability;
 import com.sni.hairsalon.model.Barber;
 import com.sni.hairsalon.model.Client;
 import com.sni.hairsalon.model.Haircut;
@@ -24,6 +27,7 @@ import com.sni.hairsalon.repository.ClientRepository;
 import com.sni.hairsalon.repository.HaircutRepository;
 import com.sni.hairsalon.service.AppointmentService;
 import com.sni.hairsalon.service.EmailService;
+import com.sni.hairsalon.model.Status;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,12 +38,14 @@ public class AppointmentServiceImpl implements AppointmentService {
     
     private final ScheduleServiceImpl  scheduleService;
     private final AvailabilityServiceImpl availabilityService;
-    private final EmailService mailSender;
-    private final ClientRepository clientRepo;
+    private final EmailService mailService;
     private final BarberRepository barberRepo;
     private final HaircutRepository haircutRepo;
     private final AppointmentRepository appointmentRepo;
     private final AppointmentMapper mapper;
+   
+    @Autowired
+    private ClientRepository clientRepo;
     
    @Transactional
    @Override
@@ -86,12 +92,64 @@ public class AppointmentServiceImpl implements AppointmentService {
       .barber(barber)
       .haircut(haircut)
       .appointmentTime(appointmentTime)
-      .status(com.sni.hairsalon.model.Status.CONFIRMED.getCode())
+      .status(Status.CONFIRMED.getCode())
       .build();
       appointmentRepo.save(appointment);
       AppointmentResponseDTO response =  mapper.toDto(appointment);
-      mailSender.sendAppointmentConfirmation(client.getUser().getEmail(),response);
+      mailService.sendAppointmentConfirmation(client.getUser().getEmail(),response);
       
       return response;
     }
+
+
+
+    @Scheduled(fixedRate = 30000)
+    public void monitorAppointmentTime(){
+      LocalDateTime now = LocalDateTime.now();
+      List<Appointment> appointments = appointmentRepo.findByAppointmentTimeBetweenAndStatus
+      (now.with(LocalTime.MIDNIGHT).truncatedTo(ChronoUnit.MINUTES),
+       now.with(LocalTime.MAX).truncatedTo(ChronoUnit.MINUTES),
+       Status.CONFIRMED.getCode()
+       );
+       
+       for(Appointment appointment : appointments){
+         checkAppointmentTime(appointment, now);
+       }
+    }
+
+
+    private void checkAppointmentTime(Appointment appointment, LocalDateTime now){
+      LocalDateTime appointmentTime = appointment.getAppointmentTime();
+      Duration difference = Duration.between(appointmentTime, now);
+      long late =  difference.toMinutes();
+
+      if(late >= 5 && late < 10){
+         mailService.sendFirstReminder(appointment.getClient()
+         .getUser().getEmail(), mapper.toDto(appointment));
+      }
+      else if(late >= 10 && late < 15){
+         mailService.sendSecondReminder(appointment.getClient()
+         .getUser().getEmail(), mapper.toDto(appointment));
+      }
+      else if(late >= 15){
+         appointment.setStatus(Status.NO_SHOW.getCode());
+         appointmentRepo.save(appointment);
+         mailService.sendCancellationNotification(appointment.getClient()
+         .getUser().getEmail(), mapper.toDto(appointment));
+         mailService.sendAppointmentCancellationToBarber(appointment.getBarber()
+         .getUser().getEmail(), mapper.toDto(appointment));
+      }
+    }
  }
+
+ 
+    /*   PENDING(1),
+    REQUESTED(2),
+    CONFIRMED(3),
+    CHECK_IN(4),
+    IN_PROGRESS(5),
+    COMPLETED(5),
+    CANCELLED_BY_CLIENT(6),
+    CANCELLED_BY_PROVIDER(7),
+    RESCHEDULED(8),
+    NO_SHOW( */

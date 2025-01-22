@@ -2,7 +2,6 @@ package com.sni.hairsalon.model;
 
 import java.time.LocalDateTime;
 
-import com.sni.hairsalon.annotation.IdGeneration;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

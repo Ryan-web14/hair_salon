@@ -26,6 +26,13 @@ public interface AppointmentRepository extends JpaRepository<Appointment,Long> {
     @Query("select a from Appointment a where a.barber.id = :barberId")
     List<Appointment> findAppointmentByBarberId(@Param("barberId") long barberId);
 
+    @Query("Select a from Appointment a where a.status = :status " +
+    "and a.appointmentTime between :startTime and :endTime")
+    List<Appointment> findByAppointmentTimeBetweenAndStatus(
+    @Param("startTime") LocalDateTime startTime,
+    @Param("endTime") LocalDateTime endTime,
+    @Param("status") int status
+);
       @Query("SELECT a FROM Appointment a WHERE a.barber.id = :barberId " +
            "AND DATE(a.appointmentTime) = :date " +
            "AND a.status = :status")
