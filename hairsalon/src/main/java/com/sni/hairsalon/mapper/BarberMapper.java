@@ -38,9 +38,10 @@ public class BarberMapper {
         BarberResponseDTO dto = new BarberResponseDTO();
         dto.setId(String.valueOf(barber.getId()));
         dto.setEmail(barber.getUser().getEmail());
-        dto.setFirstname(dto.getFirstname());
-        dto.setLastname(dto.getLastname());
+        dto.setFirstname(barber.getFirstname());
+        dto.setLastname(barber.getLastname());
         dto.setPhone(String.valueOf(barber.getPhoneNumber()));
+        dto.setAvailable(barber.isAvailable());
         return dto;
     }
 

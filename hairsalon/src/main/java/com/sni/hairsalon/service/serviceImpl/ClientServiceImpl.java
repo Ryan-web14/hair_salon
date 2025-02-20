@@ -93,8 +93,7 @@ public class ClientServiceImpl implements ClientService {
         .orElseThrow(()-> new ResourceNotFoundException("Client not found"));
 
         return mapper.toDto(client);
-    }
-
+    }    
 
     @Override
     public List<ClientResponseDTO> searchClient(String lastname, String firstname){
@@ -115,6 +114,18 @@ public class ClientServiceImpl implements ClientService {
         .stream()
         .map(client->mapper.toDto(client))
         .collect(Collectors.toList());
+    }
+
+    @Override
+    public ClientResponseDTO getClientProfile(String email) {
+        if (!ValidationUtils.isValidEmail(email)) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+
+        Client client = clientRepo.findByEmail(email)
+            .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
+
+        return mapper.toDto(client);
     }
 
 

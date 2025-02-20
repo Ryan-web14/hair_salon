@@ -24,4 +24,10 @@ public class ErrorResponse {
             .stackTrace(stackTrace)
             .build();
     }
+
+    public static ErrorResponse of(String message){
+        return ErrorResponse.builder()
+        .message(message)
+        .build();
+    }
 }

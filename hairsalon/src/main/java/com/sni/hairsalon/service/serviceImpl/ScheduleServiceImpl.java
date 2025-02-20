@@ -199,7 +199,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         Date effectiveFrom =  Date.valueOf(request.getEffectiveFrom());
        Date effectiveTo =  Date.valueOf(request.getEffectiveTo());
        
-       
         return scheduleRepo.findOverlappingSchedules(
             Long.parseLong(request.getBarberId()),
             request.getDayOfWeek(),

@@ -38,6 +38,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AppointmentServiceImpl implements AppointmentService {
 
@@ -50,9 +51,7 @@ public class AppointmentServiceImpl implements AppointmentService {
   private final AppointmentMapper mapper;
   private final SmsServiceImpl smsService;
   private final UserRepository userRepo;
-
-  @Autowired
-  private ClientRepository clientRepo;
+  private final ClientRepository clientRepo;
 
   @Transactional
   @Override
@@ -123,6 +122,7 @@ public class AppointmentServiceImpl implements AppointmentService {
   }
 
   @Override
+  @Transactional
   public List<AppointmentResponseDTO> getAllAppointment() {
 
     List<Appointment> appointments = appointmentRepo.findAll();
@@ -381,8 +381,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
   }
 
-  /*  private void checkAppointmentTodayDate(Apppointment appointment) {
+ /* private void checkAppointmentTodayDate(Appointment appointment) {
 
+    LocalDateTime now = LocalDateTime.now();*
   }*/
 
 }
@@ -401,21 +402,4 @@ public class AppointmentServiceImpl implements AppointmentService {
  * 
  * 
  * 
- * public List<AppointmentResponseDTO> getClientAppointments(String email,
- * LocalDate date) {
- * Client client = clientRepository.findByUserEmail(email)
- * .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
- * 
- * if (date != null) {
- * return appointmentRepository.findByClientAndDate(client.getId(), date)
- * .stream()
- * .map(mapper::toDto)
- * .collect(Collectors.toList());
- * }
- * 
- * return appointmentRepository.findByClientId(client.getId())
- * .stream()
- * .map(mapper::toDto)
- * .collect(Collectors.toList());
- * }
  */

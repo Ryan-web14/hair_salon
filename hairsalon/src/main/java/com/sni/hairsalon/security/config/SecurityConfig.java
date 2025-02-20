@@ -60,6 +60,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/v1/auth/**").permitAll()
                 .requestMatchers("/v1/availability/baber/**").permitAll()
+                .requestMatchers("v1/haircut/all").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
@@ -75,7 +76,7 @@ public class SecurityConfig {
     @Bean 
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("www.lhomme-cg.com")); 
+        configuration.setAllowedOrigins(Arrays.asList("https://lhomme-cg.com")); 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization",
         "Content-Type",
@@ -86,7 +87,8 @@ public class SecurityConfig {
         "User-Agent",
         "Access-Control-Allow-Origin",
         "Access-Control-Allow-Methods",
-        "Access-Control-Allow-Headers"));
+        "Access-Control-Allow-Headers",
+        "ngrok-skip-browser-warning"));
 
         configuration.setExposedHeaders(Arrays.asList(   "Access-Control-Allow-Origin",
         "Access-Control-Allow-Methods",

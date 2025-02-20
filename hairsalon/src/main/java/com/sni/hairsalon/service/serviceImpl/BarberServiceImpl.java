@@ -85,5 +85,15 @@ public class BarberServiceImpl implements BarberService {
         return mapper.toDto(barber);
     }
 
+    @Override
+    public BarberResponseDTO getBarberProfile(String email){
+            User user = userRepo.findUserByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+            Barber barber = barberRepo.findByUserId(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
+
+            return mapper.toDto(barber);
+    }
 }
 

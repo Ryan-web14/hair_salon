@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sni.hairsalon.dto.request.ClientSignupRequest;
 import com.sni.hairsalon.dto.request.UserRequestDTO;
 import com.sni.hairsalon.dto.response.AuthResponse;
+import com.sni.hairsalon.dto.response.ClientSignupResponse;
 import com.sni.hairsalon.dto.response.SessionResponseDTO;
 import com.sni.hairsalon.dto.response.UserResponseDTO;
 import com.sni.hairsalon.exception.ResourceNotFoundException;
@@ -40,11 +42,11 @@ public class AuthentificationController {
         return ResponseEntity.ok(authService.login(loginRequest, request));
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<UserResponseDTO> signup(
-     @RequestBody UserRequestDTO signupRequest){
+    @PostMapping("/signup/client")
+    public ResponseEntity<ClientSignupResponse> signup(
+     @RequestBody ClientSignupRequest signupRequest){
             return  ResponseEntity.status(HttpStatus.CREATED)
-            .body(authService.signUp(signupRequest));
+            .body(authService.signupClient(signupRequest));
         }
     
     @PostMapping("/logout")

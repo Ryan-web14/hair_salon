@@ -13,7 +13,9 @@ public interface ClientService {
     public ClientResponseDTO getClientById(long id);
     public ClientResponseDTO getClientByEmail(String email);
     public List<ClientResponseDTO> getAllClient();
-    public List<ClientResponseDTO> searchClient(String lastname, String firstname);  
+    public List<ClientResponseDTO> searchClient(String lastname, String firstname);
+    public ClientResponseDTO getClientProfile(String email);  
+    
 /* 
 
  need to work with email sending for this

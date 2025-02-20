@@ -46,7 +46,7 @@ public class AvailabilityController {
             return ResponseEntity.ok(availabilityService.updateAvailabilityStatus(id, isAvailable));
         }
 
-    @GetMapping("/barber/{barberId}/slots")
+    @GetMapping("/barber/{barberId}/slot")
     public ResponseEntity<List<AvailabilityResponseDTO>> getBarberAvailability(
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @PathVariable Long barberId){
             

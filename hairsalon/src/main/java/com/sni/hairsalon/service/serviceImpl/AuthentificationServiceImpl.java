@@ -1,5 +1,8 @@
 package com.sni.hairsalon.service.serviceImpl;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -48,6 +51,8 @@ public class AuthentificationServiceImpl implements AuthentificationService{
         .orElseThrow(()-> new ResourceNotFoundException("User not found"));
         UserResponseDTO userDto = mapper.toDto(user);
         SessionResponseDTO createdSession = sessionService.createSession(request, userDto);
+        user.setLast_login(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
+        userRepo.save(user);
         return new AuthResponse(createdSession.getToken(), userDto.getEmail());
     }
 

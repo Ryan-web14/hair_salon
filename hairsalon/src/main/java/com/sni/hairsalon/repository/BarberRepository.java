@@ -25,6 +25,8 @@ public interface BarberRepository extends JpaRepository<Barber, Long>{
     @NonNull
     List<Barber> findAll();
 
+    @Query("SELECT b FROM Barber b where b.user.id = :userId")
+    Optional<Barber> findByUserId(long userId);
     @Query("""
         SELECT DISTINCT b FROM Barber b 
         JOIN Schedule s ON s.barber.id = b.id 
@@ -90,32 +92,5 @@ public interface BarberRepository extends JpaRepository<Barber, Long>{
         @Param("endTime") LocalDateTime endTime,
         @Param("date") Date date
     );
-
-    //not correct queries
-    /*@Query("SELECT DISTINCT b FROM Barber b " +
-           "JOIN b.availabilities a " +
-           "WHERE a.startTime <= :time " +
-           "AND a.endTime >= :time " +
-           "AND a.isAvailable = true")
-    List<Barber> findAvailableBarbers(
-        @Param("time") LocalTime time
-    );
-
-
-    @Query("SELECT DISTINCT b FROM Barber b " +
-    "JOIN b.schedules s " +
-    "LEFT JOIN b.availabilities a " +
-    "WHERE s.dayOfWeek = :dayOfWeek " +
-    "AND s.startTime <= :time " +
-    "AND s.endTime >= :time " +
-    "AND s.effectiveFrom <= :date " +
-    "AND (s.effectiveTo IS NULL OR s.effectiveTo >= :date) " +
-    "AND s.isReccuring = true " +
-    "AND (a IS NULL OR (a.isAvailable = true AND a.startTime <= :time AND a.endTime >= :time))")
-List<Barber> findAvailableBarbersConsideringBoth(
- @Param("dayOfWeek") DayOfWeek dayOfWeek,
- @Param("time") LocalTime time,
- @Param("date") LocalDate date
-);*/
 
 }
