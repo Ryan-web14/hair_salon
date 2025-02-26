@@ -90,7 +90,7 @@ public class AuthentificationServiceImpl implements AuthentificationService{
         .email(userDto.getEmail())
         .firstname(request.getFirstname())
         .lastname(request.getLastname())
-        .phone(Integer.parseInt(request.getPhone()))
+        .phone(request.getPhone())
         .noShowCount(0)
         .build();
 

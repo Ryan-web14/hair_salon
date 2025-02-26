@@ -34,5 +34,5 @@ public class Client{
 
     //Number of time the client hasn't show themselve to an appointment
     @Column(name = "no_show_count", nullable = false)
-    private int noShowCount;
+    @Builder.Default private int noShowCount = 0;
 }

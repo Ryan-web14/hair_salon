@@ -11,6 +11,9 @@ public class ClientRequestDTO {
     private String email;
     private String firstname;
     private String lastname;
-    private int phone;
-    private int noShowCount;
+    private String phone;
+   @Builder.Default private int noShowCount = 0;
 }
+
+
+//admettre une valeur par defaut a noshowcount

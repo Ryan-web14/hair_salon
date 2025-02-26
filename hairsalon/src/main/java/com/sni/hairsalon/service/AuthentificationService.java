@@ -14,4 +14,6 @@ public interface AuthentificationService {
     public UserResponseDTO signUp(UserRequestDTO user);
     public ClientSignupResponse signupClient(ClientSignupRequest request);  
     public UserResponseDTO signupAdmin(UserRequestDTO request);
+    //public void validateUserEmail(String email);
+    //public void forgotPassword(String );
 }

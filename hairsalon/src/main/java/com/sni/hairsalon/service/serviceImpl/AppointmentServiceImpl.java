@@ -29,7 +29,6 @@ import com.sni.hairsalon.repository.HaircutRepository;
 import com.sni.hairsalon.repository.UserRepository;
 import com.sni.hairsalon.service.AppointmentService;
 import com.sni.hairsalon.service.EmailService;
-import com.twilio.rest.api.v2010.account.availablephonenumbercountry.Local;
 import com.sni.hairsalon.model.Status;
 import com.sni.hairsalon.model.User;
 
@@ -175,15 +174,9 @@ public class AppointmentServiceImpl implements AppointmentService {
   @Scheduled(fixedRate = 30000)
   public int countAppointmentForTheDay() {
 
-    int counter = 0;
-    LocalDate now = LocalDate.now();
-    List<AppointmentResponseDTO> appointments = getAllBarberAppointment(now);
+    List<AppointmentResponseDTO> appointments = getAllBarberAppointment(LocalDate.now());
 
-    for (int i = 0; i < appointments.size(); i++) {
-      counter++;
-    }
-
-    return counter;
+    return appointments.size();
   }
 
   @Override
@@ -288,6 +281,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
       return mapper.toDto(appointment);
     }
+
+  //private void validateCheckInTime(LocalDateTime now, LocalDateTime appointmentTime)
 
   @Override
   @Scheduled(fixedRate = 30000)

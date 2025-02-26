@@ -40,7 +40,7 @@ public class ClientServiceImpl implements ClientService {
         .user(user)
         .lastname(dto.getLastname())
         .firstname(dto.getFirstname())
-        .phoneNumber(dto.getPhone())
+        .phoneNumber(Integer.parseInt(dto.getPhone()))
         .noShowCount(0)
         .build();
         clientRepo.save(client);
@@ -50,16 +50,19 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public ClientResponseDTO updateClient(long id, ClientRequestDTO dto){
+    public ClientResponseDTO updateClient(String email,ClientRequestDTO dto){
 
         validateField(dto);
+        User user = userRepo.findUserByEmail(email)
+        .orElseThrow(()->new ResourceNotFoundException("User not found"));
+        Long userId = user.getId();
 
-        Client client = clientRepo.findById(id)
+        Client client = clientRepo.findClientByUserID(userId)
         .orElseThrow(()-> new ResourceNotFoundException("Client not found"));
     
         client.setFirstname(dto.getFirstname());
         client.setLastname(dto.getLastname());
-        client.setPhoneNumber(dto.getPhone());
+        client.setPhoneNumber(Integer.parseInt(dto.getPhone()));
         clientRepo.save(client);
 
         return mapper.toDto(client);
@@ -140,12 +143,12 @@ public class ClientServiceImpl implements ClientService {
           
         }
        
-        String phone = Integer.toString(clientRequest.getPhone()); 
+       /*String phone = Integer.toString(clientRequest.getPhone()); 
         boolean verifiedPhone = ValidationUtils.isValidPhone(phone);
         if(!verifiedPhone || phone == null){
              throw new RuntimeException("Invalid phone number"+ phone);
             
-    }
+    }8*/
 
  }
 

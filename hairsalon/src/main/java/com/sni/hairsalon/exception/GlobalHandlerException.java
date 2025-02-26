@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.twilio.http.Response;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
@@ -43,6 +45,22 @@ public class GlobalHandlerException {
                 );
             return new ResponseEntity<>(error, HttpStatus.PRECONDITION_FAILED);
         }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTokenException(
+        InvalidTokenException e, HttpServletRequest request){
+
+            ErrorResponse error = ErrorResponse.of(
+                e.getMessage(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Invalid token",
+                request.getRequestURI(),
+                getStackTrace(e)
+            );
+
+            return new ResponseEntity<>(error, HttpStatus.EXPECTATION_FAILED);
+        }
+
 
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)

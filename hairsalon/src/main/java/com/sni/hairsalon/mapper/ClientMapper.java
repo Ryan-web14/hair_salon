@@ -38,7 +38,7 @@ public class ClientMapper{
         Client newClient = new Client();
         newClient.setFirstname(request.getFirstname());
         newClient.setLastname(request.getLastname());
-        newClient.setPhoneNumber(request.getPhone());
+        newClient.setPhoneNumber(Integer.parseInt(request.getPhone()));
         newClient.setUser(user);
         return newClient;
     
@@ -55,7 +55,7 @@ public class ClientMapper{
           
         }
        
-        String phone = Integer.toString(clientRequest.getPhone()); 
+        String phone = clientRequest.getPhone(); 
         boolean verifiedPhone = ValidationUtils.isValidPhone(phone);
         if(!verifiedPhone || phone == null){
              throw new RuntimeException("Invalid phone number"+ phone);
