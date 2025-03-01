@@ -12,7 +12,7 @@ public class ClientRequestDTO {
     private String firstname;
     private String lastname;
     private String phone;
-   @Builder.Default private int noShowCount = 0;
+    private  int noShowCount;
 }
 
 

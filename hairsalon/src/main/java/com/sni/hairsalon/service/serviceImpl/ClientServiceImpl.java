@@ -40,7 +40,7 @@ public class ClientServiceImpl implements ClientService {
         .user(user)
         .lastname(dto.getLastname())
         .firstname(dto.getFirstname())
-        .phoneNumber(Integer.parseInt(dto.getPhone()))
+        .phoneNumber(Integer.parseInt(dto.getPhone()  ))
         .noShowCount(0)
         .build();
         clientRepo.save(client);
@@ -50,7 +50,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
-    public ClientResponseDTO updateClient(String email,ClientRequestDTO dto){
+    public ClientResponseDTO updateClient(String email, ClientRequestDTO dto){
 
         validateField(dto);
         User user = userRepo.findUserByEmail(email)
@@ -59,10 +59,11 @@ public class ClientServiceImpl implements ClientService {
 
         Client client = clientRepo.findClientByUserID(userId)
         .orElseThrow(()-> new ResourceNotFoundException("Client not found"));
-    
+      
         client.setFirstname(dto.getFirstname());
         client.setLastname(dto.getLastname());
         client.setPhoneNumber(Integer.parseInt(dto.getPhone()));
+        client.setNoShowCount(dto.getNoShowCount());
         clientRepo.save(client);
 
         return mapper.toDto(client);
@@ -138,17 +139,17 @@ public class ClientServiceImpl implements ClientService {
         }   
     
     
-        if(!ValidationUtils.isLetter(clientRequest.getFirstname()) || ValidationUtils.isLetter(clientRequest.getLastname())){
+        if(!ValidationUtils.isLetter(clientRequest.getFirstname()) || !ValidationUtils.isLetter(clientRequest.getLastname())){
             throw new RuntimeException("Names are invalid");
           
         }
        
-       /*String phone = Integer.toString(clientRequest.getPhone()); 
+       String phone = clientRequest.getPhone(); 
         boolean verifiedPhone = ValidationUtils.isValidPhone(phone);
         if(!verifiedPhone || phone == null){
              throw new RuntimeException("Invalid phone number"+ phone);
             
-    }8*/
+    }
 
  }
 

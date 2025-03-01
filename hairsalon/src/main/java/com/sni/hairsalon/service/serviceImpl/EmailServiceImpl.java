@@ -45,9 +45,7 @@ public class EmailServiceImpl implements EmailService{
         String subject = "Confirmation de rendez-vous";
         
         String body = String.format("""
-            ********************************************
                     CONFIRMATION DE RENDEZ-VOUS
-            ********************************************
             
             Bonjour Madame, Monsieur %s
             
@@ -120,10 +118,8 @@ public class EmailServiceImpl implements EmailService{
     public CompletableFuture<Boolean> sendFirstReminder(String to, AppointmentResponseDTO appointment){
 
         String subject = "Rappel de rendez-vous";
-        String text = String.format ("""
-  ********************************************
-           RAPPEL DE RENDEZ-VOUS URGENT
-   ********************************************
+        String text = String.format ( """
+   RAPPEL DE RENDEZ-VOUS URGE
    
    Bonjour Madame, Monsieur %s
    
@@ -158,9 +154,8 @@ public class EmailServiceImpl implements EmailService{
         String subject = "Rappel final de rendez-vous";
         String content = String.format(
             """
-  ********************************************
-           RAPPEL DE RENDEZ-VOUS URGENT
-   ********************************************
+                    
+    RAPPEL DE RENDEZ-VOUS URGE
    
     Madame, Monsieur %s
    
@@ -194,9 +189,7 @@ public class EmailServiceImpl implements EmailService{
         String subject = "Annulation de rendez-vous";
         String content = String.format(
             """
-   ********************************************
-           ANNULATION DE RENDEZ-VOUS URGENT
-   ********************************************
+    ANNULATION DE RENDEZ-VOUS URGENT
    
     Madame, Monsieur %s
    
@@ -228,9 +221,7 @@ public class EmailServiceImpl implements EmailService{
 
         String subject = "Annulation de rendez-vous";
         String content =String.format("""
-    ********************************************
-           ANNULATION DE RENDEZ-VOUS URGENT
-    ********************************************
+    ANNULATION DE RENDEZ-VOUS URGENT
    
     Madame, Monsieur %s
    
@@ -263,9 +254,7 @@ public class EmailServiceImpl implements EmailService{
         String subject = "Notification d'annulation de rendez-vous";
         String content = String.format(
             """
-             ********************************************
-               NOTIFICATION D'ANNULATION DE RENDEZ-VOUS
-             *******************************************
+            NOTIFICATION D'ANNULATION DE RENDEZ-VOUS
    
              Votre rendez-vous avec %s %s
              pour %s du %s a été annulé,
@@ -332,9 +321,7 @@ public class EmailServiceImpl implements EmailService{
         String subject = "Notification arrivé de client";
         String content = String.format(
             """
-            *******************************************
                NOTIFICATION PRESENCE DE CLIENT
-             *******************************************
    
              Le client %s est arrivé au salon de coiffure
              pour son rendez-vous.
@@ -362,15 +349,13 @@ public class EmailServiceImpl implements EmailService{
         return sendEmail(email, subject, content);
      }
 
-     
+    @Override
     @Async
     public CompletableFuture<Boolean> sendCheckInNotification(String barberEmail, Appointment appointment){
         String subject = "Notification d'arrivée de client";
         String content = String.format(
             """
-            *******************************************
                NOTIFICATION PRESENCE DE CLIENT
-             *******************************************
          
              Le client %s %s est arrivé au salon de coiffure
              pour son rendez-vous.
@@ -397,7 +382,17 @@ public class EmailServiceImpl implements EmailService{
         return sendEmail(barberEmail, subject, content);
     }
     
- 
+    @Override
+    @Async
+    public CompletableFuture<Boolean> sendPasswordResetEmail(String email, String link){
+
+        String subject = "Réinitialisation de mot de passe";
+        String content = String.format("Cliquez sur le lien pour réinitialiser votre mot de passe: %s",
+         link);
+
+         return sendEmail(email, subject, content);
+    }
+
 
     @Async
     private CompletableFuture<Boolean> sendEmail(String to, String subject, String body){
@@ -490,9 +485,7 @@ public class EmailServiceImpl implements EmailService{
 
     private String createFormattedContent(AppointmentResponseDTO appointment) {
         return String.format("""
-            ********************************************
                     CONFIRMATION DE RENDEZ-VOUS
-            ********************************************
     
             Bonjour %s,
     

@@ -74,9 +74,9 @@ public class AuthentificationServiceImpl implements AuthentificationService{
             throw new RuntimeException("Invalid email");
         }
 
-        /*if(!ValidationUtils.isValidPhone(request.getPhone())){
+        if(!ValidationUtils.isValidPhone(request.getPhone())){
             throw new RuntimeException("Invalid phone number");
-        }*/
+        }
 
         UserRequestDTO dto = UserRequestDTO.builder()
         .email(request.getEmail())

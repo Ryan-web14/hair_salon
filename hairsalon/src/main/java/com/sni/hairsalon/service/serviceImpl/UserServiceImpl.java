@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService{
     @Transactional
     public UserResponseDTO createUser(UserRequestDTO dto){
         User newUser = new User();
-        if(EmailAlreadyExist(dto.getEmail())){
+        if(emailAlreadyExist(dto.getEmail())){
             throw new ResourceAlreadyExistException("user already exist");
         }
         UserRole role = roleRepo.findUserRoleByName(dto.getRole())
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService{
     @Transactional
     public UserResponseDTO createAdmin(UserRequestDTO dto){
         
-        if(EmailAlreadyExist(dto.getEmail())){
+        if(emailAlreadyExist(dto.getEmail())){
             throw new ResourceAlreadyExistException("user already exist");
         }
         
@@ -118,10 +118,20 @@ public class UserServiceImpl implements UserService{
         User user = userRepo.findUserById(id)
         .orElseThrow(()->new ResourceNotFoundException("user not found")); 
         user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepo.save(user);
         return userMapper.toDto(user);
     }
+    
+    public User getUserByEmail(String email){
 
-    private boolean EmailAlreadyExist(String email){
+        User user = userRepo.findUserByEmail(email)
+        .orElseThrow(()-> new ResourceNotFoundException("User not found"));
+
+        return user;
+    }
+
+    @Override
+    public boolean emailAlreadyExist(String email){
         return userRepo.findUserByEmail(email).isPresent();
     }
 }
