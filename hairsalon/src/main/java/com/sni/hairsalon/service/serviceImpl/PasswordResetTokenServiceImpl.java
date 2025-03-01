@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
-import org.eclipse.angus.mail.handlers.message_rfc822;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,12 +12,17 @@ import com.sni.hairsalon.model.PasswordResetToken;
 import com.sni.hairsalon.repository.PasswordResetTokenRepository;
 import com.sni.hairsalon.service.PasswordResetTokenService;
 import com.sni.hairsalon.utils.ValidationUtils;
+import com.sni.hairsalon.model.User;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class PasswordResetTokenServiceImpl implements PasswordResetTokenService  {
     
-    private PasswordResetTokenRepository pwdResetTokenRepo;
+    private final PasswordResetTokenRepository pwdResetTokenRepo;
+    private final UserServiceImpl userService;
     private static final long EXPIRATTION_TIME = 30;
 
     public String createToken(String email){
@@ -41,7 +45,6 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
     }  
     
     
-    
     public PasswordResetToken validateToken(String token){
 
         PasswordResetToken resetToken = pwdResetTokenRepo.findByToken(token)
@@ -56,5 +59,12 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
         }
 
         return resetToken;
+    }
+
+    public void resetPassword(String token, String newPassword){
+
+        String email = pwdResetTokenRepo.findEmailByToken(token);
+        User foundUser = userService.getUserByEmail(email);
+        userService.updatePassword(foundUser.getId(), newPassword);
     }
 }

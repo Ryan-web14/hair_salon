@@ -6,5 +6,6 @@ public interface PasswordResetTokenService {
     
     public String createToken(String email);
     public PasswordResetToken validateToken(String token);
+    public void resetPassword(String token, String password);
     
 }

@@ -1,14 +1,14 @@
 package com.sni.hairsalon.service.serviceImpl;
-
+/*see how to put the appointment in progress too */
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,6 @@ import com.sni.hairsalon.service.EmailService;
 import com.sni.hairsalon.model.Status;
 import com.sni.hairsalon.model.User;
 
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -102,7 +101,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         .appointmentTime(appointmentTime)
         .status(Status.CONFIRMED.getCode())
         .build();
-    appointmentRepo.save(appointment);
+    Appointment verifiedAppointment = checkAppointmentTodayDate(appointment);
+    appointmentRepo.save(verifiedAppointment);
     AppointmentResponseDTO response = mapper.toDto(appointment);
     mailService.sendAppointmentConfirmation(client.getUser().getEmail(), response);
     // smsService.sendConfirmationSms(appointment);
@@ -262,17 +262,15 @@ public class AppointmentServiceImpl implements AppointmentService {
         throw new ResourceNotFoundException("No confirmed appointment found for the day");
       }
 
-      Appointment appointment = appointments.get(0);
+      //Get the closest appointment with appointment time
+      Appointment appointment = appointments.stream()
+      .min(Comparator.comparing(Appointment::getAppointmentTime))
+      .orElseThrow(()-> new IllegalStateException("No appointment retrieve"));
+      
       LocalDateTime appointmentTime = appointment.getAppointmentTime();
       
       //verify if the checking is done before 16 minutes earlier than the appointment time
-      if (now.isBefore(appointmentTime.minusMinutes(16))) {
-          throw new IllegalStateException("Too early to check in");
-      }
-      
-      if (now.isAfter(appointmentTime.plusMinutes(15))) {
-          throw new IllegalStateException("Too late to check in");
-      }
+      validateCheckInTime(now, appointmentTime);
 
       //update status and save the apt
       appointment.setStatus(Status.CHECK_IN.getCode());
@@ -282,7 +280,15 @@ public class AppointmentServiceImpl implements AppointmentService {
       return mapper.toDto(appointment);
     }
 
-  //private void validateCheckInTime(LocalDateTime now, LocalDateTime appointmentTime)
+  private void validateCheckInTime(LocalDateTime now, LocalDateTime appointmentTime){
+    if (now.isBefore(appointmentTime.minusMinutes(16))) {
+      throw new IllegalStateException("Too early to check in");
+  }
+  
+  if (now.isAfter(appointmentTime.plusMinutes(15))) {
+      throw new IllegalStateException("Too late to check in");
+  }
+  }
 
   @Override
   @Scheduled(fixedRate = 30000)
@@ -321,7 +327,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     return;
   }
 
-  @Scheduled(fixedRate = 30000)
+  @Scheduled(fixedRate = 300000)
   public void monitorAppointmentTime() {
     LocalDateTime now = LocalDateTime.now();
     List<Appointment> appointments = appointmentRepo.findByAppointmentTimeBetweenAndStatus(
@@ -376,10 +382,48 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
   }
 
- /* private void checkAppointmentTodayDate(Appointment appointment) {
+  private Appointment checkAppointmentTodayDate(Appointment appointment) {
 
-    LocalDateTime now = LocalDateTime.now();*
-  }*/
+    LocalDateTime now = LocalDateTime.now();
+
+    if(appointment.getAppointmentTime().toLocalDate().equals(now.toLocalDate())){
+      
+      LocalDateTime eveningStart = now.toLocalDate().atTime(17,00);
+
+      if(now.isAfter(eveningStart.minusHours(4))){
+        
+        throw new IllegalStateException("Appointment taken the same day must be 4 hours prior to 17h00");
+      } 
+
+      Barber barber = appointment.getBarber();
+      int duration = appointment.getHaircut().getDuration();
+
+      //We look for slot available betweeen 17h-19h for the date of the appointment
+      LocalDateTime startSlot = eveningStart;
+      LocalDateTime eveningEnd = now.toLocalDate().atTime(19,00);
+      
+      boolean slotFound = false;
+
+      while(startSlot.plusMinutes(duration).isBefore(eveningEnd) ||
+      startSlot.isBefore(eveningEnd)){
+
+        if(availabilityService.isAvailableSlot(barber.getId(), startSlot, duration)){
+
+          appointment.setAppointmentTime(startSlot);
+          availabilityService.makeSlotUnavailable(barber.getId(), startSlot, duration);
+          slotFound = true;
+        }
+
+        if(slotFound == false){
+          throw new ResourceNotFoundException("No slot found for 17h to 19h");
+        }
+
+      }
+      
+    }
+    return appointment;
+      
+  }
 
 }
 
@@ -393,8 +437,5 @@ public class AppointmentServiceImpl implements AppointmentService {
  * CANCELLED_BY_CLIENT(6),
  * CANCELLED_BY_PROVIDER(7),
  * RESCHEDULED(8),
- * NO_SHOW(
- * 
- * 
- * 
+ * NO_SHOW()
  */

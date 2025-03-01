@@ -50,7 +50,7 @@ public class ClientMapper{
         }   
     
     
-        if(!ValidationUtils.isLetter(clientRequest.getFirstname()) || ValidationUtils.isLetter(clientRequest.getLastname())){
+        if(ValidationUtils.isLetter(clientRequest.getFirstname()) == false || ValidationUtils.isLetter(clientRequest.getLastname()) == false){
             throw new RuntimeException("Names are invalid");
           
         }

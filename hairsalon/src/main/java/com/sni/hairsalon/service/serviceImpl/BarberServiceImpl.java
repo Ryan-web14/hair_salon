@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sni.hairsalon.dto.request.BarberRequestDTO;
+import com.sni.hairsalon.dto.request.ClientRequestDTO;
 import com.sni.hairsalon.dto.response.BarberResponseDTO;
 import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.mapper.BarberMapper;
@@ -16,6 +17,7 @@ import com.sni.hairsalon.model.User;
 import com.sni.hairsalon.repository.BarberRepository;
 import com.sni.hairsalon.repository.UserRepository;
 import com.sni.hairsalon.service.BarberService;
+import com.sni.hairsalon.utils.ValidationUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +32,7 @@ public class BarberServiceImpl implements BarberService {
     @Override
         public BarberResponseDTO createBarber(BarberRequestDTO dto){
 
+            validateField(dto);
             User user = userRepo.findUserByEmail(dto.getEmail())
             .orElseThrow(()-> new ResourceNotFoundException("User not found"));
 
@@ -57,6 +60,7 @@ public class BarberServiceImpl implements BarberService {
  
     @Override
     public BarberResponseDTO updateBarber(String id, BarberRequestDTO requestDTO){
+        validateField(requestDTO);
         Barber barber = barberRepo.findById(Long.parseLong(id))
             .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
 
@@ -95,5 +99,24 @@ public class BarberServiceImpl implements BarberService {
 
             return mapper.toDto(barber);
     }
+
+        private void validateField(BarberRequestDTO requestDTO){
+        if(requestDTO.getFirstname().isEmpty() || requestDTO.getLastname().isEmpty()){
+            throw new RuntimeException("Empty name");
+        }   
+    
+    
+        if(!ValidationUtils.isLetter(requestDTO.getFirstname()) || ValidationUtils.isLetter(requestDTO.getLastname())){
+            throw new RuntimeException("Names are invalid");
+          
+        }
+       
+       String phone = requestDTO.getPhone(); 
+        boolean verifiedPhone = ValidationUtils.isValidPhone(phone);
+        if(!verifiedPhone || phone == null){
+             throw new RuntimeException("Invalid phone number"+ phone);
+            
+    }
+}
 }
 

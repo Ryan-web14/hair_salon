@@ -34,7 +34,7 @@ public class ClientController {
 
     @PutMapping("/update")
     public ResponseEntity<ClientResponseDTO> updateClient(@AuthenticationPrincipal UserPrincipal authenticatedUser,
-    ClientRequestDTO request){
+    @RequestBody ClientRequestDTO request){
         String email = authenticatedUser.getUsername();
         return ResponseEntity.ok().body(clientService.updateClient(email, request));
     }

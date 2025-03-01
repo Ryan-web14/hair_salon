@@ -18,6 +18,6 @@ public interface EmailService {
     public CompletableFuture<Boolean> sendCancellationNotification(String to, AppointmentResponseDTO appointment);
     public CompletableFuture<Boolean> sendAppointmentCancellationToClient(String to, AppointmentResponseDTO appointment);
     public CompletableFuture<Boolean> sendCheckIn(Appointment appointment);
-     public CompletableFuture<Boolean> sendWelcomeMessage(Client client);
-    
+    public CompletableFuture<Boolean> sendWelcomeMessage(Client client);
+    public CompletableFuture<Boolean> sendPasswordResetEmail(String email, String link);
 }

@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 public class ValidationUtils {
     
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-z0-9+_.-]+@(.+)");
-    private static final Pattern PHONE_PATTERN = Pattern.compile("^[\\d{9}]");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^(06|04|05)\\d{7}$");
 
     public static boolean isAlphaWithSpaces(String str){
         if(str == null || str.isEmpty()){
@@ -33,13 +33,7 @@ public class ValidationUtils {
         if (str == null || str.trim().isEmpty()) {
             return false;
         }
-        
-        for (char c : str.toCharArray()) {
-            if (!Character.isLetter(c) && !Character.isSpaceChar(c)) {
-                return false;
-            }
-        }
-        return true;
+        return str.matches("^[\\p{L} \\-\\'\\.]++$");
     }
     
     public static boolean isNumber(String number){
