@@ -1,6 +1,6 @@
 package com.sni.hairsalon.security.config;
 
-import java.lang.reflect.Array;
+
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,20 +22,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.sni.hairsalon.security.filter.JWTFilter;
 import com.sni.hairsalon.security.service.MyUserDetailsService;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
     private final MyUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
-
-    // Constructor injection
-    public SecurityConfig(MyUserDetailsService userDetailsService, 
-                         PasswordEncoder passwordEncoder) {
-        this.userDetailsService = userDetailsService;
-        this.passwordEncoder = passwordEncoder;
-    }
-    @Autowired
-    private JWTFilter jwtFilter;
+    private final JWTFilter jwtFilter;
 
     @Bean
     public AuthenticationManager authenticationManager() {

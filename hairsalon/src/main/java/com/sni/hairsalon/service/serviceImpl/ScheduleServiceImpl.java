@@ -21,6 +21,7 @@ import com.sni.hairsalon.model.Barber;
 import com.sni.hairsalon.model.Schedule;
 import com.sni.hairsalon.repository.BarberRepository;
 import com.sni.hairsalon.repository.ScheduleRepository;
+import com.sni.hairsalon.service.AvailabilityService;
 import com.sni.hairsalon.service.ScheduleService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepo;
     private final BarberRepository barberRepo;
     private final ScheduleMapper mapper;
-    private final AvailabilityServiceImpl availabilityService;
+    private final AvailabilityService availabilityService;
 
     @Override
     public ScheduleResponseDTO createSchedule(ScheduleRequestDTO request){
