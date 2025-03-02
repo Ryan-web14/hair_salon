@@ -1,6 +1,5 @@
 package com.sni.hairsalon.mapper;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.sni.hairsalon.dto.request.UserRequestDTO;
@@ -12,11 +11,14 @@ import com.sni.hairsalon.model.UserRole;
 import com.sni.hairsalon.repository.UserRoleRepository;
 import com.sni.hairsalon.utils.ValidationUtils;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class UserMapper {
 
-    @Autowired
-    UserRoleRepository roleRepo;
+   
+    private final UserRoleRepository roleRepo;
 
     public User toEntity(UserRequestDTO request, String roleName){
         validateField(request);

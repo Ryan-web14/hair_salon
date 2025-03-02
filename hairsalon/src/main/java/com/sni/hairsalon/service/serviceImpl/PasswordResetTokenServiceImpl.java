@@ -8,9 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sni.hairsalon.exception.InvalidTokenException;
+import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.model.PasswordResetToken;
 import com.sni.hairsalon.repository.PasswordResetTokenRepository;
 import com.sni.hairsalon.service.PasswordResetTokenService;
+import com.sni.hairsalon.service.UserService;
 import com.sni.hairsalon.utils.ValidationUtils;
 import com.sni.hairsalon.model.User;
 
@@ -22,11 +24,14 @@ import lombok.RequiredArgsConstructor;
 public class PasswordResetTokenServiceImpl implements PasswordResetTokenService  {
     
     private final PasswordResetTokenRepository pwdResetTokenRepo;
-    private final UserServiceImpl userService;
+    private final UserService userService;
     private static final long EXPIRATTION_TIME = 30;
 
     public String createToken(String email){
         
+        if(!userService.emailAlreadyExist(email)){
+            throw new ResourceNotFoundException("Vous recevre un email");
+        }
         if(!ValidationUtils.isValidEmail(email)){
             throw new RuntimeException("Invalid email");
         }

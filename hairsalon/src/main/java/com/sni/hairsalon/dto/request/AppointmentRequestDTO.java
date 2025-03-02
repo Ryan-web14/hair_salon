@@ -5,10 +5,14 @@ import java.time.LocalDateTime;
 
 import com.sni.hairsalon.model.Status;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor(staticName = "create")
 @Builder
 public class AppointmentRequestDTO {
     private String email;

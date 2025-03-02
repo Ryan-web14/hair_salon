@@ -17,8 +17,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProfileController {
     
-    public final ClientServiceImpl clientService;
-    public final BarberServiceImpl barberService;
+    private final ClientServiceImpl clientService;
+    private final BarberServiceImpl barberService;
 
     @GetMapping
     public ResponseEntity<?> getProfile(@AuthenticationPrincipal UserPrincipal authenticatedUser){

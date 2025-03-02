@@ -12,11 +12,11 @@ public enum Status{
     CONFIRMED(3),
     CHECK_IN(4),
     IN_PROGRESS(5),
-    COMPLETED(5),
-    CANCELLED_BY_CLIENT(6),
-    CANCELLED_BY_PROVIDER(7),
-    RESCHEDULED(8),
-    NO_SHOW(9);
+    COMPLETED(6),
+    CANCELLED_BY_CLIENT(7),
+    CANCELLED_BY_PROVIDER(8),
+    RESCHEDULED(9),
+    NO_SHOW(10);
 
     private int code;
 

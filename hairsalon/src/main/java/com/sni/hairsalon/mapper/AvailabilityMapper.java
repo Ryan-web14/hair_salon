@@ -2,7 +2,6 @@ package com.sni.hairsalon.mapper;
 
 import java.time.temporal.ChronoUnit;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.sni.hairsalon.dto.request.AvailabilityRequestDTO;
@@ -12,11 +11,13 @@ import com.sni.hairsalon.model.Availability;
 import com.sni.hairsalon.model.Barber;
 import com.sni.hairsalon.repository.BarberRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class AvailabilityMapper {
     
-    @Autowired
-    BarberRepository barberRepo;
+    private final BarberRepository barberRepo;
 
     public Availability toEntity(AvailabilityRequestDTO dto){
         Barber barber = barberRepo.findBarberById(Long.parseLong(dto.getBarberId()))
@@ -27,7 +28,7 @@ public class AvailabilityMapper {
         availability.setEndTime(dto.getEndTime());
         availability.setAvailable(dto.isAvailable());
         
-        if(dto.getNote() != null || !dto.getNote().isEmpty()){
+        if(dto.getNote() != null  && !dto.getNote().isEmpty()){
             availability.setNote(dto.getNote());
         }
         

@@ -18,8 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sni.hairsalon.dto.request.AvailabilityRequestDTO;
 import com.sni.hairsalon.dto.response.AvailabilityResponseDTO;
-import com.sni.hairsalon.service.serviceImpl.AvailabilityServiceImpl;
-
+import com.sni.hairsalon.service.AvailabilityService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AvailabilityController {
     
-    private final AvailabilityServiceImpl availabilityService;
+    private final AvailabilityService availabilityService;
 
     @PostMapping("/admin/create")
     @PreAuthorize("hasRole('ADMIN')")
