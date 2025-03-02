@@ -14,16 +14,15 @@ import com.sni.hairsalon.model.User;
 import com.sni.hairsalon.model.UserPrincipal;
 import com.sni.hairsalon.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 
 @Service
+@RequiredArgsConstructor
 public class MyUserDetailsService implements UserDetailsService{
     
      private static final Logger logger = LoggerFactory.getLogger(MyUserDetailsService.class);
      private final UserRepository userRepo;
-     
-    public MyUserDetailsService(UserRepository userRepo) {
-        this.userRepo = userRepo;
-    }
 
 
     @Override

@@ -19,13 +19,14 @@ import com.sni.hairsalon.security.Utils.JWTUtils;
 import com.sni.hairsalon.service.SessionService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class SessionServiceImpl implements SessionService {
     
-    @Autowired
-    SessionMapper mapper;
-
+   
+    private final SessionMapper mapper;
     private final UserRepository userRepo;
     private final JWTUtils jwtUtils;
     private final UserSessionRepository sessionRepo;
@@ -33,13 +34,6 @@ public class SessionServiceImpl implements SessionService {
     @Value("${sessionTimeout:86400000}")
     private final long sessionTimeout;
 
-
-    public SessionServiceImpl(UserRepository userRepo, JWTUtils jwtUtils, UserSessionRepository sessionRepo){
-        this.jwtUtils = jwtUtils;
-        this.userRepo = userRepo;
-        this.sessionRepo = sessionRepo;
-        this.sessionTimeout = 1440L;
-    }
 
     @Override 
     public SessionResponseDTO createSession(HttpServletRequest request, UserResponseDTO user){

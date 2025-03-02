@@ -28,7 +28,10 @@ import com.sni.hairsalon.repository.ClientRepository;
 import com.sni.hairsalon.repository.HaircutRepository;
 import com.sni.hairsalon.repository.UserRepository;
 import com.sni.hairsalon.service.AppointmentService;
+import com.sni.hairsalon.service.AvailabilityService;
 import com.sni.hairsalon.service.EmailService;
+import com.sni.hairsalon.service.ScheduleService;
+import com.sni.hairsalon.service.SmsService;
 import com.sni.hairsalon.model.Status;
 import com.sni.hairsalon.model.User;
 
@@ -40,14 +43,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AppointmentServiceImpl implements AppointmentService {
 
-  private final ScheduleServiceImpl scheduleService;
-  private final AvailabilityServiceImpl availabilityService;
+  private final ScheduleService scheduleService;
+  private final AvailabilityService availabilityService;
   private final EmailService mailService;
   private final BarberRepository barberRepo;
   private final HaircutRepository haircutRepo;
   private final AppointmentRepository appointmentRepo;
   private final AppointmentMapper mapper;
-  private final SmsServiceImpl smsService;
+  private final SmsService smsService;
   private final UserRepository userRepo;
   private final ClientRepository clientRepo;
 

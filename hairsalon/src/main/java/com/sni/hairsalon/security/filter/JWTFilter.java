@@ -29,7 +29,6 @@ public class JWTFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final MyUserDetailsService userDetailsService;
-
     private final JWTUtils jwtUtils;
     
     @SuppressWarnings("null")

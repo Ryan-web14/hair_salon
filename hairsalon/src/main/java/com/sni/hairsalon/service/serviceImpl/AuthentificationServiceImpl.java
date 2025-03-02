@@ -23,6 +23,9 @@ import com.sni.hairsalon.mapper.UserMapper;
 import com.sni.hairsalon.model.User;
 import com.sni.hairsalon.repository.UserRepository;
 import com.sni.hairsalon.service.AuthentificationService;
+import com.sni.hairsalon.service.ClientService;
+import com.sni.hairsalon.service.SessionService;
+import com.sni.hairsalon.service.UserService;
 import com.sni.hairsalon.utils.ValidationUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,9 +36,9 @@ import lombok.RequiredArgsConstructor;
 public class AuthentificationServiceImpl implements AuthentificationService{
     
     private final UserRepository userRepo;
-    private final SessionServiceImpl sessionService;
-    private final UserServiceImpl userService;
-    public final ClientServiceImpl clientService;
+    private final SessionService sessionService;
+    private final UserService userService;
+    public final ClientService clientService;
     private final AuthenticationManager authenticationManager;
     private final UserMapper mapper;
 

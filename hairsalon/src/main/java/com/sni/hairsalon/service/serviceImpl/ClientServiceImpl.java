@@ -14,6 +14,7 @@ import com.sni.hairsalon.model.User;
 import com.sni.hairsalon.repository.ClientRepository;
 import com.sni.hairsalon.repository.UserRepository;
 import com.sni.hairsalon.service.ClientService;
+import com.sni.hairsalon.service.EmailService;
 import com.sni.hairsalon.utils.ValidationUtils;
 
 import jakarta.transaction.Transactional;
@@ -23,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
     
-    private final EmailServiceImpl mailService;
+    private final EmailService mailService;
     private final UserRepository userRepo;
    // private final UserServiceImpl userService;
     private final ClientRepository clientRepo;
