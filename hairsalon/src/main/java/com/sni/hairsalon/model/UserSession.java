@@ -11,7 +11,7 @@ import lombok.*;
 
 @Data
 @AllArgsConstructor(staticName = "create")
-@RequiredArgsConstructor(staticName = "of")
+@NoArgsConstructor
 @Entity
 @Builder
 @Table(name = "user_session")

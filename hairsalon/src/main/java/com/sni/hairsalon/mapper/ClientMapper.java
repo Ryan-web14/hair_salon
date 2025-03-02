@@ -12,10 +12,13 @@ import com.sni.hairsalon.repository.ClientRepository;
 import com.sni.hairsalon.repository.UserRepository;
 import com.sni.hairsalon.utils.ValidationUtils;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class ClientMapper{
 
-    UserRepository userRepo;
+    private final UserRepository userRepo;
 
     @Autowired
     ClientRepository clientRepo;

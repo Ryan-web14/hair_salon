@@ -1,6 +1,5 @@
 package com.sni.hairsalon.mapper;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.sni.hairsalon.dto.request.BarberRequestDTO;
@@ -11,11 +10,13 @@ import com.sni.hairsalon.model.User;
 import com.sni.hairsalon.repository.UserRepository;
 import com.sni.hairsalon.utils.ValidationUtils;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class BarberMapper {
 
-    @Autowired
-    UserRepository userRepo;
+    private final UserRepository userRepo;
     
     public Barber toEntity(BarberRequestDTO dto){
         validateField(dto);

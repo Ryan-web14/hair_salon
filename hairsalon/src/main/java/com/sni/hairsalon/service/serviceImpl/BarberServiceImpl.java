@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sni.hairsalon.dto.request.BarberRequestDTO;
-import com.sni.hairsalon.dto.request.ClientRequestDTO;
 import com.sni.hairsalon.dto.response.BarberResponseDTO;
 import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.mapper.BarberMapper;

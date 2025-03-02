@@ -318,7 +318,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     Appointment appointment = appointmentRepo.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
 
-    if (appointment.getStatus() == 5 || appointment.getStatus() == 6 || appointment.getStatus() == 7) {
+    if (appointment.getStatus() == 6 || appointment.getStatus() == 7 || appointment.getStatus() == 8) {
       throw new IllegalStateException("Appointment can't be completed");
     }
 
@@ -428,14 +428,14 @@ public class AppointmentServiceImpl implements AppointmentService {
 }
 
 /*
- * PENDING(1),
- * REQUESTED(2),
- * CONFIRMED(3),
- * CHECK_IN(4),
- * IN_PROGRESS(5),
- * COMPLETED(5),
- * CANCELLED_BY_CLIENT(6),
- * CANCELLED_BY_PROVIDER(7),
- * RESCHEDULED(8),
- * NO_SHOW()
+    PENDING(1),
+    REQUESTED(2),
+    CONFIRMED(3),
+    CHECK_IN(4),
+    IN_PROGRESS(5),
+    COMPLETED(6),
+    CANCELLED_BY_CLIENT(7),
+    CANCELLED_BY_PROVIDER(8),
+    RESCHEDULED(9),
+    NO_SHOW(10);
  */

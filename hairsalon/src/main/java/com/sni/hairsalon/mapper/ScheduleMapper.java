@@ -2,7 +2,6 @@ package com.sni.hairsalon.mapper;
 
 import java.sql.Date;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.sni.hairsalon.dto.request.ScheduleRequestDTO;
@@ -12,11 +11,14 @@ import com.sni.hairsalon.model.Barber;
 import com.sni.hairsalon.model.Schedule;
 import com.sni.hairsalon.repository.BarberRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class ScheduleMapper {
     
-    @Autowired
-    BarberRepository barberRepo;
+   
+   private final BarberRepository barberRepo;
 
     public Schedule toEntity(ScheduleRequestDTO dto){
         Barber barber = barberRepo.findBarberById(Long.parseLong(dto.getBarberId())).

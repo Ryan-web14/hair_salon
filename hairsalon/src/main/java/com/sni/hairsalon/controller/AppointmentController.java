@@ -16,8 +16,7 @@ import com.sni.hairsalon.dto.request.AppointmentRequestDTO;
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
 import com.sni.hairsalon.exception.BadRequestException;
 import com.sni.hairsalon.model.UserPrincipal;
-import com.sni.hairsalon.service.serviceImpl.AppointmentServiceImpl;
-
+import com.sni.hairsalon.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -25,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AppointmentController {
     
-    private final AppointmentServiceImpl appointmentService;
+    private final AppointmentService appointmentService;
 
     @PostMapping("/")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or hasRole('CLIENT')")

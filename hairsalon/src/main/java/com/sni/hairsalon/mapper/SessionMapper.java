@@ -2,7 +2,6 @@ package com.sni.hairsalon.mapper;
 
 import java.time.LocalDateTime;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.sni.hairsalon.dto.request.SessionRequestDTO;
@@ -13,11 +12,14 @@ import com.sni.hairsalon.model.User;
 import com.sni.hairsalon.model.UserSession;
 import com.sni.hairsalon.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class SessionMapper {
 
-    @Autowired
-    private UserRepository userRepo;
+    
+    private final UserRepository userRepo;
 
     public UserSession toEntity(UserResponseDTO dto,SessionRequestDTO request){
         User user =  userRepo.findUserById(Long.parseLong(dto.getId()))
