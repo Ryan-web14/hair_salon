@@ -32,13 +32,13 @@ public class SessionServiceImpl implements SessionService {
     private final UserSessionRepository sessionRepo;
 
     @Value("${sessionTimeout:86400000}")
-    private final long sessionTimeout;
+    private long sessionTimeout;
 
 
     @Override 
     public SessionResponseDTO createSession(HttpServletRequest request, UserResponseDTO user){
         User userFound = userRepo.findUserById(Long.parseLong(user.getId()))
-        .orElseThrow(()-> new ResourceNotFoundException("User not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         String token = jwtUtils.generateToken(userFound);
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expiration = now.plusMinutes(sessionTimeout);
