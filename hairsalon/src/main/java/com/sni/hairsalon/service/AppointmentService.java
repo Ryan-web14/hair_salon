@@ -10,11 +10,12 @@ public interface AppointmentService {
     
     public AppointmentResponseDTO createAppointment(AppointmentRequestDTO request);
     public AppointmentResponseDTO updateSAppointmentStatus(long id,int status);
-    public void cancelAppointmentByClient(long id, long clientId);
+    public void cancelAppointmentByClient(long id, String clientEmail);
     public void cancelAppointment(long id);
     public List<AppointmentResponseDTO> getAllAppointment();
     public List<AppointmentResponseDTO> getAllBarberAppointment(LocalDate date);
     public List<AppointmentResponseDTO> getBarberAppointment(long barberId);
+    public List<AppointmentResponseDTO> getMyBarberAppointment(String email);
     public List<AppointmentResponseDTO> getClientAppointment(long clientId);
     public List<AppointmentResponseDTO> getCompletedAppointment();
     public List<AppointmentResponseDTO> getClientCompletedAppointment(String email);

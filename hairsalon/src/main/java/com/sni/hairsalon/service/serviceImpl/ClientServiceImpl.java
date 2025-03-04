@@ -72,6 +72,23 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     @Transactional
+    public ClientResponseDTO updateAdminClient(long clientId, ClientRequestDTO dto){
+
+        validateField(dto);
+        Client client = clientRepo.findById(clientId)
+        .orElseThrow(()-> new ResourceNotFoundException("Client not found"));
+      
+        client.setFirstname(dto.getFirstname());
+        client.setLastname(dto.getLastname());
+        client.setPhoneNumber(Integer.parseInt(dto.getPhone()));
+        client.setNoShowCount(dto.getNoShowCount());
+        clientRepo.save(client);
+
+        return mapper.toDto(client);
+    }
+
+    @Override
+    @Transactional
     public void  deleteClient(long id){
 
         clientRepo.deleteById(id); 

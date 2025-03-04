@@ -170,8 +170,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     return appointments.stream()
         .map(appointment -> mapper.toDto(appointment))
         .collect(Collectors.toList());
-
   }
+
+
 
   @Override
   @Scheduled(fixedRate = 30000)
@@ -218,11 +219,11 @@ public class AppointmentServiceImpl implements AppointmentService {
   }
 
   @Override
-  public void cancelAppointmentByClient(long id, long clientId) {
+  public void cancelAppointmentByClient(long id, String clientEmail){
 
     Appointment cancelAppointment = appointmentRepo.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
-    Client client = clientRepo.findById(clientId)
+    Client client = clientRepo.findByEmail(clientEmail)
         .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
 
     if (cancelAppointment.getClient().getId() != client.getId()) {
@@ -325,7 +326,7 @@ public class AppointmentServiceImpl implements AppointmentService {
       throw new IllegalStateException("Appointment can't be completed");
     }
 
-    appointment.setStatus(5);
+    appointment.setStatus(6);
     appointmentRepo.save(appointment);
     return;
   }
@@ -362,6 +363,15 @@ public class AppointmentServiceImpl implements AppointmentService {
   private void notifyBarber(Appointment apt) {
     mailService.sendCheckIn(apt);
     return;
+  }
+  
+  public List<AppointmentResponseDTO> getMyBarberAppointment(String email){
+
+    Barber barber = barberRepo.findByEmail(email)
+    .orElseThrow(()-> new ResourceNotFoundException("Client not found"));
+
+    return getBarberAppointment(barber.getId());
+
   }
 
   private void checkAppointmentTime(Appointment appointment, LocalDateTime now) {
@@ -425,8 +435,9 @@ public class AppointmentServiceImpl implements AppointmentService {
       
     }
     return appointment;
-      
   }
+
+
 
 }
 

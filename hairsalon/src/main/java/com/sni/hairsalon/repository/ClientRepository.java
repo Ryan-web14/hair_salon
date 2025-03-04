@@ -12,7 +12,7 @@ import com.sni.hairsalon.model.Client;
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long>{
-   //Optional<Client> findById(long id);
+   Optional<Client> findById(long id);
    Optional<Client>  findClientByFirstname(String name);
    Optional<Client>  findClientByLastname(String name);
    Optional<Client>  findClientByPhoneNumber(int phone);
