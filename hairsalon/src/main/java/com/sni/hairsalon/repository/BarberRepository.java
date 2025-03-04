@@ -1,5 +1,6 @@
 package com.sni.hairsalon.repository;
 
+import java.lang.foreign.Linker.Option;
 import java.sql.Date;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -20,7 +21,10 @@ public interface BarberRepository extends JpaRepository<Barber, Long>{
     Barber findBarberByLastname(String lastname);
     List<Barber> findBarberByFirstname(String firstname);
     Barber findBarberByPhoneNumber(int phoneNumber);
-
+    
+    @Query("SELECT b FROM Barber b where b.user.email = :email")
+    Optional<Barber> findByEmail(String email);
+    
     @Override
     @NonNull
     List<Barber> findAll();

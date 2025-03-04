@@ -17,5 +17,3 @@ public class ClientRequestDTO {
     private  int noShowCount;
 }
 
-
-//admettre une valeur par defaut a noshowcount
