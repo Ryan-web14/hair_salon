@@ -38,7 +38,7 @@ public class AvailabilityController {
         }
 
     @PostMapping("/{id}/status")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+@PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<AvailabilityResponseDTO> updateAvailabilityStatus(
         @PathVariable Long id, @RequestParam boolean isAvailable){
             

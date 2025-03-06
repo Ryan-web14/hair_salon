@@ -9,7 +9,7 @@ public interface  BarberService {
     
     public BarberResponseDTO createBarber(BarberRequestDTO dto);
     public List<BarberResponseDTO> getAllBarber();
-     public BarberResponseDTO updateBarber(String id, BarberRequestDTO request);
+     public BarberResponseDTO updateBarber(Long id, BarberRequestDTO request);
     public void   deleteBarber(long id);
     public BarberResponseDTO getBarberById(long id);
     public BarberResponseDTO getBarberProfile(String email);

@@ -113,6 +113,66 @@ public class AppointmentServiceImpl implements AppointmentService {
   }
 
   @Override
+  public AppointmentResponseDTO updateAppointmentByAdmin(long id,AppointmentRequestDTO request){
+
+    Appointment appointment = appointmentRepo.findById(id)
+    .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+
+  User user = userRepo.findUserByEmail(request.getEmail())
+    .orElseThrow(() -> new ResourceNotFoundException("User not Found"));
+
+  Client client = clientRepo.findClientByUserID(user.getId())
+    .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
+
+  Barber barber = barberRepo.findById(Long.parseLong(request.getBarberId()))
+    .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
+
+  Haircut haircut = haircutRepo.findById(request.getHaircutId())
+    .orElseThrow(() -> new ResourceNotFoundException("Haircut not found"));
+
+  LocalDate appointmentDate = request.getAppointmentTime().toLocalDate();
+  LocalDateTime appointmentTime = request.getAppointmentTime().truncatedTo(ChronoUnit.MINUTES);
+
+  ScheduleResponseDTO schedule = scheduleService.getBarberScheduleForDate(Long.parseLong(request.getBarberId()),
+    appointmentDate);
+
+  LocalDateTime startSchedule = schedule.getStartTime();
+  LocalDateTime endSchedule = schedule.getEndTime();
+
+  if (appointmentDate.isBefore(schedule.getEffectiveFrom()) ||
+    appointmentDate.isAfter(schedule.getEffectiveTo())) {
+    throw new IllegalStateException("The appointment date doesn't match the barber schedule");
+  }
+
+  if (appointmentTime.isBefore(startSchedule)
+    || appointmentTime.isAfter(endSchedule)) {
+    throw new IllegalStateException("The appointment time doesn't match the barber hour");
+  }
+
+  if (!availabilityService.isAvailableSlot(barber.getId(),
+    appointmentTime, haircut.getDuration())) {
+
+    throw new IllegalStateException("Slot is not available");
+  }
+
+  availabilityService.makeSlotUnavailable(barber.getId(), appointmentTime, haircut.getDuration());
+
+  appointment.setClient(client);
+  appointment.setBarber(barber);
+  appointment.setHaircut(haircut);
+  appointment.setAppointmentTime(appointmentTime);
+  appointment.setStatus(Status.CONFIRMED.getCode());
+
+  appointmentRepo.save(appointment);
+
+  AppointmentResponseDTO response = mapper.toDto(appointment);
+  mailService.sendAppointmentConfirmation(client.getUser().getEmail(), response);
+
+  return response;
+  }
+
+
+  @Override
   public AppointmentResponseDTO updateSAppointmentStatus(long id, int status) {
 
     Appointment appointment = appointmentRepo.findById(id)

@@ -1,7 +1,8 @@
 package com.sni.hairsalon.service.serviceImpl;
 
 import java.time.LocalDateTime;
-
+import java.util.Comparator;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,18 @@ public class SessionServiceImpl implements SessionService {
     public SessionResponseDTO createSession(HttpServletRequest request, UserResponseDTO user){
         User userFound = userRepo.findUserById(Long.parseLong(user.getId()))
         .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        List<UserSession> ActiveSessions = sessionRepo.findByUser_IdAndIsActiveTrue(userFound.getId());
+        if(ActiveSessions.size() >= 3){
+            UserSession oldSession =  ActiveSessions.stream()
+            .min(Comparator.comparing(UserSession::getCreated_at))
+            .orElse(null);
+            if(oldSession != null){
+                oldSession.setActive(false);
+                sessionRepo.save(oldSession);
+            }
+        }
+
         String token = jwtUtils.generateToken(userFound);
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expiration = now.plusMinutes(sessionTimeout);

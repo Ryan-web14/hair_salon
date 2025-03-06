@@ -29,9 +29,9 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
 
     public String createToken(String email){
         
-        if(!userService.emailAlreadyExist(email)){
-            throw new ResourceNotFoundException("Vous recevre un email");
-        }
+    //    if(!userService.emailAlreadyExist(email)){
+    //         throw new IllgalStateAccess("Vous recevrez un email");
+    //     }
         if(!ValidationUtils.isValidEmail(email)){
             throw new RuntimeException("Invalid email");
         }
@@ -69,6 +69,10 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
     public void resetPassword(String token, String newPassword){
 
         String email = pwdResetTokenRepo.findEmailByToken(token);
+        PasswordResetToken resetToken = pwdResetTokenRepo.findByToken(token)
+        .orElseThrow(()-> new InvalidTokenException("Token not found"));
+        resetToken.setUsed(true);
+        pwdResetTokenRepo.save(resetToken);
         User foundUser = userService.getUserByEmail(email);
         userService.updatePassword(foundUser.getId(), newPassword);
     }

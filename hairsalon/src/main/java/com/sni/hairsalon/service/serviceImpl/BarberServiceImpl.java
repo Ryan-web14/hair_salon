@@ -58,9 +58,9 @@ public class BarberServiceImpl implements BarberService {
     }
  
     @Override
-    public BarberResponseDTO updateBarber(String id, BarberRequestDTO requestDTO){
+    public BarberResponseDTO updateBarber(Long id, BarberRequestDTO requestDTO){
         validateField(requestDTO);
-        Barber barber = barberRepo.findById(Long.parseLong(id))
+        Barber barber = barberRepo.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
 
         barber.setLastname(requestDTO.getLastname());

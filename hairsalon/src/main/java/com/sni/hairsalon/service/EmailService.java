@@ -20,4 +20,5 @@ public interface EmailService {
     public CompletableFuture<Boolean> sendCheckIn(Appointment appointment);
     public CompletableFuture<Boolean> sendWelcomeMessage(Client client);
     public CompletableFuture<Boolean> sendPasswordResetEmail(String email, String link);
+    public CompletableFuture<Boolean> sendTemporaryPasswordChangeEmail(String email, String temporaryPassword, String link);
 }

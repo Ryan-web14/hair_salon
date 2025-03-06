@@ -157,16 +157,6 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         Barber barber = barberRepo.findById(barberId)
         .orElseThrow(()-> new ResourceNotFoundException("Barber not found"));
-
-        /*List<Schedule> specificSchedule = scheduleRepo.findNonRecurringSchedules(barber.getId(), date);
-
-        if(!specificSchedule.isEmpty()){
-            return specificSchedule
-            .stream()
-            .map(schedule->mapper.toDto(schedule))
-            .collect(Collectors.toList());
-        }
-*/
         return mapper.toDto(
             scheduleRepo.findRecurringSchedules(barber.getId(), date.getDayOfWeek().getValue(), 
             date));

@@ -80,5 +80,26 @@ public class AuthentificationController {
 
         return ResponseEntity.ok("mot de passe réinitialisé");
     }
+
+    @PostMapping("/admin/signup/client")
+    public ResponseEntity<ClientSignupResponse> signupClientByAdmin(@RequestBody ClientSignupRequest request){
+        
+        String token = passwordResetService.createToken(request.getEmail());
+
+        String passwordLink = "https://lhomme-cg.com/change-password?token=" + token;
+
+       return ResponseEntity.ok().body(authService.signupClientByAdmin(request, passwordLink));
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changeTemporaryPassword(@RequestBody ResetPasswordRequestDTO resetRequest){
+        String token = resetRequest.getToken();
+        String newPassword = resetRequest.getNewPassword();
+
+        passwordResetService.validateToken(token);
+        passwordResetService.resetPassword(token, newPassword);
+
+        return ResponseEntity.ok("Changement effectué");
+    }
   }
 

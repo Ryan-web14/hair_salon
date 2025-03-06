@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.sni.hairsalon.dto.request.AppointmentRequestDTO;
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
@@ -123,7 +124,7 @@ public class AppointmentController {
     public ResponseEntity<Void> cancelAppointmentByClient(@PathVariable long id, @RequestParam String clientEmail, @AuthenticationPrincipal 
     UserPrincipal authenticatedUser){
         try{
-            String email = authenticatedUser.getUsername();
+            String email =   authenticatedUser.getUsername();
             String role = authenticatedUser.getAuthorities().iterator().next().getAuthority();
             
             if(role.equals("ROLE_CLIENT"))
@@ -140,9 +141,9 @@ public class AppointmentController {
 
   @PutMapping("/{appointmentId}/admin/cancel")
   @PreAuthorize("hasRole('ADMIN') or hasRole(MANAGER)")
-  public ResponseEntity<Void> cancelAppointment(@PathVariable long id){
+  public ResponseEntity<Void> cancelAppointment(@PathVariable long appointmentId){
 
-    appointmentService.cancelAppointment(id);
+    appointmentService.cancelAppointment(appointmentId);
     return ResponseEntity.noContent().build();
   }
 
@@ -154,6 +155,13 @@ public class AppointmentController {
     return ResponseEntity.ok().body(appointmentService.searchAppointmentByClientName(name, status));
   }
 
+  @PutMapping("/{appointmentId}/admin/update")
+  @PreAuthorize("hasRole('ADMIN') or hasRole(MANAGER)")
+  public ResponseEntity<AppointmentResponseDTO> updateAppointmentByAdmin(@PathVariable long appointmentId, 
+  @RequestBody AppointmentRequestDTO request){
+    
+    return ResponseEntity.ok().body(appointmentService.updateAppointmentByAdmin(appointmentId, request));
+  }
 }
 
 

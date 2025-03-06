@@ -22,8 +22,10 @@ import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.mapper.UserMapper;
 import com.sni.hairsalon.model.User;
 import com.sni.hairsalon.repository.UserRepository;
+import com.sni.hairsalon.security.service.RandomAlphaNumericGeneratorService;
 import com.sni.hairsalon.service.AuthentificationService;
 import com.sni.hairsalon.service.ClientService;
+import com.sni.hairsalon.service.EmailService;
 import com.sni.hairsalon.service.SessionService;
 import com.sni.hairsalon.service.UserService;
 import com.sni.hairsalon.utils.ValidationUtils;
@@ -41,6 +43,8 @@ public class AuthentificationServiceImpl implements AuthentificationService{
     public final ClientService clientService;
     private final AuthenticationManager authenticationManager;
     private final UserMapper mapper;
+    private final EmailService mailService;
+    private final RandomAlphaNumericGeneratorService randomStringService;
 
     @Override 
     public AuthResponse login(UserRequestDTO dto, HttpServletRequest request){
@@ -125,5 +129,57 @@ public class AuthentificationServiceImpl implements AuthentificationService{
        UserResponseDTO dto = userService.createUser(user);
        return dto;
     }
+
+    @Override
+    @Transactional
+    public ClientSignupResponse signupClientByAdmin(ClientSignupRequest request, String link){
+
+        if(!ValidationUtils.isLetter(request.getFirstname()) || 
+        !ValidationUtils.isAlphaWithSpaces(request.getFirstname())){
+            throw new RuntimeException("Invalid firstname");
+        }
+
+        if(!ValidationUtils.isLetter(request.getLastname()) || 
+        !ValidationUtils.isAlphaWithSpaces(request.getLastname())){
+            throw new RuntimeException("Invalid Lastname");
+        }
+
+        if(!ValidationUtils.isValidEmail(request.getEmail())){
+            throw new RuntimeException("Invalid email");
+        }
+
+        if(!ValidationUtils.isValidPhone(request.getPhone())){
+            throw new RuntimeException("Invalid phone number");
+        }
+
+        String randomPassword = randomStringService.generateRandomAlphaNumeric(10);
+
+        UserRequestDTO dto = UserRequestDTO.builder()
+        .email(request.getEmail())
+        .role("CLIENT")
+        .password(randomPassword)
+        .build();
+
+        UserResponseDTO userDto = userService.createUser(dto);
+
+        ClientRequestDTO clientDto = ClientRequestDTO.builder()
+        .email(userDto.getEmail())
+        .firstname(request.getFirstname())
+        .lastname(request.getLastname())
+        .phone(request.getPhone())
+        .noShowCount(0)
+        .build();
+
+        
+       ClientResponseDTO clientResponse =  clientService.createClient(clientDto);
+
+       mailService.sendTemporaryPasswordChangeEmail(request.getEmail(),randomPassword, link);
+
+       if(clientResponse.getEmail().isEmpty()){
+            userRepo.deleteById(Long.parseLong(userDto.getId()));
+       }
+        return new ClientSignupResponse(clientResponse.getEmail());
+    }
+
 
 }
