@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.sni.hairsalon.security.Utils.JWTUtils;
 import com.sni.hairsalon.security.service.MyUserDetailsService;
+import com.sni.hairsalon.service.SessionService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,6 +30,7 @@ public class JWTFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final MyUserDetailsService userDetailsService;
+    private final SessionService sessionService;
     private final JWTUtils jwtUtils;
     
     @SuppressWarnings("null")
@@ -67,6 +69,10 @@ public class JWTFilter extends OncePerRequestFilter {
     }
 
     private void processToken(String token){
+
+        if(sessionService.isSessionValid(token) == false){
+            throw new IllegalAccessError("Not valid session");
+        }
         String email = jwtUtils.validateTokenAndRetrieveSubject(token);
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserPrincipal userDetails = (UserPrincipal) userDetailsService.loadUserByUsername(email);

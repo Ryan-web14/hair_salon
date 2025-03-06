@@ -88,7 +88,7 @@ public class EmailServiceImpl implements EmailService{
             Bonjour Madame, Monsieur %s
             
             Cet email confirme la création de votre compte
-            et nous souhaitons la bienvenue chez l'homme.
+            et nous vous souhaitons la bienvenue chez l'homme.
 
             ID client: %s
             Nom: %s
@@ -393,6 +393,27 @@ public class EmailServiceImpl implements EmailService{
          return sendEmail(email, subject, content);
     }
 
+    @Async
+    public CompletableFuture<Boolean> sendTemporaryPasswordChangeEmail(String email, String temporaryPassword, String link){
+        String subject = "Changement temporaire de mot de passe";
+        String content = String.format(
+            """
+            Bonjour,
+
+            Votre mot de passe temporaire est: %s
+
+            Veuillez cliquer sur le lien suivant pour changer votre mot de passe: %s
+
+            Cordialement,
+            L'équipe de L'HOMME
+
+            Ne pas répondre. Générer automatiquement.
+            """,
+            temporaryPassword, link
+        );
+
+        return sendEmail(email, subject, content);
+    }
 
     @Async
     private CompletableFuture<Boolean> sendEmail(String to, String subject, String body){
