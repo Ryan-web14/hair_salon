@@ -72,7 +72,7 @@ public class AppointmentController {
  }
 
     @GetMapping("/admin/completed")
-    @PreAuthorize("hasRole('ADMIN') or hasRole(MANAGER)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<List<AppointmentResponseDTO>> getCompletedAppointment(String email){
 
         return ResponseEntity.ok().body(appointmentService.getClientCompletedAppointment(email));
@@ -80,7 +80,7 @@ public class AppointmentController {
     }
 
     @PostMapping("/{appointmentId}/status/completed")
-    @PreAuthorize("hasRole('ADMIN') or hasRole(MANAGER)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<Void> completeAppointment(@PathVariable long appointmentId){
 
         appointmentService.makeAppointmentCompleted(appointmentId);
@@ -95,7 +95,7 @@ public class AppointmentController {
     } 
 
     @GetMapping("/barber/admin/date")
-    @PreAuthorize("hasRole('ADMIN') or hasRole(MANAGER)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<List<AppointmentResponseDTO>> getAllBarberAppointment( 
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
 
@@ -121,7 +121,7 @@ public class AppointmentController {
     }
 
     @PostMapping("/{appointmentId}/cancel")
-    public ResponseEntity<Void> cancelAppointmentByClient(@PathVariable long id, @RequestParam String clientEmail, @AuthenticationPrincipal 
+    public ResponseEntity<Void> cancelAppointmentByClient(@PathVariable long appointmentId, @RequestParam String clientEmail, @AuthenticationPrincipal 
     UserPrincipal authenticatedUser){
         try{
             String email =   authenticatedUser.getUsername();
@@ -129,7 +129,7 @@ public class AppointmentController {
             
             if(role.equals("ROLE_CLIENT"))
             {
-               appointmentService.cancelAppointmentByClient(id,email);
+               appointmentService.cancelAppointmentByClient(appointmentId,email);
                return ResponseEntity.noContent().build();
             }
     
@@ -140,7 +140,7 @@ public class AppointmentController {
   }
 
   @PutMapping("/{appointmentId}/admin/cancel")
-  @PreAuthorize("hasRole('ADMIN') or hasRole(MANAGER)")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<Void> cancelAppointment(@PathVariable long appointmentId){
 
     appointmentService.cancelAppointment(appointmentId);
@@ -148,7 +148,7 @@ public class AppointmentController {
   }
 
   @GetMapping("/search/{status}/name")
-  @PreAuthorize("hasRole('ADMIN') or hasRole(MANAGER)")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<List<AppointmentResponseDTO>> searchAppointment(@PathVariable Integer status,
    @RequestParam String name){
 
@@ -156,7 +156,7 @@ public class AppointmentController {
   }
 
   @PutMapping("/{appointmentId}/admin/update")
-  @PreAuthorize("hasRole('ADMIN') or hasRole(MANAGER)")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<AppointmentResponseDTO> updateAppointmentByAdmin(@PathVariable long appointmentId, 
   @RequestBody AppointmentRequestDTO request){
     

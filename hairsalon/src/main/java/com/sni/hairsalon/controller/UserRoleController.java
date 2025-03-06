@@ -13,7 +13,7 @@ import com.sni.hairsalon.service.UserRoleService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("v1/role")
+@RequestMapping("/v1/role")
 @RequiredArgsConstructor
 public class UserRoleController {
 
