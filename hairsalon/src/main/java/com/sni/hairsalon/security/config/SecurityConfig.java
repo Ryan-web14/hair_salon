@@ -56,7 +56,7 @@ public class SecurityConfig {
                 .requestMatchers("/v1/auth/**").permitAll()
                 .requestMatchers("/v1/role/**").permitAll()
                 .requestMatchers("/v1/availability/baber/**").permitAll()
-                .requestMatchers("v1/haircut/all").permitAll()
+                .requestMatchers("/v1/haircut/all").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form.disable())
