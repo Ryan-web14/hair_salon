@@ -76,7 +76,7 @@ public class ScheduleController {
             return ResponseEntity.ok(scheduleService.getAllCurrentSchedule(date));
         }
 
-    @GetMapping("/current/{id}/barber")
+    @GetMapping("/current/barber")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<List<ScheduleResponseDTO>> getTodayScheduleForBarber(@RequestParam  Long barberId){
         

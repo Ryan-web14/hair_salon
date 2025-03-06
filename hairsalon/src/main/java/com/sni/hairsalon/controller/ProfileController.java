@@ -13,7 +13,7 @@ import com.sni.hairsalon.model.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("v1/me")
+@RequestMapping("/v1/me")
 @RequiredArgsConstructor
 public class ProfileController {
     

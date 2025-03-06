@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BarberController {
     
-    private final com.sni.hairsalon.service.BarberService barberService;
+    private final BarberService barberService;
 
     @PostMapping("/")
     public ResponseEntity<BarberResponseDTO> createBarber(@RequestBody BarberRequestDTO request){
