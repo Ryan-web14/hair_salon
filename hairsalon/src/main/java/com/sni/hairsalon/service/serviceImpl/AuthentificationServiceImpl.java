@@ -115,6 +115,8 @@ public class AuthentificationServiceImpl implements AuthentificationService{
         if(!request.getRole().isEmpty()){
             request.setRole("");
         }
+        
+        request.setRole("ADMIN");
 
         return userService.createAdmin(request); 
     }

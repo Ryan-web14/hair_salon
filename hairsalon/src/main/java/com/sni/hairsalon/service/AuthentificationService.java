@@ -17,3 +17,5 @@ public interface AuthentificationService {
     public UserResponseDTO signupAdmin(UserRequestDTO request);
     //public void validateUserEmail(String email);
 }
+//TODO create a specific login for admin and mananger 
+//TODO create a specific login for barber 

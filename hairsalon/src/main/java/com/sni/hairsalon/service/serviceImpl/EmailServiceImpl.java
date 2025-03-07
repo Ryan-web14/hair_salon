@@ -3,6 +3,7 @@ package com.sni.hairsalon.service.serviceImpl;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -291,7 +292,8 @@ public class EmailServiceImpl implements EmailService{
         schedule.append("Voici votre programme de la journée: ");
 
         appointments.stream()
-        .map(apt->schedule.append(String.format(
+        .sorted(Comparator.comparing(Appointment::getAppointmentTime))
+        .forEach(apt->schedule.append(String.format(
             
         """
                 %s - %s

@@ -16,14 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.sni.hairsalon.dto.request.AppointmentRequestDTO;
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
 import com.sni.hairsalon.exception.BadRequestException;
 import com.sni.hairsalon.model.UserPrincipal;
 import com.sni.hairsalon.service.AppointmentService;
-import com.twilio.http.Response;
 
 import lombok.RequiredArgsConstructor;
 
