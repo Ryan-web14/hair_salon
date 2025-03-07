@@ -1,7 +1,7 @@
 package com.sni.hairsalon.dto.request;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -16,8 +16,9 @@ import lombok.NoArgsConstructor;
 public class BulkScheduleRequestDTO {
     private String barberId;
     private List<Integer> workingDays;
-    private LocalTime startTime;
-    private LocalTime endTime;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+    private boolean isRecurring;
+    private LocalDate effectiveFrom;
+    private LocalDate effectiveTo;
 }

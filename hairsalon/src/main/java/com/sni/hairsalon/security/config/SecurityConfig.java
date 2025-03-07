@@ -55,7 +55,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/v1/auth/**").permitAll()
                 .requestMatchers("/v1/role/**").permitAll()
-                .requestMatchers("/v1/availability/baber/**").permitAll()
+                .requestMatchers("/v1/availability/barber/**").permitAll()
                 .requestMatchers("/v1/haircut/all").permitAll()
                 .anyRequest().authenticated()
             )

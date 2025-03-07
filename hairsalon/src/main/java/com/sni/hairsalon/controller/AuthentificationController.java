@@ -15,6 +15,7 @@ import com.sni.hairsalon.dto.request.ResetPasswordRequestDTO;
 import com.sni.hairsalon.dto.request.UserRequestDTO;
 import com.sni.hairsalon.dto.response.AuthResponse;
 import com.sni.hairsalon.dto.response.ClientSignupResponse;
+import com.sni.hairsalon.dto.response.UserResponseDTO;
 import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.service.AuthentificationService;
 import com.sni.hairsalon.service.EmailService;
@@ -89,6 +90,12 @@ public class AuthentificationController {
         String passwordLink = "https://lhomme-cg.com/change-password?token=" + token;
 
        return ResponseEntity.ok().body(authService.signupClientByAdmin(request, passwordLink));
+    }
+
+    @PostMapping("/signup/admin")
+    public ResponseEntity<UserResponseDTO> signupAdmin(@RequestBody UserRequestDTO request){
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(authService.signupAdmin(request));
     }
 
     @PostMapping("/change-password")

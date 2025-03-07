@@ -15,10 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sni.hairsalon.dto.request.BulkScheduleRequestDTO;
 import com.sni.hairsalon.dto.request.ScheduleRequestDTO;
 import com.sni.hairsalon.dto.request.ScheduleTemplateRequestDTO;
 import com.sni.hairsalon.dto.response.ScheduleResponseDTO;
-import com.sni.hairsalon.service.serviceImpl.ScheduleServiceImpl;
+import com.sni.hairsalon.service.ScheduleService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ScheduleController {
     
-    private final ScheduleServiceImpl scheduleService;
+    private final ScheduleService scheduleService;
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
@@ -81,6 +82,14 @@ public class ScheduleController {
     public ResponseEntity<List<ScheduleResponseDTO>> getTodayScheduleForBarber(@RequestParam  Long barberId){
         
         return ResponseEntity.ok(scheduleService.getBarBerTodayCurrentSchedule(barberId));
+    }
+
+    @PostMapping("/bulk")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    public ResponseEntity<List<ScheduleResponseDTO>> createBulkSchedules(
+            @RequestBody BulkScheduleRequestDTO request) {
+              return ResponseEntity.status(HttpStatus.CREATED)
+            .body(scheduleService.bulkCreateSchedules(request));
     }
 }
 
