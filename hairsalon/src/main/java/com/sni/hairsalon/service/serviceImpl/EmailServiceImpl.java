@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
+import com.sni.hairsalon.dto.response.UserResponseDTO;
 import com.sni.hairsalon.model.Appointment;
 import com.sni.hairsalon.model.Client;
 import com.sni.hairsalon.service.EmailService;
@@ -415,12 +416,36 @@ public class EmailServiceImpl implements EmailService{
         );
 
         return sendEmail(email, subject, content);
-    }
+        }
 
-    @Async
-    private CompletableFuture<Boolean> sendEmail(String to, String subject, String body){
+        @Async
+        public CompletableFuture<Boolean> sendBarberAccountInformation(String email, UserResponseDTO dto, String randomPassword) {
+        String subject = "Informations de compte";
+        String content = String.format(
+            """
+            Bonjour,
 
-        try{
+            Votre compte a été créé avec succès. Voici vos informations de connexion :
+
+            Email : %s
+            Mot de passe temporaire : %s
+
+            Veuillez vous connecter et changer votre mot de passe dès que possible.
+
+            Cordialement,
+            L'équipe de L'HOMME
+
+            Ne pas répondre. Générer automatiquement.
+            """,
+            dto.getEmail(), randomPassword
+        );
+
+        return sendEmail(email, subject, content);
+        }
+
+        @Async
+        private CompletableFuture<Boolean> sendEmail(String to, String subject, String body) {
+        try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(to);
@@ -428,11 +453,12 @@ public class EmailServiceImpl implements EmailService{
             message.setText(body);
             mailSender.send(message);
             return CompletableFuture.completedFuture(true);
-        }catch(MailException e){
+        } catch (MailException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to send mail");
         }
-    }
+        }
+
     
     @Async
     private CompletableFuture<Boolean> sendHtmlEmail(String to, String subject, String content){

@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.sni.hairsalon.model.User;
 import com.sni.hairsalon.model.UserSession;
 
 @Repository

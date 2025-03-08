@@ -37,4 +37,11 @@ List<Availability> findByBarberIdAndDateAndIsAvailableTrue(
         @Param("barberId") long barberId,
         @Param("startTime") LocalDateTime starTime,
         @Param("endTime") LocalDateTime endTime);
+
+        @Query("SELECT a FROM Availability a WHERE a.barber.id = :barberId " +
+       "AND ((a.startTime < :endTime AND a.endTime > :startTime))")
+List<Availability> findOverlappingSlots(
+    @Param("barberId") long barberId, 
+    @Param("startTime") LocalDateTime startTime, 
+    @Param("endTime") LocalDateTime endTime);
 }

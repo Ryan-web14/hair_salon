@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sni.hairsalon.dto.request.AppointmentRequestDTO;
+import com.sni.hairsalon.dto.request.AppointmentUpdateRequestDTO;
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
 import com.sni.hairsalon.exception.BadRequestException;
 import com.sni.hairsalon.model.UserPrincipal;
@@ -156,7 +157,7 @@ public class AppointmentController {
   @PutMapping("/{appointmentId}/admin/update")
   @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<AppointmentResponseDTO> updateAppointmentByAdmin(@PathVariable long appointmentId, 
-  @RequestBody AppointmentRequestDTO request){
+  @RequestBody AppointmentUpdateRequestDTO request){
     
     return ResponseEntity.ok().body(appointmentService.updateAppointmentByAdmin(appointmentId, request));
   }

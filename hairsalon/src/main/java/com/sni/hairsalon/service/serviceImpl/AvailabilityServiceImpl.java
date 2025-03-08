@@ -92,30 +92,78 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     }
 
     @Override
-    public void makeSlotUnavailable(long barberId, LocalDateTime startTime, int duration){
+public void makeSlotUnavailable(long barberId, LocalDateTime startTime, int duration) {
+ 
+    startTime = startTime.truncatedTo(ChronoUnit.MINUTES);
+    
+    //1calculate each needed slots
+    int slotDuration = 30; 
+    int numSlots = (int) Math.ceil((double) duration / slotDuration);
+    
+    for (int i = 0; i < numSlots; i++) {
+        LocalDateTime currentSlotStart = startTime.plusMinutes(i * slotDuration);
+        LocalDateTime currentSlotEnd = currentSlotStart.plusMinutes(slotDuration);
         
-        LocalDateTime endTime = startTime.plusMinutes(duration).truncatedTo(ChronoUnit.MINUTES);
-        Availability availability = availabilityRepo.findByStartAndEndTimeAndBarber(barberId, 
-        startTime.truncatedTo(ChronoUnit.MINUTES), endTime)
-        .orElseThrow(()-> new ResourceNotFoundException("time slot not found"));
-
-        availability.setAvailable(false);
-
-        return;
+        try {
+            Availability availability = availabilityRepo.findByStartAndEndTimeAndBarber(
+                barberId, currentSlotStart, currentSlotEnd)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Créneau non trouvé pour le barbier " + barberId + 
+                    " de " + currentSlotStart + " à " + currentSlotEnd));
+            
+            availability.setAvailable(false);
+            availabilityRepo.save(availability);
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        }
     }
+}
 
+// //TODO fix those function to verify the availability of a slot
+//     @Override
+//     public Boolean isAvailableSlot(long barberId, LocalDateTime startTime, int duration){
 
-    @Override
-    public Boolean isAvailableSlot(long barberId, LocalDateTime startTime, int duration){
+//         LocalDateTime endTime = startTime.plusMinutes(duration).truncatedTo(ChronoUnit.MINUTES);
+//         Availability availability = availabilityRepo.findByStartAndEndTimeAndBarber(barberId, 
+//         startTime, endTime)
+//         .orElseThrow(()-> new ResourceNotFoundException("time slot not found"));
 
-        LocalDateTime endTime = startTime.plusMinutes(duration).truncatedTo(ChronoUnit.MINUTES);
-        Availability availability = availabilityRepo.findByStartAndEndTimeAndBarber(barberId, 
-        startTime.truncatedTo(ChronoUnit.MINUTES), endTime)
-        .orElseThrow(()-> new ResourceNotFoundException("time slot not found"));
-        return availability.isAvailable();
-    }
+//         return availability.isAvailable();
+//     }
 
-
+    // @Override
+    // public Boolean isAvailableSlot(long barberId, LocalDateTime startTime, int duration) {
+    //     startTime = startTime.truncatedTo(ChronoUnit.MINUTES);
+    //     LocalDateTime endTime = startTime.plusMinutes(duration).truncatedTo(ChronoUnit.MINUTES);
+        
+    //     // Vérifier si nous avons des créneaux qui couvrent complètement la période
+    //     List<Availability> overlappingSlots = availabilityRepo.findOverlappingSlots(
+    //         barberId, startTime, endTime);
+        
+    //     if (overlappingSlots.isEmpty()) {
+    //         return false;  // Pas de créneaux du tout
+    //     }
+        
+    //     // Vérifier si tous les créneaux sont disponibles
+    //     if (!overlappingSlots.stream().allMatch(Availability::isAvailable)) {
+    //         return false;  // Au moins un créneau n'est pas disponible
+    //     }
+        
+    //     // Vérifier si les créneaux couvrent toute la période
+    //     LocalDateTime earliestStart = overlappingSlots.stream()
+    //         .map(Availability::getStartTime)
+    //         .min(LocalDateTime::compareTo)
+    //         .orElse(LocalDateTime.MAX);
+        
+    //     LocalDateTime latestEnd = overlappingSlots.stream()
+    //         .map(Availability::getEndTime)
+    //         .max(LocalDateTime::compareTo)
+    //         .orElse(LocalDateTime.MIN);
+        
+    //     // La période est entièrement couverte si le début des créneaux est <= au début demandé
+    //     // et la fin des créneaux est >= à la fin demandée
+    //     return !earliestStart.isAfter(startTime) && !latestEnd.isBefore(endTime);
+    // }
     
     private List<Availability> generateTimeSlot(Barber barber, 
     LocalDateTime startTime, LocalDateTime endTime){

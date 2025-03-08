@@ -16,4 +16,5 @@ public class BarberRequestDTO {
     private String firstname;
     private String phone;
     private String description;
+    private boolean available;
 }
