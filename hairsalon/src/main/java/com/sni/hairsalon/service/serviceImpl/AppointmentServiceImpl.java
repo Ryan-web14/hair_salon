@@ -14,6 +14,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.sni.hairsalon.dto.request.AppointmentRequestDTO;
+import com.sni.hairsalon.dto.request.AppointmentUpdateRequestDTO;
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
 import com.sni.hairsalon.dto.response.ScheduleResponseDTO;
 import com.sni.hairsalon.exception.ResourceNotFoundException;
@@ -67,7 +68,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     Barber barber = barberRepo.findById(Long.parseLong(request.getBarberId()))
         .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
 
-    Haircut haircut = haircutRepo.findById(request.getHaircutId())
+    Haircut haircut = haircutRepo.findHaircutByType(request.getHaircutId())
         .orElseThrow(() -> new ResourceNotFoundException("Haircut not found"));
 
     LocalDate appointmentDate = request.getAppointmentTime().toLocalDate();
@@ -88,12 +89,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         || appointmentTime.isAfter(endSchedule)) {
       throw new IllegalStateException("The appointment time doesn't match the barber hour");
     }
+     //TODO reuse it after fixing the function in availability
 
-    if (!availabilityService.isAvailableSlot(barber.getId(),
-        appointmentTime, haircut.getDuration())) {
+    // if (!availabilityService.isAvailableSlot(barber.getId(),
+    //     appointmentTime, haircut.getDuration())) {
 
-      throw new IllegalStateException("Slot is not available");
-    }
+    //   throw new IllegalStateException("Slot is not available");
+    // }
 
     availabilityService.makeSlotUnavailable(barber.getId(), appointmentTime, haircut.getDuration());
 
@@ -112,8 +114,24 @@ public class AppointmentServiceImpl implements AppointmentService {
     return response;
   }
 
+private Haircut findHaircutByTypeFlexible(String requestType) {
+  if (requestType == null || requestType.trim().isEmpty()) {
+      throw new ResourceNotFoundException("Haircut type cannot be empty");
+  }
+  
+  String normalizedRequestType = requestType.toLowerCase().replaceAll("\\s+", "");
+  
+  return haircutRepo.findAll().stream()
+      .filter(h -> {
+          String normalizedType = h.getType().toLowerCase().replaceAll("\\s+", "");
+          return normalizedType.equals(normalizedRequestType);
+      })
+      .findFirst()
+      .orElseThrow(() -> new ResourceNotFoundException("Haircut not found: " + requestType));
+}
+
   @Override
-  public AppointmentResponseDTO updateAppointmentByAdmin(long id,AppointmentRequestDTO request){
+  public AppointmentResponseDTO updateAppointmentByAdmin(long id,AppointmentUpdateRequestDTO request){
 
     Appointment appointment = appointmentRepo.findById(id)
     .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
@@ -127,11 +145,13 @@ public class AppointmentServiceImpl implements AppointmentService {
   Barber barber = barberRepo.findById(Long.parseLong(request.getBarberId()))
     .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
 
-  Haircut haircut = haircutRepo.findById(request.getHaircutId())
-    .orElseThrow(() -> new ResourceNotFoundException("Haircut not found"));
+  // Haircut haircut = haircutRepo.findHaircutByType(request.getHaircut())
+  //   .orElseThrow(() -> new ResourceNotFoundException("Haircut not found"));
+
+  Haircut haircut = findHaircutByTypeFlexible(request.getHaircutType());
 
   LocalDate appointmentDate = request.getAppointmentTime().toLocalDate();
-  LocalDateTime appointmentTime = request.getAppointmentTime().truncatedTo(ChronoUnit.MINUTES);
+  LocalDateTime appointmentTime = request.getAppointmentTime();
 
   ScheduleResponseDTO schedule = scheduleService.getBarberScheduleForDate(Long.parseLong(request.getBarberId()),
     appointmentDate);
@@ -149,11 +169,12 @@ public class AppointmentServiceImpl implements AppointmentService {
     throw new IllegalStateException("The appointment time doesn't match the barber hour");
   }
 
-  if (!availabilityService.isAvailableSlot(barber.getId(),
-    appointmentTime, haircut.getDuration())) {
+  // //TODO: after fixing the function in the availability service reuse those here
+  // if (!availabilityService.isAvailableSlot(barber.getId(),
+  //   appointmentTime, haircut.getDuration())) {
 
-    throw new IllegalStateException("Slot is not available");
-  }
+  //   throw new IllegalStateException("Slot is not available");
+  // }
 
   availabilityService.makeSlotUnavailable(barber.getId(), appointmentTime, haircut.getDuration());
 
@@ -480,12 +501,13 @@ public class AppointmentServiceImpl implements AppointmentService {
       while(startSlot.plusMinutes(duration).isBefore(eveningEnd) ||
       startSlot.isBefore(eveningEnd)){
 
-        if(availabilityService.isAvailableSlot(barber.getId(), startSlot, duration)){
+        //TODO reuse it after fixing the function in availability
+        // if(availabilityService.isAvailableSlot(barber.getId(), startSlot, duration)){
 
-          appointment.setAppointmentTime(startSlot);
-          availabilityService.makeSlotUnavailable(barber.getId(), startSlot, duration);
-          slotFound = true;
-        }
+        //   appointment.setAppointmentTime(startSlot);
+        //   availabilityService.makeSlotUnavailable(barber.getId(), startSlot, duration);
+        //   slotFound = true;
+        // }
 
         if(slotFound == false){
           throw new ResourceNotFoundException("No slot found for 17h to 19h");

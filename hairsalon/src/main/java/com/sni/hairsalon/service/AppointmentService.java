@@ -5,11 +5,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.sni.hairsalon.dto.request.AppointmentRequestDTO;
+import com.sni.hairsalon.dto.request.AppointmentUpdateRequestDTO;
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
 public interface AppointmentService {
     
     public AppointmentResponseDTO createAppointment(AppointmentRequestDTO request);
-    public AppointmentResponseDTO updateAppointmentByAdmin(long id,AppointmentRequestDTO request);
+    public AppointmentResponseDTO updateAppointmentByAdmin(long id,AppointmentUpdateRequestDTO request);
     public AppointmentResponseDTO updateSAppointmentStatus(long id,int status);
     public void cancelAppointmentByClient(long id, String clientEmail);
     public void cancelAppointment(long id);

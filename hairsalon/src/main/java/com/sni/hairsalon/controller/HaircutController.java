@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sni.hairsalon.dto.request.HaircutRequestDTO;
 import com.sni.hairsalon.dto.response.HaircutResponseDTO;
+import com.sni.hairsalon.model.Haircut;
+import com.sni.hairsalon.repository.HaircutRepository;
 import com.sni.hairsalon.service.HaircutService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class HaircutController {
     
     private final HaircutService haircutService;
+    private final HaircutRepository repo;
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
@@ -52,4 +55,8 @@ public class HaircutController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/all/repo")
+    public ResponseEntity<List<Haircut>> getAllHaircutsFromRepo(){
+        return ResponseEntity.ok(repo.findAll());
+    }
 }

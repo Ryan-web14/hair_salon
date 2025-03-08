@@ -27,10 +27,11 @@ public class BarberController {
     private final BarberService barberService;
 
     @PostMapping("/")
-    public ResponseEntity<BarberResponseDTO> createBarber(@RequestBody BarberRequestDTO request){
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    public ResponseEntity<BarberResponseDTO> createBarberByAdmin(@RequestBody BarberRequestDTO request){
 
         return ResponseEntity.status(HttpStatus.CREATED)
-        .body(barberService.createBarber(request));
+        .body(barberService.createBarberByAdmin(request));
      }
 
      @GetMapping("/all")
@@ -38,10 +39,10 @@ public class BarberController {
         return ResponseEntity.ok().body(barberService.getAllBarber());
      }
 
-     @PutMapping("/{barberid}/admin/update")
+     @PutMapping("/{id}/admin/update")
      @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-     public ResponseEntity<BarberResponseDTO> updateBarberByAdmin(@PathVariable Long barberId,@RequestBody BarberRequestDTO request){
-         return ResponseEntity.ok().body(barberService.updateBarber(barberId, request));
+     public ResponseEntity<BarberResponseDTO> updateBarberByAdmin(@PathVariable Long id,@RequestBody BarberRequestDTO request){
+         return ResponseEntity.ok().body(barberService.updateBarber(id, request));
      }
 
      @PostMapping("/{barberId}/admin/delete")

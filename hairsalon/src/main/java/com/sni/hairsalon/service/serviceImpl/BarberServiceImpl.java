@@ -14,8 +14,8 @@ import com.sni.hairsalon.mapper.BarberMapper;
 import com.sni.hairsalon.model.Barber;
 import com.sni.hairsalon.model.User;
 import com.sni.hairsalon.repository.BarberRepository;
-import com.sni.hairsalon.repository.UserRepository;
 import com.sni.hairsalon.service.BarberService;
+import com.sni.hairsalon.service.UserService;
 import com.sni.hairsalon.utils.ValidationUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BarberServiceImpl implements BarberService {
     
-    private final UserRepository userRepo;
+    private final UserService userService;
     private final BarberRepository barberRepo;
     private final BarberMapper mapper;
     
@@ -32,8 +32,7 @@ public class BarberServiceImpl implements BarberService {
         public BarberResponseDTO createBarber(BarberRequestDTO dto){
 
             validateField(dto);
-            User user = userRepo.findUserByEmail(dto.getEmail())
-            .orElseThrow(()-> new ResourceNotFoundException("User not found"));
+            User user = userService.getUserByEmail(dto.getEmail());
 
             Barber barber = Barber.builder()
             .user(user)
@@ -45,6 +44,22 @@ public class BarberServiceImpl implements BarberService {
             barberRepo.save(barber);
             return mapper.toDto(barber);
         }
+
+     @Override
+     public BarberResponseDTO createBarberByAdmin(BarberRequestDTO dto){
+
+        validateField(dto);
+        User user = userService.createBarberUserByAdmin(dto);
+        Barber barber = Barber.builder()
+        .user(user)
+        .lastname(dto.getLastname())
+        .firstname(dto.getFirstname())
+        .phoneNumber(Integer.parseInt(dto.getPhone()))
+        .description(dto.getDescription())
+        .build();
+        barberRepo.save(barber);
+        return mapper.toDto(barber);
+     }   
 
     @Override
     @Transactional(readOnly = true) 
@@ -58,6 +73,7 @@ public class BarberServiceImpl implements BarberService {
     }
  
     @Override
+    @Transactional
     public BarberResponseDTO updateBarber(Long id, BarberRequestDTO requestDTO){
         validateField(requestDTO);
         Barber barber = barberRepo.findById(id)
@@ -66,6 +82,7 @@ public class BarberServiceImpl implements BarberService {
         barber.setLastname(requestDTO.getLastname());
         barber.setFirstname(requestDTO.getFirstname());
         barber.setPhoneNumber(Integer.parseInt(requestDTO.getPhone()));
+        barber.setAvailable(requestDTO.isAvailable());
         barber.setDescription(requestDTO.getDescription());
 
         barberRepo.save(barber);
@@ -90,8 +107,7 @@ public class BarberServiceImpl implements BarberService {
 
     @Override
     public BarberResponseDTO getBarberProfile(String email){
-            User user = userRepo.findUserByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            User user = userService.getUserByEmail(email);
 
             Barber barber = barberRepo.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
@@ -100,15 +116,15 @@ public class BarberServiceImpl implements BarberService {
     }
 
         private void validateField(BarberRequestDTO requestDTO){
-        if(requestDTO.getFirstname().isEmpty() || requestDTO.getLastname().isEmpty()){
-            throw new RuntimeException("Empty name");
-        }   
+        // if(requestDTO.getFirstname().isEmpty() || requestDTO.getLastname().isEmpty()){
+        //     throw new RuntimeException("Empty name");
+        // }   
     
-    
-        if(!ValidationUtils.isLetter(requestDTO.getFirstname()) || ValidationUtils.isLetter(requestDTO.getLastname())){
-            throw new RuntimeException("Names are invalid");
+        // //TODO correct this
+        // if(!ValidationUtils.isLetter(requestDTO.getFirstname()) || ValidationUtils.isLetter(requestDTO.getLastname())){
+        //     throw new RuntimeException("Names are invalid");
           
-        }
+        // }
        
        String phone = requestDTO.getPhone(); 
         boolean verifiedPhone = ValidationUtils.isValidPhone(phone);

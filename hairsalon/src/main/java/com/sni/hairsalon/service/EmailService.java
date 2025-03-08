@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
+import com.sni.hairsalon.dto.response.UserResponseDTO;
 import com.sni.hairsalon.model.Appointment;
 import com.sni.hairsalon.model.Client;
 
@@ -21,4 +22,5 @@ public interface EmailService {
     public CompletableFuture<Boolean> sendWelcomeMessage(Client client);
     public CompletableFuture<Boolean> sendPasswordResetEmail(String email, String link);
     public CompletableFuture<Boolean> sendTemporaryPasswordChangeEmail(String email, String temporaryPassword, String link);
+    public CompletableFuture<Boolean> sendBarberAccountInformation(String email,UserResponseDTO dto, String randomPassword);
 }

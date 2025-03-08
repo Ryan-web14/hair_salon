@@ -1,5 +1,6 @@
 package com.sni.hairsalon.service.serviceImpl;
 
+import org.apache.commons.validator.EmailValidator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.sni.hairsalon.dto.request.BarberRequestDTO;
 import com.sni.hairsalon.dto.request.UserRequestDTO;
 import com.sni.hairsalon.dto.response.UserResponseDTO;
 import com.sni.hairsalon.exception.ResourceAlreadyExistException;
@@ -16,6 +18,8 @@ import com.sni.hairsalon.model.User;
 import com.sni.hairsalon.model.UserRole;
 import com.sni.hairsalon.repository.UserRepository;
 import com.sni.hairsalon.repository.UserRoleRepository;
+import com.sni.hairsalon.security.service.RandomAlphaNumericGeneratorService;
+import com.sni.hairsalon.service.EmailService;
 import com.sni.hairsalon.service.UserService;
 import com.sni.hairsalon.utils.ValidationUtils;
 
@@ -30,6 +34,8 @@ public class UserServiceImpl implements UserService{
     private final UserRoleRepository roleRepo;
     private final UserRepository userRepo;    
     private final UserMapper userMapper;
+    private final RandomAlphaNumericGeneratorService random;
+    private final EmailService mailService;
 
     @Override
     @Transactional
@@ -71,8 +77,25 @@ public class UserServiceImpl implements UserService{
         userRepo.save(newAdmin);
 
         return userMapper.toDto(newAdmin);
+    }
 
-    
+    @Override
+    @Transactional
+    public User createBarberUserByAdmin(BarberRequestDTO dto){
+
+        UserRole role = roleRepo.findUserRoleByName("BARBER")
+        .orElseThrow(()-> new ResourceNotFoundException("Role not found"));
+
+        String randomPassword = random.generateRandomAlphaNumeric(6);
+        User barberUser = User.builder()
+        .email(dto.getEmail())
+        .role(role)
+        .passwordHash(passwordEncoder.encode(randomPassword))
+        .build();
+        UserResponseDTO response = userMapper.toDto(barberUser);
+        userRepo.save(barberUser);
+        mailService.sendBarberAccountInformation(dto.getEmail(),response, randomPassword);
+        return barberUser;
 
     }
 
