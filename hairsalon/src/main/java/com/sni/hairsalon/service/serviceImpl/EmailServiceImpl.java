@@ -352,6 +352,39 @@ public class EmailServiceImpl implements EmailService{
         return sendEmail(email, subject, content);
      }
 
+     @Override
+     @Async
+     public CompletableFuture<Boolean> sendBarberNotificationOfNewAppointment(String barberEmail, Appointment appointment){
+        String subject = "Nouveau rendez-vous";
+        String content = String.format(
+            """
+            Bonjour,
+
+            Vous avez un nouveau rendez-vous avec le client %s %s.
+
+            Détail de rendez-vous:
+            Date: %s
+            Heure: %s
+            Service: %s
+            Durée: %d minutes
+
+            Cordialement,
+            L'équipe de L'HOMME
+
+            Ne pas répondre. Générer automatiquement.
+            """,
+            appointment.getClient().getFirstname(),
+            appointment.getClient().getLastname(),
+            appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("d MMMM yyyy")),
+            appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+            appointment.getHaircut().getType(),
+            appointment.getHaircut().getDuration()
+        );
+
+        return sendEmail(barberEmail, subject, content);
+     }
+
+
     @Override
     @Async
     public CompletableFuture<Boolean> sendCheckInNotification(String barberEmail, Appointment appointment){

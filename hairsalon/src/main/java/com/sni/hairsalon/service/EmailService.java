@@ -23,4 +23,5 @@ public interface EmailService {
     public CompletableFuture<Boolean> sendPasswordResetEmail(String email, String link);
     public CompletableFuture<Boolean> sendTemporaryPasswordChangeEmail(String email, String temporaryPassword, String link);
     public CompletableFuture<Boolean> sendBarberAccountInformation(String email,UserResponseDTO dto, String randomPassword);
+    public CompletableFuture<Boolean> sendBarberNotificationOfNewAppointment(String barberEmail, Appointment appointment);
 }

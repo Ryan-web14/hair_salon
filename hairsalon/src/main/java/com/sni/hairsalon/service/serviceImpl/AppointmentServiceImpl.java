@@ -107,6 +107,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     appointmentRepo.save(verifiedAppointment);
     AppointmentResponseDTO response = mapper.toDto(appointment);
     mailService.sendAppointmentConfirmation(client.getUser().getEmail(), response);
+    mailService.sendBarberNotificationOfNewAppointment(response.getBarberEmail(), verifiedAppointment);
     // smsService.sendConfirmationSms(appointment);
     return response;
   }
