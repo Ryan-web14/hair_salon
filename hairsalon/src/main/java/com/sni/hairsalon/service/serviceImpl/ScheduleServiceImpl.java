@@ -6,7 +6,6 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
 
@@ -50,14 +49,12 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new IllegalStateException("Schedule overlap with another");
         }
 
-        boolean recurring = request.isRecurring();
-
         Schedule schedule = Schedule.builder()
                 .barber(barber)
                 .dayOfWeek(request.getDayOfWeek())
                 .startTime(request.getStartTime())
                 .endTime(request.getEndTime())
-                .is_recurring(recurring)
+                .is_recurring(true)
                 .effectiveFrom(Date.valueOf(request.getEffectiveFrom()))
                 .effectiveTo(Date.valueOf(request.getEffectiveTo()))
                 .build();
@@ -136,7 +133,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     .dayOfWeek(currentDate.getDayOfWeek().getValue())
     .startTime(request.getStartTime())
     .endTime(request.getEndTime())
-    .is_recurring(request.isRecurring())
+    .is_recurring(true)
     .effectiveFrom(Date.valueOf(request.getEffectiveFrom()))
     .effectiveTo(Date.valueOf(request.getEffectiveTo()))
     .build();

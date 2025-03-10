@@ -90,7 +90,6 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public void  deleteClient(long id){
-
         clientRepo.deleteById(id); 
         return;
     }
