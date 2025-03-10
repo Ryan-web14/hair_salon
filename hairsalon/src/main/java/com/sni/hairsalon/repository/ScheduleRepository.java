@@ -73,10 +73,15 @@ List<Schedule> findOverlappingSchedules(
 @Query("SELECT s FROM Schedule s WHERE :date BETWEEN s.effectiveFrom AND s.effectiveTo")
 List<Schedule> findCurrentSchedules(@Param("date") LocalDate date);    
 
-    @Query("SELECT s FROM Schedule s WHERE s.barber.id = :barberId AND :date BETWEEN s.effectiveFrom AND s.effectiveTo")
-List<Schedule> findCurrentSchedulesForBaber(
+@Query("SELECT s FROM Schedule s WHERE s.barber.id = :barberId " +
+       "AND :date BETWEEN s.effectiveFrom AND s.effectiveTo " +
+       "AND s.dayOfWeek = :dayOfWeek " +
+       "ORDER BY s.is_recurring DESC, s.effectiveFrom DESC " +
+       "LIMIT 1")
+Optional<Schedule> findCurrentSchedulesForBarber(
     @Param("barberId") Long barberId, 
-    @Param("date") LocalDate date
+    @Param("date") LocalDate date,
+    @Param("dayOfWeek") int dayOfWeek
 );
 
 @Query("SELECT s FROM Schedule s WHERE s.barber.id = :barberId " +

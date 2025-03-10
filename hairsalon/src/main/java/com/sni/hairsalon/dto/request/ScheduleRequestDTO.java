@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "create")
-public class ScheduleRequestDTO {
-    private String barberId;
+public class  ScheduleRequestDTO {
+    private String id;
     private int dayOfWeek; 
     private LocalDateTime startTime;
     private LocalDateTime endTime;

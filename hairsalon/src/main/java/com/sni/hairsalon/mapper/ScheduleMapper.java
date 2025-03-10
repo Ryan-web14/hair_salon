@@ -21,7 +21,7 @@ public class ScheduleMapper {
    private final BarberRepository barberRepo;
 
     public Schedule toEntity(ScheduleRequestDTO dto){
-        Barber barber = barberRepo.findBarberById(Long.parseLong(dto.getBarberId())).
+        Barber barber = barberRepo.findBarberById(Long.parseLong(dto.getId())).
         orElseThrow(()-> new ResourceNotFoundException("Barber not found")); 
         Date sqlEffectiveFromDate = Date.valueOf(dto.getEffectiveFrom());
         Date sqlEffectiveToDate = Date.valueOf(dto.getEffectiveTo());

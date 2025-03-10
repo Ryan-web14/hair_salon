@@ -36,7 +36,7 @@ public class AppointmentMapper {
         .orElseThrow(()-> new ResourceNotFoundException("client not found"));
         Barber barber = barberRepo.findById(Long.parseLong(request.getBarberId()))
         .orElseThrow(()-> new ResourceNotFoundException("barber not found"));
-        Haircut haircut = haircutRepo.findHaircutByType(request.getHaircutId())
+        Haircut haircut = haircutRepo.findHaircutByType(request.getHaircutType())
         .orElseThrow(()-> new ResourceNotFoundException("haircut not found")); 
         Appointment appointment = Appointment.builder()
         .client(client)
