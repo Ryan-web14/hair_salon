@@ -25,6 +25,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+//TODO Work on a asynchronous generation slot for large batch in big schedule 
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -42,22 +43,24 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         Barber barber = barberRepo.findById(Long.parseLong(dto.getBarberId()))
         .orElseThrow(()-> new ResourceNotFoundException("Barber not found"));
 
-        List<Availability> slots = generateTimeSlot(barber, dto.getStarTime(), dto.getEndTime());
+        List<Availability> generatedSlots = generateTimeSlot(barber, dto.getStarTime(), dto.getEndTime());
 
-        List<AvailabilityResponseDTO> savedSlots = new ArrayList<>();
-        int batchSize = 50;
+        // List<AvailabilityResponseDTO> savedSlots = new ArrayList<>();
+        // int batchSize = 50;
         
-        for (int i = 0; i < slots.size(); i += batchSize) {
-            int end = Math.min(i + batchSize, slots.size());
-            List<Availability> batch = slots.subList(i, end);
+        // for (int i = 0; i < slots.size(); i += batchSize) {
+        //     int end = Math.min(i + batchSize, slots.size());
+        //     List<Availability> batch = slots.subList(i, end);
             
-            List<Availability> savedBatch = availabilityRepo.saveAll(batch);
-            savedSlots.addAll(savedBatch.stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList()));
-        }
+        //     List<Availability> savedBatch = availabilityRepo.saveAll(batch);
+        //     savedSlots.addAll(savedBatch.stream()
+        //         .map(mapper::toDto)
+        //         .collect(Collectors.toList()));
+        // }
         
-    return savedSlots; 
+    return generatedSlots.stream()
+    .map(mapper::toDto)
+    .collect(Collectors.toList()); 
     }
 
     @Override
@@ -136,7 +139,7 @@ public void makeSlotUnavailable(long barberId, LocalDateTime startTime, int dura
     //     startTime = startTime.truncatedTo(ChronoUnit.MINUTES);
     //     LocalDateTime endTime = startTime.plusMinutes(duration).truncatedTo(ChronoUnit.MINUTES);
         
-    //     // Vérifier si nous avons des créneaux qui couvrent complètement la période
+     // Vérifier si nous avons des créneaux qui couvrent complètement la période
     //     List<Availability> overlappingSlots = availabilityRepo.findOverlappingSlots(
     //         barberId, startTime, endTime);
         
@@ -144,12 +147,12 @@ public void makeSlotUnavailable(long barberId, LocalDateTime startTime, int dura
     //         return false;  // Pas de créneaux du tout
     //     }
         
-    //     // Vérifier si tous les créneaux sont disponibles
+        // Vérifier si tous les créneaux sont disponibles
     //     if (!overlappingSlots.stream().allMatch(Availability::isAvailable)) {
     //         return false;  // Au moins un créneau n'est pas disponible
     //     }
         
-    //     // Vérifier si les créneaux couvrent toute la période
+     // Vérifier si les créneaux couvrent toute la période
     //     LocalDateTime earliestStart = overlappingSlots.stream()
     //         .map(Availability::getStartTime)
     //         .min(LocalDateTime::compareTo)
@@ -160,32 +163,22 @@ public void makeSlotUnavailable(long barberId, LocalDateTime startTime, int dura
     //         .max(LocalDateTime::compareTo)
     //         .orElse(LocalDateTime.MIN);
         
-    //     // La période est entièrement couverte si le début des créneaux est <= au début demandé
-    //     // et la fin des créneaux est >= à la fin demandée
+         // La période est entièrement couverte si le début des créneaux est <= au début demandé
+         // et la fin des créneaux est >= à la fin demandée
     //     return !earliestStart.isAfter(startTime) && !latestEnd.isBefore(endTime);
     // }
+    
     
     private List<Availability> generateTimeSlot(Barber barber, 
     LocalDateTime startTime, LocalDateTime endTime){
         List<Availability> slots = new ArrayList<>();
         LocalDateTime currentSlotStart = startTime.truncatedTo(ChronoUnit.MINUTES);
 
-        if (startTime == null || endTime == null || barber == null) {
-            throw new IllegalArgumentException("Start time, end time, and barber cannot be null");
-        }
-    
-        if (startTime.isAfter(endTime)) {
-            throw new IllegalArgumentException("Start time cannot be after end time");
-        }
-    
-        if (startTime.getHour() < 8 || endTime.getHour() > 20) {
-            throw new IllegalArgumentException("Slots must be within business hours (8AM-8PM)");
-        }
-    
-        // Validate minimum slot duration (30 minutes)
-        if (Duration.between(startTime, endTime).toMinutes() < 30) {
-            throw new IllegalArgumentException("Time range must be at least 30 minutes");
-        }
+        validateWorkingHours(startTime, endTime, barber);
+
+        int batch = 0;
+        int maxBatchRequest = 20; 
+        List<Availability> batchRequest = new ArrayList<>(maxBatchRequest); 
 
         try {
     
@@ -193,7 +186,7 @@ public void makeSlotUnavailable(long barberId, LocalDateTime startTime, int dura
                   currentSlotStart.plusMinutes(30).equals(endTime)) {
                 
                 LocalDateTime slotStart = currentSlotStart;
-                LocalDateTime slotEnd = currentSlotStart.plusMinutes(30).truncatedTo(ChronoUnit.MINUTES);
+                LocalDateTime slotEnd = currentSlotStart.plusMinutes(30);
     
                 // Check for overlapping slots
                 boolean hasOverlap = slots.stream()
@@ -212,33 +205,51 @@ public void makeSlotUnavailable(long barberId, LocalDateTime startTime, int dura
                 .isAvailable(true)
                 .note(" ")
                 .build();
-    
-                slots.add(slot);
+
+                batchRequest.add(slot);
+                batch++;
+                
+                if(batch >= maxBatchRequest){
+                    slots.addAll(availabilityRepo.saveAll(batchRequest));
+                    batchRequest.clear();
+                    batch = 0;
+                }
                 currentSlotStart = currentSlotStart.plusMinutes(30);
 
+            }
+
+            if(!batchRequest.isEmpty()){
+                slots.addAll(availabilityRepo.saveAll(batchRequest));                
             }
          
            return slots;
         
         }catch(Exception e ){
-            throw new RuntimeException("Failed to generate time slots", e);
+            throw new RuntimeException("Failed to generate time slots startTime: " + currentSlotStart.toString() + "endTime " + endTime.toString(), e);
         }
     }
 
 
-    /* private void validateWorkingHours(LocalDateTime start, LocalDateTime end) {
-        int startHour = start.getHour();
-        int endHour = end.getHour();
-        
-        if (startHour < 8 || endHour > 20) {
-            throw new IllegalArgumentException("Slots must be within business hours (8AM-8PM)");
+     private void validateWorkingHours(LocalDateTime startTime, LocalDateTime endTime, Barber barber) {
+  
+        if (startTime == null || endTime  == null || barber == null) {
+            throw new IllegalArgumentException("Start time, end time, and barber cannot be null");
         }
-    }
+    
+        if (startTime.isAfter(endTime)) {
+            throw new IllegalArgumentException("Start time cannot be after end time");
+        }
+    
+        if (startTime.getHour() < 8 || endTime.getHour() > 20) {
+            throw new IllegalArgumentException("Slots must be within business hours (8h-20h-)");
+        }
+    
+        // Validate minimum slot duration (30 minutes)
+        if (Duration.between(startTime, endTime).toMinutes() < 30) {
+            throw new IllegalArgumentException("Time range must be at least 30 minutes");
+        }
 
-    private void validateNoExistingSlots(Long barberId, LocalDateTime start, LocalDateTime end) {
-        boolean slotsExist = availabilityRepo.existsByBarberIdAndTimeRange(barberId, start, end);
-        if (slotsExist) {
-            throw new IllegalStateException("Slots already exist for this time range");
-        }
-    } */
+
+}
+
 }

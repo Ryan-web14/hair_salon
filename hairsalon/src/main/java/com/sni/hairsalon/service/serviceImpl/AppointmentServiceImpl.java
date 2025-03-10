@@ -68,26 +68,23 @@ public class AppointmentServiceImpl implements AppointmentService {
     Barber barber = barberRepo.findById(Long.parseLong(request.getBarberId()))
         .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
 
-    Haircut haircut = haircutRepo.findHaircutByType(request.getHaircutId())
+    Haircut haircut = haircutRepo.findHaircutByType(request.getHaircutType())
         .orElseThrow(() -> new ResourceNotFoundException("Haircut not found"));
 
     LocalDate appointmentDate = request.getAppointmentTime().toLocalDate();
-    LocalDateTime appointmentTime = request.getAppointmentTime();
+    LocalDateTime appointmentDateTime = request.getAppointmentTime();
+    LocalTime appointmentTime = request.getAppointmentTime().toLocalTime();
 
     ScheduleResponseDTO schedule = scheduleService.getBarberScheduleForDate(Long.parseLong(request.getBarberId()),
         appointmentDate);
 
-    LocalDateTime startSchedule = schedule.getStartTime();
-    LocalDateTime endSchedule = schedule.getEndTime();
-
-    if (appointmentDate.isBefore(schedule.getEffectiveFrom()) ||
-        appointmentDate.isAfter(schedule.getEffectiveTo())) {
-      throw new IllegalStateException("The appointment date doesn't match the barber schedule");
-    }
+    LocalTime startSchedule = schedule.getStartTime().toLocalTime();
+    LocalTime endSchedule = schedule.getEndTime().toLocalTime();
 
     if (appointmentTime.isBefore(startSchedule)
         || appointmentTime.isAfter(endSchedule)) {
-      throw new IllegalStateException("The appointment time doesn't match the barber hour");
+      throw new IllegalStateException("The appointment time doesn't match the barber hour" +
+      "startTime: " + schedule.getStartTime() + " endTime: " + schedule.getEndTime());
     }
      //TODO reuse it after fixing the function in availability
 
@@ -97,13 +94,13 @@ public class AppointmentServiceImpl implements AppointmentService {
     //   throw new IllegalStateException("Slot is not available");
     // }
 
-    availabilityService.makeSlotUnavailable(barber.getId(), appointmentTime, haircut.getDuration());
+    availabilityService.makeSlotUnavailable(barber.getId(), appointmentDateTime, haircut.getDuration());
 
     Appointment appointment = Appointment.builder()
         .client(client)
         .barber(barber)
         .haircut(haircut)
-        .appointmentTime(appointmentTime)
+        .appointmentTime(appointmentDateTime)
         .status(Status.CONFIRMED.getCode())
         .build();
     Appointment verifiedAppointment = checkAppointmentTodayDate(appointment);
@@ -151,23 +148,20 @@ private Haircut findHaircutByTypeFlexible(String requestType) {
   Haircut haircut = findHaircutByTypeFlexible(request.getHaircutType());
 
   LocalDate appointmentDate = request.getAppointmentTime().toLocalDate();
-  LocalDateTime appointmentTime = request.getAppointmentTime();
+  LocalDateTime appointmentDateTime = request.getAppointmentTime();
+  LocalTime appointmentTime = request.getAppointmentTime().toLocalTime();
 
   ScheduleResponseDTO schedule = scheduleService.getBarberScheduleForDate(Long.parseLong(request.getBarberId()),
-    appointmentDate);
+  appointmentDate);
 
-  LocalDateTime startSchedule = schedule.getStartTime();
-  LocalDateTime endSchedule = schedule.getEndTime();
+LocalTime startSchedule = schedule.getStartTime().toLocalTime();
+LocalTime endSchedule = schedule.getEndTime().toLocalTime();
 
-  if (appointmentDate.isBefore(schedule.getEffectiveFrom()) ||
-    appointmentDate.isAfter(schedule.getEffectiveTo())) {
-    throw new IllegalStateException("The appointment date doesn't match the barber schedule");
-  }
-
-  if (appointmentTime.isBefore(startSchedule)
-    || appointmentTime.isAfter(endSchedule)) {
-    throw new IllegalStateException("The appointment time doesn't match the barber hour");
-  }
+if (appointmentTime.isBefore(startSchedule)
+  || appointmentTime.isAfter(endSchedule)) {
+throw new IllegalStateException("The appointment time doesn't match the barber hour" +
+"startTime: " + schedule.getStartTime() + " endTime: " + schedule.getEndTime());
+}
 
   // //TODO: after fixing the function in the availability service reuse those here
   // if (!availabilityService.isAvailableSlot(barber.getId(),
@@ -176,12 +170,12 @@ private Haircut findHaircutByTypeFlexible(String requestType) {
   //   throw new IllegalStateException("Slot is not available");
   // }
 
-  availabilityService.makeSlotUnavailable(barber.getId(), appointmentTime, haircut.getDuration());
+  availabilityService.makeSlotUnavailable(barber.getId(), appointmentDateTime, haircut.getDuration());
 
   appointment.setClient(client);
   appointment.setBarber(barber);
   appointment.setHaircut(haircut);
-  appointment.setAppointmentTime(appointmentTime);
+  appointment.setAppointmentTime(appointmentDateTime);
   appointment.setStatus(Status.CONFIRMED.getCode());
 
   appointmentRepo.save(appointment);

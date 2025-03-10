@@ -26,6 +26,7 @@ import com.sni.hairsalon.repository.ScheduleRepository;
 import com.sni.hairsalon.service.AvailabilityService;
 import com.sni.hairsalon.service.ScheduleService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -38,8 +39,9 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final AvailabilityService availabilityService;
 
     @Override
+    @Transactional
     public ScheduleResponseDTO createSchedule(ScheduleRequestDTO request) {
-        Barber barber = barberRepo.findById(Long.parseLong(request.getBarberId()))
+        Barber barber = barberRepo.findById(Long.parseLong(request.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
 
         validateTimeRange(request.getStartTime(), request.getEndTime());
@@ -48,35 +50,64 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new IllegalStateException("Schedule overlap with another");
         }
 
-        LocalDate currentDate = request.getEffectiveFrom();
-        while (!currentDate.isAfter(request.getEffectiveTo())) {
-            if (currentDate.getDayOfWeek().getValue() == request.getDayOfWeek()) {
-                AvailabilityRequestDTO dto = AvailabilityRequestDTO.builder()
-                        .barberId(request.getBarberId())
-                        .starTime(LocalDateTime.of(currentDate,
-                                request.getStartTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
-                        .endTime(LocalDateTime.of(currentDate,
-                                request.getEndTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
-                        .isAvailable(true)
-                        .build();
-
-                availabilityService.createAvailability(dto);
-            }
-            currentDate = currentDate.plusDays(1);
-        }
+        boolean recurring = request.isRecurring();
 
         Schedule schedule = Schedule.builder()
                 .barber(barber)
                 .dayOfWeek(request.getDayOfWeek())
                 .startTime(request.getStartTime())
                 .endTime(request.getEndTime())
-                .is_recurring(request.isRecurring())
+                .is_recurring(recurring)
                 .effectiveFrom(Date.valueOf(request.getEffectiveFrom()))
                 .effectiveTo(Date.valueOf(request.getEffectiveTo()))
                 .build();
 
+
+                LocalDate currentDate = request.getEffectiveFrom();
+                int batchSize = 0;
+                int maxBatchSize = 5;
+                List<AvailabilityRequestDTO> batchRequest = new ArrayList<>();
+
+                while (!currentDate.isAfter(request.getEffectiveTo())) {
+                    if (currentDate.getDayOfWeek().getValue() == request.getDayOfWeek()) {
+                        AvailabilityRequestDTO dto = AvailabilityRequestDTO.builder()
+                                .barberId(request.getId())
+                                .starTime(LocalDateTime.of(currentDate,
+                                        request.getStartTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
+                                .endTime(LocalDateTime.of(currentDate,
+                                        request.getEndTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
+                                .isAvailable(true)
+                                .build();
+        
+                        batchRequest.add(dto);
+
+                        batchSize++;
+
+                    if(batchSize >= maxBatchSize){
+                        batchSize = 0;
+                        processBatch(batchRequest);
+                        batchRequest.clear();
+                    }
+                        
+                }
+ 
+                    currentDate = currentDate.plusDays(1);
+                }
+                
+                if(!batchRequest.isEmpty()){
+                    processBatch(batchRequest);
+                }
+
         return mapper.toDto(scheduleRepo.save(schedule));
     }
+
+    private void processBatch(List<AvailabilityRequestDTO> batch){
+
+        for(AvailabilityRequestDTO dto : batch){
+            availabilityService.createAvailability(dto);
+        }
+    }
+
 
     @Override
     public List<ScheduleResponseDTO> bulkCreateSchedules(BulkScheduleRequestDTO request){
@@ -202,22 +233,22 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         Barber barber = barberRepo.findById(barberId)
                 .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
-        return mapper.toDto(
-                scheduleRepo.findRecurringSchedules(barber.getId(), date.getDayOfWeek().getValue(),
-                        date));
+
+        Schedule schedule = scheduleRepo.findCurrentSchedulesForBarber(barber.getId(),date, date.getDayOfWeek().getValue())
+        .orElseThrow(()-> new ResourceNotFoundException("No found schedule"));
+        return mapper.toDto(schedule);
     }
 
     @Override
-    public List<ScheduleResponseDTO> getBarBerTodayCurrentSchedule(long barberId) {
+    public ScheduleResponseDTO getBarBerTodayCurrentSchedule(long barberId) {
 
         Barber barber = barberRepo.findById(barberId)
                 .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
 
-        List<Schedule> barberSchedule = scheduleRepo.findCurrentSchedulesForBaber(barber.getId(), LocalDate.now());
+        Schedule barberSchedule = scheduleRepo.findCurrentSchedulesForBarber(barber.getId(), LocalDate.now(), LocalDate.now().getDayOfWeek().getValue())
+        .orElseThrow(()-> new ResourceNotFoundException("No schedule found"));
 
-        return barberSchedule.stream()
-                .map(schedule -> mapper.toDto(schedule))
-                .collect(Collectors.toList());
+        return mapper.toDto(barberSchedule);
 
     }
 
@@ -235,7 +266,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         Date effectiveTo = Date.valueOf(request.getEffectiveTo());
 
         return scheduleRepo.findOverlappingSchedules(
-                Long.parseLong(request.getBarberId()),
+                Long.parseLong(request.getId()),
                 request.getDayOfWeek(),
                 request.getStartTime(),
                 request.getEndTime(),

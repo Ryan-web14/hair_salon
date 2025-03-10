@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class AppointmentRequestDTO {
     private String email;
     private String barberId; 
-    private String haircutId;
+    private String haircutType;
     private LocalDateTime appointmentTime;
     
     @Builder.Default

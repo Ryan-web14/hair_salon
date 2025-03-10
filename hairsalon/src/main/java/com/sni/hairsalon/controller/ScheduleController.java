@@ -1,6 +1,7 @@
 package com.sni.hairsalon.controller;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -33,7 +34,6 @@ public class ScheduleController {
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<ScheduleResponseDTO> createSchedule(@RequestBody ScheduleRequestDTO request){
-
         return ResponseEntity.status(HttpStatus.CREATED)
         .body(scheduleService.createSchedule(request));
     }
@@ -79,7 +79,7 @@ public class ScheduleController {
 
     @GetMapping("/current/barber")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-    public ResponseEntity<List<ScheduleResponseDTO>> getTodayScheduleForBarber(@RequestParam  Long barberId){
+    public ResponseEntity <ScheduleResponseDTO> getTodayScheduleForBarber(@RequestParam  Long barberId){
         
         return ResponseEntity.ok(scheduleService.getBarBerTodayCurrentSchedule(barberId));
     }
@@ -93,3 +93,21 @@ public class ScheduleController {
     }
 }
 
+
+//TODO work on this function
+
+/*@PostMapping("/create-large")
+public ResponseEntity<?> createLargeSchedule(@RequestBody ScheduleRequestDTO request) {
+    // Validate request and create schedule without slots
+    ScheduleResponseDTO scheduleDto = scheduleService.createScheduleWithoutSlots(request);
+    
+    // Trigger async process for slot generation
+    slotGenerationJobService.scheduleSlotGeneration(request, scheduleDto.getId());
+    
+    return ResponseEntity.accepted()
+        .body(Map.of(
+            "message", "Schedule created. Slots will be generated in the background.",
+            "scheduleId", scheduleDto.getId(),
+            "statusCheckEndpoint", "/v1/schedule/generation-status/" + scheduleDto.getId()
+        ));
+ */
