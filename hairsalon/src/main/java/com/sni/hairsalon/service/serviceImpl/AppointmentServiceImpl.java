@@ -68,8 +68,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     Barber barber = barberRepo.findById(Long.parseLong(request.getBarberId()))
         .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
 
-    Haircut haircut = haircutRepo.findHaircutByType(request.getHaircutType())
-        .orElseThrow(() -> new ResourceNotFoundException("Haircut not found"));
+    Haircut haircut = findHaircutByTypeFlexible(request.getHaircutType());
 
     LocalDate appointmentDate = request.getAppointmentTime().toLocalDate();
     LocalDateTime appointmentDateTime = request.getAppointmentTime();
