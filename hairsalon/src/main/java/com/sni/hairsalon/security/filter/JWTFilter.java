@@ -70,9 +70,9 @@ public class JWTFilter extends OncePerRequestFilter {
 
     private void processToken(String token){
 
-        if(sessionService.isSessionValid(token) == false){
-            throw new IllegalAccessError("Not valid session");
-        }
+        // if(sessionService.isSessionValid(token) == false){
+        //     throw new IllegalAccessError("Not valid session");
+        //}
         String email = jwtUtils.validateTokenAndRetrieveSubject(token);
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserPrincipal userDetails = (UserPrincipal) userDetailsService.loadUserByUsername(email);

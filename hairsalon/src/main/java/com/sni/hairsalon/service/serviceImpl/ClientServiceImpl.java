@@ -90,6 +90,10 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public void  deleteClient(long id){
+        Client client = clientRepo.findById(id)
+        .orElseThrow(()->new ResourceNotFoundException("No client found"));
+        User user = userRepo.findById(client.getUser().getId());
+        userRepo.delete(user);
         clientRepo.deleteById(id); 
         return;
     }
