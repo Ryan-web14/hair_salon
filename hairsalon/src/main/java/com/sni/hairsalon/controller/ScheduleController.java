@@ -39,9 +39,9 @@ public class ScheduleController {
     }
 
     @GetMapping("/{id}/barber")
-    public ResponseEntity<List<ScheduleResponseDTO>> getBarberSchedule(@PathVariable Long barberId){
+    public ResponseEntity<List<ScheduleResponseDTO>> getBarberSchedule(@PathVariable Long id){
         
-        return ResponseEntity.ok(scheduleService.getBarberSchedule(barberId));
+        return ResponseEntity.ok(scheduleService.getBarberSchedule(id));
     }
 
     @PostMapping("/admin/{id}/barber")

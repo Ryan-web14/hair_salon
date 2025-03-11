@@ -142,9 +142,6 @@ private Haircut findHaircutByTypeFlexible(String requestType) {
   Barber barber = barberRepo.findById(Long.parseLong(request.getBarberId()))
     .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
 
-  // Haircut haircut = haircutRepo.findHaircutByType(request.getHaircut())
-  //   .orElseThrow(() -> new ResourceNotFoundException("Haircut not found"));
-
   Haircut haircut = findHaircutByTypeFlexible(request.getHaircutType());
 
   LocalDate appointmentDate = request.getAppointmentTime().toLocalDate();
@@ -182,7 +179,6 @@ throw new IllegalStateException("The appointment time doesn't match the barber h
 
   AppointmentResponseDTO response = mapper.toDto(appointment);
   mailService.sendAppointmentConfirmation(client.getUser().getEmail(), response);
-
   return response;
   }
 
