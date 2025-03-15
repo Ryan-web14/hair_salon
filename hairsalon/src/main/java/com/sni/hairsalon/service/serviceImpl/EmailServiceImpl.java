@@ -271,13 +271,6 @@ public class EmailServiceImpl implements EmailService{
    
              Votre rendez-vous avec %s %s
              pour %s du %s a été annulé,
-    
-             ----------------------------------------
-             IMPORTANT: Cette annulation pour cause 
-             de retard compte comme une non présence.
-             A la troisième annulation, votre compte
-             sera bloqué
-             ----------------------------------------
 
              Cordialement,
              L'équipe de L'HOMME

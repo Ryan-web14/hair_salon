@@ -89,6 +89,13 @@ public class SessionServiceImpl implements SessionService {
         return mapper.toDto(session);
     }
 
+    @Override
+    public void deleteAllSession(){
+
+        sessionRepo.deleteAll();
+        return;
+    }
+
     private String getClientIP(HttpServletRequest request) {
         String xfHeader = request.getHeader("X-Forwarded-For");
         if (xfHeader == null) {
