@@ -67,4 +67,11 @@ public class ClientController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    public ResponseEntity<Void> deleteAllAvailability(){
+        clientService.deleteAllClient();;
+        return ResponseEntity.noContent().build();
+    }
+
 }

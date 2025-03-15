@@ -17,8 +17,10 @@ import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.mapper.AvailabilityMapper;
 import com.sni.hairsalon.model.Availability;
 import com.sni.hairsalon.model.Barber;
+import com.sni.hairsalon.model.Schedule;
 import com.sni.hairsalon.repository.AvailabilityRepository;
 import com.sni.hairsalon.repository.BarberRepository;
+import com.sni.hairsalon.repository.ScheduleRepository;
 import com.sni.hairsalon.service.AvailabilityService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
 
     
     private final AvailabilityRepository availabilityRepo;
+    private final ScheduleRepository scheduleRepo;
     private final BarberRepository barberRepo;
     private final AvailabilityMapper mapper;
 
@@ -43,7 +46,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         Barber barber = barberRepo.findById(Long.parseLong(dto.getBarberId()))
         .orElseThrow(()-> new ResourceNotFoundException("Barber not found"));
 
-    List<Availability> generatedSlots = generateTimeSlot(barber, dto.getStarTime(), dto.getEndTime());
+    List<Availability> generatedSlots = generateTimeSlot(barber, dto.getStarTime(), dto.getEndTime(), dto.getScheduleId());
     return generatedSlots.stream()
     .map(mapper::toDto)
     .collect(Collectors.toList()); 
@@ -116,6 +119,13 @@ public void makeSlotUnavailable(long barberId, LocalDateTime startTime, int dura
     }
 }
 
+@Override
+public void deleteAllAvailability(){
+
+    availabilityRepo.deleteAll();
+    return;
+}
+
 // //TODO fix those function to verify the availability of a slot
 //     @Override
 //     public Boolean isAvailableSlot(long barberId, LocalDateTime startTime, int duration){
@@ -164,7 +174,7 @@ public void makeSlotUnavailable(long barberId, LocalDateTime startTime, int dura
     
     @Transactional
     private List<Availability> generateTimeSlot(Barber barber, 
-    LocalDateTime startTime, LocalDateTime endTime){
+    LocalDateTime startTime, LocalDateTime endTime, long scheduleId){
         List<Availability> slots = new ArrayList<>();
         LocalDateTime currentSlotStart = startTime.truncatedTo(ChronoUnit.MINUTES);
 
@@ -219,12 +229,17 @@ public void makeSlotUnavailable(long barberId, LocalDateTime startTime, int dura
                     throw new IllegalAccessError("Creneau existe");
                 }
 
+                Schedule schedule = scheduleRepo.findById(scheduleId)
+                .orElseThrow(()-> new ResourceNotFoundException("No schedule found"));
+
+                
                 Availability slot = Availability.builder()
                 .barber(barber)
                 .startTime(slotStart)
                 .endTime(slotEnd)
                 .isAvailable(true)
                 .note(" ")
+                .schedule(schedule)
                 .build();
 
                 batchRequest.add(slot);

@@ -34,9 +34,9 @@ public class Availability{
     @JoinColumn(name = "barber_id", nullable = false)
     private Barber barber;
 
-    // @ManyToOne
-    // @JoinColumn(name = "schedule_id", nullable = false)
-    // private Schedule schedule;
+    @ManyToOne
+    @JoinColumn(name = "schedule_id", nullable = false)
+    private Schedule schedule;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "start_time", nullable = false)

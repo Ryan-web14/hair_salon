@@ -13,6 +13,7 @@ public interface AvailabilityService {
     public List<AvailabilityResponseDTO>getBarberAvailability(long barberId, LocalDate date);
    // public Boolean isAvailableSlot(long id, LocalDateTime startTime, int duration);
     public void makeSlotUnavailable(long barberId, LocalDateTime startTime, int duration);
+    public void deleteAllAvailability();
 }
 
 

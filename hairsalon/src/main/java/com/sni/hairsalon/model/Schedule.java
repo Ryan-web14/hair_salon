@@ -67,8 +67,8 @@ public class Schedule {
     @Column(name = "effective_to", nullable = false)
     private Date effectiveTo;
 
-    // @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private List<Availability> availabilities;
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Availability> availabilities;
 
     
     

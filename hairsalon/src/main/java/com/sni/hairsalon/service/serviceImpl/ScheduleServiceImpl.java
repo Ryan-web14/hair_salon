@@ -136,23 +136,8 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         while (currentDate.isBefore(request.getEffectiveTo())) {
             if (request.getWorkingDays().contains(currentDate.getDayOfWeek().getValue())) {
-                AvailabilityRequestDTO dto = AvailabilityRequestDTO.builder()
-                        .barberId(request.getBarberId())
-                        .starTime(LocalDateTime.of(currentDate,
-                                request.getStartTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
-                        .endTime(LocalDateTime.of(currentDate,
-                                request.getEndTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
-                        .isAvailable(true)
-                        .build();
-                batchRequest.add(dto);
-                batch++;
 
-                if (batch >= maxBatch) {
-                    batch = 0;
-                    processBatch(batchRequest);
-                    batchRequest.clear();
-                }
-
+                
                 Schedule schedule = Schedule.builder()
                         .barber(barber)
                         .dayOfWeek(currentDate.getDayOfWeek().getValue())
@@ -165,6 +150,25 @@ public class ScheduleServiceImpl implements ScheduleService {
 
                 scheduleRepo.save(schedule);
                 schedules.add(mapper.toDto(schedule));
+
+                AvailabilityRequestDTO dto = AvailabilityRequestDTO.builder()
+                        .barberId(request.getBarberId())
+                        .starTime(LocalDateTime.of(currentDate,
+                                request.getStartTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
+                        .endTime(LocalDateTime.of(currentDate,
+                                request.getEndTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
+                        .isAvailable(true)
+                        .scheduleId(schedule.getId())
+                        .build();
+                batchRequest.add(dto);
+                batch++;
+
+                if (batch >= maxBatch) {
+                    batch = 0;
+                    processBatch(batchRequest);
+                    batchRequest.clear();
+                }
+
             }
             currentDate = currentDate.plusDays(1);
         }
@@ -230,6 +234,13 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         scheduleRepo.deleteById(schedule.getId());
 
+        return;
+    }
+
+    @Override
+    public void deleteAllSchedule(){
+
+        scheduleRepo.deleteAll();
         return;
     }
 

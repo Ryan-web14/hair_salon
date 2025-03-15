@@ -381,6 +381,12 @@ throw new IllegalStateException("The appointment time doesn't match the barber h
   }
 
   @Override
+  public void deleteAllAppointment(){
+    appointmentRepo.deleteAll();
+    return;
+  }
+
+  @Override
   @Scheduled(fixedRate = 30000)
   public int countAppointmentForTheDay() {
 

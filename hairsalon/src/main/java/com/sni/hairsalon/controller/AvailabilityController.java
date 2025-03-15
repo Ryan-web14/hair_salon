@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sni.hairsalon.dto.request.AvailabilityRequestDTO;
 import com.sni.hairsalon.dto.response.AvailabilityResponseDTO;
-import com.sni.hairsalon.repository.AvailabilityRepository;
 import com.sni.hairsalon.service.AvailabilityService;
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 public class AvailabilityController {
     
     private final AvailabilityService availabilityService;
-    private final AvailabilityRepository repo;
 
     @PostMapping("/admin/create")
     @PreAuthorize("hasRole('ADMIN')")
@@ -57,7 +55,7 @@ public class AvailabilityController {
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<Void> deleteAllAvailability(){
-        repo.deleteAll();
+        availabilityService.deleteAllAvailability();;
         return ResponseEntity.noContent().build();
     }
 }

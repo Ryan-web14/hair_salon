@@ -19,5 +19,6 @@ public interface ScheduleService {
     public List<ScheduleResponseDTO> getAllCurrentSchedule(LocalDate date);
     public ScheduleResponseDTO getBarBerTodayCurrentSchedule(long barberId);
     public void deleteSchedule(Long id);
+    public void deleteAllSchedule();
 
 }

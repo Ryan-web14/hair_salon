@@ -31,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 public class ScheduleController {
     
     private final ScheduleService scheduleService;
-    private final ScheduleRepository repo;
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
@@ -106,7 +105,7 @@ public class ScheduleController {
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<Void> deleteAllSchedule(){
-        repo.deleteAll();
+        scheduleService.deleteAllSchedule();
         return ResponseEntity.noContent().build();
 
     }

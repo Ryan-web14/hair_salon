@@ -16,5 +16,6 @@ public class AvailabilityRequestDTO {
     private LocalDateTime starTime;
     private LocalDateTime endTime;
     private boolean isAvailable;
+    private long scheduleId;
     private String note;
 }
