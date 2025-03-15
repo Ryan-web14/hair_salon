@@ -68,6 +68,8 @@ public class EmailServiceImpl implements EmailService{
             préferable de s'y prendre 12 à 24h en avance 
             ou de nous contacter.
 
+            Téléphone: +242 04 045 12 12
+
             Ne pas répondre. Générer automatiquement.
             """,
             appointment.getClientFirstname(),
@@ -102,6 +104,8 @@ public class EmailServiceImpl implements EmailService{
             À très bientôt !
 
             L'équipe de L'HOMME
+
+            Téléphone: +242 04 045 12 12
 
             Ne pas répondre. Générer automatiquement.
             """,
@@ -142,6 +146,8 @@ public class EmailServiceImpl implements EmailService{
    Cordialement,
    L'équipe de L'HOMME
     
+   Téléphone: +242 04 045 12 12
+
    Ne pas répondre. Générer automatiquement.
         """,
         appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")));
@@ -177,6 +183,8 @@ public class EmailServiceImpl implements EmailService{
    Cordialement,
    L'équipe de L'HOMME
 
+   Téléphone: +242 04 045 12 12
+
    Ne pas répondre. Générer automatiquement.
                     """,
     appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")));
@@ -208,6 +216,8 @@ public class EmailServiceImpl implements EmailService{
    Cordialement,
    L'équipe de L'HOMME
 
+   Téléphone: +242 04 045 12 12
+
    Ne pas répondre. Générer automatiquement.
    """, 
     appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
@@ -227,8 +237,7 @@ public class EmailServiceImpl implements EmailService{
    
     Madame, Monsieur %s
    
-   Votre rendez-vous pour %s du %s a été annulé,
-   pour cause de retard.
+   Votre rendez-vous pour %s du %s a été annulé.
     
    ----------------------------------------
    IMPORTANT: Si vous désirez un rendez-vous
@@ -237,6 +246,8 @@ public class EmailServiceImpl implements EmailService{
 
    Cordialement,
    L'équipe de L'HOMME
+   
+   Téléphone: +242 04 045 12 12
 
    Ne pas répondre. Générer automatiquement.            
                 """,

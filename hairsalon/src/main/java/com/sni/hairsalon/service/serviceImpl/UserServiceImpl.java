@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public User createBarberUserByAdmin(BarberRequestDTO dto){
+    public Long createBarberUserByAdmin(BarberRequestDTO dto){
 
         UserRole role = roleRepo.findUserRoleByName("BARBER")
         .orElseThrow(()-> new ResourceNotFoundException("Role not found"));
@@ -94,16 +94,16 @@ public class UserServiceImpl implements UserService{
         .build();
         UserResponseDTO response = userMapper.toDto(barberUser);
         userRepo.save(barberUser);
-        mailService.sendBarberAccountInformation(dto.getEmail(),response, randomPassword);
-        return barberUser;
+        mailService.sendBarberAccountInformation(barberUser.getEmail(),response, randomPassword);
+        return barberUser.getId();
 
     }
 
     @Override
-    public UserResponseDTO getUserById(long id){
+    public User getUserById(long id){
         User user = userRepo.findUserById(id)
         .orElseThrow(()->new ResourceNotFoundException("user not found"));
-        return userMapper.toDto(user);
+        return user;
      }
 
      @Override

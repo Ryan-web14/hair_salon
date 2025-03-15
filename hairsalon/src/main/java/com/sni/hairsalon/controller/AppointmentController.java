@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.service.annotation.DeleteExchange;
 
 import com.sni.hairsalon.dto.request.AppointmentRequestDTO;
 import com.sni.hairsalon.dto.request.AppointmentUpdateRequestDTO;
@@ -163,6 +162,40 @@ public class AppointmentController {
     
     return ResponseEntity.ok().body(appointmentService.updateAppointmentByAdmin(appointmentId, request));
   }
+
+  @GetMapping("/run-appointment")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<Void> sendAppointmentScheduleToBarber(){
+        
+    appointmentService.sendDailyAppointmentScheduleToBarber();
+    return ResponseEntity.noContent().build();
+  }
+
+  @GetMapping("/monitor-appointment")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<Void> monitorAppointment(){
+
+    appointmentService.monitorAppointmentTime();
+    return ResponseEntity.noContent().build();
+
+  }
+
+  @GetMapping("/progress")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<Void> checkProgressAppointment(){
+    
+    appointmentService.monitorCheckInAppointment();
+    return ResponseEntity.noContent().build();
+  }
+
+  @GetMapping("/check-completed")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<Void> InprogressToCompleted(){
+
+    appointmentService.InprogressToCompleted();
+    return ResponseEntity.noContent().build();
+  }  
+
 }
 
 

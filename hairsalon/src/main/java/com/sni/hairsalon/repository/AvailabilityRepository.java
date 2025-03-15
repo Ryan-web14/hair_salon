@@ -26,14 +26,14 @@ List<Availability> findByBarberIdAndDateAndIsAvailableTrue(
  @Param("startTime") LocalDateTime startTime,
  @Param("endTime") LocalDateTime endTime
 );
-    @Query("select a from Availability a where a.barber.id = :baberId")
+    @Query("select a from Availability a where a.barber.id = :barberId")
     List<Availability> findAvailabilityByBarberId(@Param("barberId") long barberId);
 
     @Query("Select a from Availability a where a.barber.id = :barberId " +
     "and a.startTime = :startTime "+
     "and a.endTime = :endTime " +
     "and isAvailable = true")
-    Optional<Availability> findByStartAndEndTimeAndBarber(
+    List<Availability> findByStartAndEndTimeAndBarber(
         @Param("barberId") long barberId,
         @Param("startTime") LocalDateTime starTime,
         @Param("endTime") LocalDateTime endTime);
@@ -44,4 +44,24 @@ List<Availability> findOverlappingSlots(
     @Param("barberId") long barberId, 
     @Param("startTime") LocalDateTime startTime, 
     @Param("endTime") LocalDateTime endTime);
+
+
+    // Find slots that overlap with a given time range
+    @Query("SELECT a FROM Availability a WHERE a.barber.id = :barberId " +
+           "AND ((a.startTime <= :endTime AND a.endTime >= :startTime))")
+    List<Availability> findByBarberAndTimeRangeOverlap(
+        @Param("barberId") Long barberId, 
+        @Param("startTime") LocalDateTime startTime, 
+        @Param("endTime") LocalDateTime endTime);
+        
+    // Check if a specific slot exists
+    @Query("SELECT COUNT(a) > 0 FROM Availability a " +
+    "WHERE a.barber.id = :barberId " +
+    "AND a.startTime = :startTime " +
+    "AND a.endTime = :endTime")
+boolean existsByBarberIdAndStartTimeAndEndTime(
+ @Param("barberId") Long barberId, 
+ @Param("startTime") LocalDateTime startTime, 
+ @Param("endTime") LocalDateTime endTime
+);
 }
