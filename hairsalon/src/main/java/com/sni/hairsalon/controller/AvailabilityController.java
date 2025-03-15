@@ -55,6 +55,7 @@ public class AvailabilityController {
             return ResponseEntity.ok(availabilityService.getBarberAvailability(barberId, date));
         } 
     @DeleteMapping("/delete")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<Void> deleteAllAvailability(){
         repo.deleteAll();
         return ResponseEntity.noContent().build();
