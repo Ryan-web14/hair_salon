@@ -104,6 +104,7 @@ public class ScheduleController {
     }
 
     @DeleteMapping("/delete")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<Void> deleteAllSchedule(){
         repo.deleteAll();
         return ResponseEntity.noContent().build();
