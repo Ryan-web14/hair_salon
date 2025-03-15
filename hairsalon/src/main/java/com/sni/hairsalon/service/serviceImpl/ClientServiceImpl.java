@@ -151,6 +151,13 @@ public class ClientServiceImpl implements ClientService {
         return mapper.toDto(client);
     }
 
+    @Override
+    public void deleteAllClient(){
+
+        clientRepo.deleteAll();
+        return;
+    }
+
 
       private void validateField(ClientRequestDTO clientRequest){
         if(clientRequest.getFirstname().isEmpty() || clientRequest.getLastname().isEmpty()){

@@ -24,6 +24,7 @@ import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
 import com.sni.hairsalon.exception.BadRequestException;
 import com.sni.hairsalon.model.UserPrincipal;
 import com.sni.hairsalon.service.AppointmentService;
+import com.twilio.http.Response;
 
 import lombok.RequiredArgsConstructor;
 
@@ -195,6 +196,14 @@ public class AppointmentController {
     appointmentService.InprogressToCompleted();
     return ResponseEntity.noContent().build();
   }  
+
+  @DeleteMapping("/delete")
+  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+  public ResponseEntity<Void> deleteAllAppointment(){
+
+    appointmentService.deleteAllAppointment();
+    return ResponseEntity.noContent().build();
+  }
 
 }
 

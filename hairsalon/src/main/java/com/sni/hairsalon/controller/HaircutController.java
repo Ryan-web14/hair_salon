@@ -54,9 +54,4 @@ public class HaircutController {
         haircutService.deleteHaircut(id);
         return ResponseEntity.noContent().build();
     }
-
-    @GetMapping("/all/repo")
-    public ResponseEntity<List<Haircut>> getAllHaircutsFromRepo(){
-        return ResponseEntity.ok(repo.findAll());
-    }
 }
