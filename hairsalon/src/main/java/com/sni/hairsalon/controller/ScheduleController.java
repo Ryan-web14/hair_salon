@@ -1,13 +1,13 @@
 package com.sni.hairsalon.controller;
 
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +20,7 @@ import com.sni.hairsalon.dto.request.BulkScheduleRequestDTO;
 import com.sni.hairsalon.dto.request.ScheduleRequestDTO;
 import com.sni.hairsalon.dto.request.ScheduleTemplateRequestDTO;
 import com.sni.hairsalon.dto.response.ScheduleResponseDTO;
+import com.sni.hairsalon.repository.ScheduleRepository;
 import com.sni.hairsalon.service.ScheduleService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,13 +31,14 @@ import lombok.RequiredArgsConstructor;
 public class ScheduleController {
     
     private final ScheduleService scheduleService;
+    private final ScheduleRepository repo;
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<ScheduleResponseDTO> createSchedule(@RequestBody ScheduleRequestDTO request){
         return ResponseEntity.status(HttpStatus.CREATED)
         .body(scheduleService.createSchedule(request));
-    }
+    }  
 
     @GetMapping("/{id}/barber")
     public ResponseEntity<List<ScheduleResponseDTO>> getBarberSchedule(@PathVariable Long id){
@@ -51,6 +53,15 @@ public class ScheduleController {
 
         return ResponseEntity.ok(scheduleService.updateSchedule(barberId, request));
     }
+
+    @DeleteMapping("/{scheduleId}/delete")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    public ResponseEntity<Void> deleteSchedule(@PathVariable Long scheduleId){
+
+        scheduleService.deleteSchedule(scheduleId);
+        return ResponseEntity.noContent().build();
+    }
+
 
     @PostMapping("/template")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
@@ -90,6 +101,13 @@ public class ScheduleController {
             @RequestBody BulkScheduleRequestDTO request) {
               return ResponseEntity.status(HttpStatus.CREATED)
             .body(scheduleService.bulkCreateSchedules(request));
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteAllSchedule(){
+        repo.deleteAll();
+        return ResponseEntity.noContent().build();
+
     }
 }
 

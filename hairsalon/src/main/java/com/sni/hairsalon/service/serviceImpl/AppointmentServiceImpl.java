@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-
 import com.sni.hairsalon.dto.request.AppointmentRequestDTO;
 import com.sni.hairsalon.dto.request.AppointmentUpdateRequestDTO;
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
@@ -28,6 +27,7 @@ import com.sni.hairsalon.repository.BarberRepository;
 import com.sni.hairsalon.repository.ClientRepository;
 import com.sni.hairsalon.repository.HaircutRepository;
 import com.sni.hairsalon.repository.UserRepository;
+import com.sni.hairsalon.security.filter.JWTFilter;
 import com.sni.hairsalon.service.AppointmentService;
 import com.sni.hairsalon.service.AvailabilityService;
 import com.sni.hairsalon.service.EmailService;
@@ -243,17 +243,6 @@ throw new IllegalStateException("The appointment time doesn't match the barber h
         .collect(Collectors.toList());
   }
 
-
-
-  @Override
-  @Scheduled(fixedRate = 30000)
-  public int countAppointmentForTheDay() {
-
-    List<AppointmentResponseDTO> appointments = getAllBarberAppointment(LocalDate.now());
-
-    return appointments.size();
-  }
-
   @Override
   public List<AppointmentResponseDTO> getClientAppointment(long clientId) {
 
@@ -326,7 +315,7 @@ throw new IllegalStateException("The appointment time doesn't match the barber h
 
       Client client =  clientRepo.findByEmail(email)
       .orElseThrow(()->new ResourceNotFoundException("Client not found"));
-      LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+      LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).plusHours(1);
       LocalDate currentDate = now.toLocalDate();
       //find all appointments for client for the current day
       List<Appointment> appointments = appointmentRepo.findByClientAndDateAndStatus(client.getId(),
@@ -366,17 +355,6 @@ throw new IllegalStateException("The appointment time doesn't match the barber h
   }
 
   @Override
-  @Scheduled(fixedRate = 30000)
-  public int clientCount() {
-
-    LocalDate now = LocalDate.now();
-
-    int count = appointmentRepo.countDistinctClientsForDate(now, 3);
-
-    return count;
-  }
-
-  @Override
   public void cancelAppointment(long id) {
 
     Appointment cancelAppointment = appointmentRepo.findById(id)
@@ -402,9 +380,59 @@ throw new IllegalStateException("The appointment time doesn't match the barber h
     return;
   }
 
+  @Override
+  @Scheduled(fixedRate = 30000)
+  public int countAppointmentForTheDay() {
+
+    List<AppointmentResponseDTO> appointments = getAllBarberAppointment(LocalDate.now());
+
+    return appointments.size();
+  }
+
+  @Override
+  @Scheduled(fixedRate = 30000)
+  public int clientCount() {
+
+    LocalDate now = LocalDate.now();
+
+    int count = appointmentRepo.countDistinctClientsForDate(now, 3);
+
+    return count;
+  }
+
+  @Scheduled(fixedRate = 100000)
+  public void monitorCheckInAppointment(){
+
+      LocalDateTime now = LocalDateTime.now().plusHours(1).truncatedTo(ChronoUnit.MINUTES);
+      List<Appointment> appointments = appointmentRepo.findAppointmentByStatus(4);
+
+      for(Appointment apt  : appointments){
+
+        if (isWithinOneMinute(apt.getAppointmentTime(), now)) {
+          // Update the appointment status to 5
+          apt.setStatus(5);
+          appointmentRepo.save(apt);
+
+        }
+      }
+  }
+  
+  @Scheduled(fixedRate = 100000)
+  public void InprogressToCompleted(){
+
+    List<Appointment> appointments = appointmentRepo.findAppointmentByStatus(5);
+    LocalDateTime now = LocalDateTime.now();
+
+    for(Appointment apt : appointments){
+
+      makeInProgressToCompleted(apt, now);
+    }
+
+  }
+
   @Scheduled(fixedRate = 300000)
   public void monitorAppointmentTime() {
-    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime now = LocalDateTime.now().plusHours(1);
     List<Appointment> appointments = appointmentRepo.findByAppointmentTimeBetweenAndStatus(
         now.with(LocalTime.MIDNIGHT).truncatedTo(ChronoUnit.MINUTES),
         now.with(LocalTime.MAX).truncatedTo(ChronoUnit.MINUTES),
@@ -415,7 +443,7 @@ throw new IllegalStateException("The appointment time doesn't match the barber h
     }
   }
 
-  @Scheduled(cron = "0 0 6 * * *")
+  @Scheduled(cron = "0 0 7 * * *", zone = "Africa/Lagos")
   public void sendDailyAppointmentScheduleToBarber() {
     LocalDate today = LocalDate.now();
     List<Barber> barbers = barberRepo.findAll();
@@ -445,6 +473,16 @@ throw new IllegalStateException("The appointment time doesn't match the barber h
 
   }
 
+  private void makeInProgressToCompleted(Appointment appointment, LocalDateTime now){
+
+    if(appointment.getAppointmentTime().isAfter(now.plusMinutes(10))){
+
+      appointment.setStatus(6);
+      appointmentRepo.save(appointment);
+
+    }
+  }
+
   private void checkAppointmentTime(Appointment appointment, LocalDateTime now) {
     LocalDateTime appointmentTime = appointment.getAppointmentTime();
     Duration difference = Duration.between(appointmentTime, now);
@@ -466,9 +504,14 @@ throw new IllegalStateException("The appointment time doesn't match the barber h
     }
   }
 
+  private boolean isWithinOneMinute(LocalDateTime time1, LocalDateTime time2) {
+    long diffInSeconds = Math.abs(time1.until(time2, ChronoUnit.SECONDS));
+    return diffInSeconds <= 60; // 1 minute = 60 seconds
+}
+
   private Appointment checkAppointmentTodayDate(Appointment appointment) {
 
-    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime now = LocalDateTime.now().plusHours(1);
 
     if(appointment.getAppointmentTime().toLocalDate().equals(now.toLocalDate())){
       

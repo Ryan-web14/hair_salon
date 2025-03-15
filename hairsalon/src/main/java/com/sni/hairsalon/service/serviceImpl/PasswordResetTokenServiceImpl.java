@@ -27,6 +27,7 @@ public class PasswordResetTokenServiceImpl implements PasswordResetTokenService 
     private final UserService userService;
     private static final long EXPIRATTION_TIME = 30;
 
+    @Transactional
     public String createToken(String email){
         
     //    if(!userService.emailAlreadyExist(email)){

@@ -5,8 +5,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 import org.springframework.stereotype.Service;
@@ -59,93 +62,118 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .effectiveTo(Date.valueOf(request.getEffectiveTo()))
                 .build();
 
+        LocalDate currentDate = request.getEffectiveFrom();
+        int batchSize = 0;
+        int maxBatchSize = 5;
+        List<AvailabilityRequestDTO> batchRequest = new ArrayList<>();
 
-                LocalDate currentDate = request.getEffectiveFrom();
-                int batchSize = 0;
-                int maxBatchSize = 5;
-                List<AvailabilityRequestDTO> batchRequest = new ArrayList<>();
+        while (!currentDate.isAfter(request.getEffectiveTo())) {
+            if (currentDate.getDayOfWeek().getValue() == request.getDayOfWeek()) {
+                AvailabilityRequestDTO dto = AvailabilityRequestDTO.builder()
+                        .barberId(request.getId())
+                        .starTime(LocalDateTime.of(currentDate,
+                                request.getStartTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
+                        .endTime(LocalDateTime.of(currentDate,
+                                request.getEndTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
+                        .isAvailable(true)
+                        .build();
 
-                while (!currentDate.isAfter(request.getEffectiveTo())) {
-                    if (currentDate.getDayOfWeek().getValue() == request.getDayOfWeek()) {
-                        AvailabilityRequestDTO dto = AvailabilityRequestDTO.builder()
-                                .barberId(request.getId())
-                                .starTime(LocalDateTime.of(currentDate,
-                                        request.getStartTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
-                                .endTime(LocalDateTime.of(currentDate,
-                                        request.getEndTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
-                                .isAvailable(true)
-                                .build();
-        
-                        batchRequest.add(dto);
+                batchRequest.add(dto);
 
-                        batchSize++;
+                batchSize++;
 
-                    if(batchSize >= maxBatchSize){
-                        batchSize = 0;
-                        processBatch(batchRequest);
-                        batchRequest.clear();
-                    }
-                        
-                }
- 
-                    currentDate = currentDate.plusDays(1);
-                }
-                
-                if(!batchRequest.isEmpty()){
+                if (batchSize >= maxBatchSize) {
+                    batchSize = 0;
                     processBatch(batchRequest);
+                    batchRequest.clear();
                 }
+
+            }
+
+            currentDate = currentDate.plusDays(1);
+        }
+
+        if (!batchRequest.isEmpty()) {
+            processBatch(batchRequest);
+        }
 
         return mapper.toDto(scheduleRepo.save(schedule));
     }
 
-    private void processBatch(List<AvailabilityRequestDTO> batch){
-
-        for(AvailabilityRequestDTO dto : batch){
-            availabilityService.createAvailability(dto);
-        }
-    }
-
-
     @Override
-    public List<ScheduleResponseDTO> bulkCreateSchedules(BulkScheduleRequestDTO request){
-        
+    @Transactional
+    public List<ScheduleResponseDTO> bulkCreateSchedules(BulkScheduleRequestDTO request) {
+
         Barber barber = barberRepo.findById(Long.parseLong(request.getBarberId()))
-        .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
 
         validateTimeRange(request.getStartTime(), request.getEndTime());
 
-        List<Schedule> schedules = new ArrayList<>();
+        //cehck if there is any overlapping schedule by itering for each day in the request
+        for (Integer day : request.getWorkingDays()) {
+            ScheduleRequestDTO dto = ScheduleRequestDTO.builder()
+                    .id(request.getBarberId())
+                    .dayOfWeek(day)
+                    .effectiveFrom(request.getEffectiveFrom())
+                    .effectiveTo(request.getEffectiveTo())
+                    .startTime(request.getStartTime())
+                    .endTime(request.getEndTime())
+                    .isRecurring(true)
+                    .build();
 
+            if (hasAnyOverlappingSchedule(dto)) {
+                throw new IllegalStateException("Schedule overlap with another");
+            }
+        }
+
+        List<ScheduleResponseDTO> schedules = new ArrayList<>();
+
+        //Managing the creation of availabilities through batches for high frequency creation 
         LocalDate currentDate = request.getEffectiveFrom();
+        int batch = 0;
+        int maxBatch = 10;
+        List<AvailabilityRequestDTO> batchRequest = new ArrayList<>();
 
-        while(currentDate.isBefore(request.getEffectiveTo())){
-            if(request.getWorkingDays().contains(currentDate.getDayOfWeek().getValue())){
+        while (currentDate.isBefore(request.getEffectiveTo())) {
+            if (request.getWorkingDays().contains(currentDate.getDayOfWeek().getValue())) {
                 AvailabilityRequestDTO dto = AvailabilityRequestDTO.builder()
-                .barberId(request.getBarberId())
-                .starTime(LocalDateTime.of(currentDate, request.getStartTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
-                .endTime(LocalDateTime.of(currentDate, request.getEndTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
-                .isAvailable(true)
-                .build();
-                availabilityService.createAvailability(dto);
-           
-            Schedule schedule = Schedule.builder()
-    .barber(barber)     
-    .dayOfWeek(currentDate.getDayOfWeek().getValue())
-    .startTime(request.getStartTime())
-    .endTime(request.getEndTime())
-    .is_recurring(true)
-    .effectiveFrom(Date.valueOf(request.getEffectiveFrom()))
-    .effectiveTo(Date.valueOf(request.getEffectiveTo()))
-    .build();
-            
-                schedules.add(schedule);
+                        .barberId(request.getBarberId())
+                        .starTime(LocalDateTime.of(currentDate,
+                                request.getStartTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
+                        .endTime(LocalDateTime.of(currentDate,
+                                request.getEndTime().toLocalTime().truncatedTo(ChronoUnit.MINUTES)))
+                        .isAvailable(true)
+                        .build();
+                batchRequest.add(dto);
+                batch++;
+
+                if (batch >= maxBatch) {
+                    batch = 0;
+                    processBatch(batchRequest);
+                    batchRequest.clear();
+                }
+
+                Schedule schedule = Schedule.builder()
+                        .barber(barber)
+                        .dayOfWeek(currentDate.getDayOfWeek().getValue())
+                        .startTime(request.getStartTime())
+                        .endTime(request.getEndTime())
+                        .is_recurring(true)
+                        .effectiveFrom(Date.valueOf(request.getEffectiveFrom()))
+                        .effectiveTo(Date.valueOf(request.getEffectiveTo()))
+                        .build();
+
+                scheduleRepo.save(schedule);
+                schedules.add(mapper.toDto(schedule));
             }
             currentDate = currentDate.plusDays(1);
         }
 
-        return scheduleRepo.saveAll(schedules).stream()
-        .map(schedule->mapper.toDto(schedule))
-        .collect(Collectors.toList());
+        if(!batchRequest.isEmpty()){
+            processBatch(batchRequest);
+        }
+
+        return schedules;
     }
 
     @Override
@@ -160,10 +188,20 @@ public class ScheduleServiceImpl implements ScheduleService {
             String.format("No schedule found for barber %d", barber.getId());
         }
 
-        return schedules
-                .stream()
-                .map(schedule -> mapper.toDto(schedule))
-                .collect(Collectors.toList());
+        Set<String> uniqueDay = new HashSet<>();
+        List<ScheduleResponseDTO> uniqueSchedule = new ArrayList<>();
+
+        for(Schedule schedule : schedules){
+            DayOfWeek dayOfWeek = DayOfWeek.of(schedule.getDayOfWeek());
+            String day = dayOfWeek.toString();
+
+            if(!uniqueDay.contains(day)){
+                uniqueDay.add(day);
+                uniqueSchedule.add(mapper.toDto(schedule));
+            }
+        }
+
+        return uniqueSchedule;
     }
 
     @Override
@@ -182,6 +220,17 @@ public class ScheduleServiceImpl implements ScheduleService {
         schedule.setEffectiveTo(Date.valueOf(request.getEffectiveTo()));
         Schedule updatedSchedule = scheduleRepo.save(schedule);
         return mapper.toDto(updatedSchedule);
+    }
+
+    @Override
+    public void deleteSchedule(Long id){
+        
+        Schedule schedule = scheduleRepo.findById(id)
+        .orElseThrow(()-> new ResourceNotFoundException("Schedule not found"));
+
+        scheduleRepo.deleteById(schedule.getId());
+
+        return;
     }
 
     @Override
@@ -231,8 +280,9 @@ public class ScheduleServiceImpl implements ScheduleService {
         Barber barber = barberRepo.findById(barberId)
                 .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
 
-        Schedule schedule = scheduleRepo.findCurrentSchedulesForBarber(barber.getId(),date, date.getDayOfWeek().getValue())
-        .orElseThrow(()-> new ResourceNotFoundException("No found schedule"));
+        Schedule schedule = scheduleRepo
+                .findCurrentSchedulesForBarber(barber.getId(), date, date.getDayOfWeek().getValue())
+                .orElseThrow(() -> new ResourceNotFoundException("No found schedule"));
         return mapper.toDto(schedule);
     }
 
@@ -242,8 +292,10 @@ public class ScheduleServiceImpl implements ScheduleService {
         Barber barber = barberRepo.findById(barberId)
                 .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
 
-        Schedule barberSchedule = scheduleRepo.findCurrentSchedulesForBarber(barber.getId(), LocalDate.now(), LocalDate.now().getDayOfWeek().getValue())
-        .orElseThrow(()-> new ResourceNotFoundException("No schedule found"));
+        Schedule barberSchedule = scheduleRepo
+                .findCurrentSchedulesForBarber(barber.getId(), LocalDate.now(),
+                        LocalDate.now().getDayOfWeek().getValue())
+                .orElseThrow(() -> new ResourceNotFoundException("No schedule found"));
 
         return mapper.toDto(barberSchedule);
 
@@ -270,6 +322,14 @@ public class ScheduleServiceImpl implements ScheduleService {
                 effectiveFrom,
                 effectiveTo).size() > 0;
     }
+
+    private void processBatch(List<AvailabilityRequestDTO> batch) {
+
+        for (AvailabilityRequestDTO dto : batch) {
+            availabilityService.createAvailability(dto);
+        }
+    }
+
 
 }
 

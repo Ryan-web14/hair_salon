@@ -26,5 +26,9 @@ public interface AppointmentService {
     public AppointmentResponseDTO checkIn(String email);
     public int clientCount();
     public int countAppointmentForTheDay();
+    public void sendDailyAppointmentScheduleToBarber(); 
+    public void monitorAppointmentTime();
+    public void monitorCheckInAppointment();
+    public void InprogressToCompleted();
         
 }

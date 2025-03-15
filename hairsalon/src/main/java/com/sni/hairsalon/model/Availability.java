@@ -2,7 +2,6 @@ package com.sni.hairsalon.model;
 
 import java.time.LocalDateTime;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,6 +34,10 @@ public class Availability{
     @JoinColumn(name = "barber_id", nullable = false)
     private Barber barber;
 
+    // @ManyToOne
+    // @JoinColumn(name = "schedule_id", nullable = false)
+    // private Schedule schedule;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
@@ -48,6 +51,4 @@ public class Availability{
 
     @Column(name = "note", nullable = true)
     private String note;
-    
-
 }

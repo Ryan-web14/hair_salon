@@ -11,11 +11,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import com.sni.hairsalon.model.Schedule;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule,Long > {
+
     List<Schedule> findByBarberId(long id);
     List<Schedule> findByDayOfWeek(DayOfWeek dayOfWeek);
 
@@ -70,6 +70,16 @@ List<Schedule> findOverlappingSchedules(
  @Param("effectiveTo") Date effectiveTo
 );
 
+@Query("SELECT COUNT(s) > 0 FROM Schedule s " +
+"WHERE s.barber.id = :barberId " +
+"AND :date BETWEEN CAST(s.effectiveFrom AS LocalDate) AND CAST(s.effectiveTo AS LocalDate) " + 
+"AND s.dayOfWeek = :dayOfWeek")
+Boolean existsByBarberIdAndDateAndDayOfWeek(
+    @Param("barberId") Long barberId,
+    @Param("date") LocalDate date,
+    @Param("dayOfWeek") int dayOfWeek
+);
+
 @Query("SELECT s FROM Schedule s WHERE :date BETWEEN s.effectiveFrom AND s.effectiveTo")
 List<Schedule> findCurrentSchedules(@Param("date") LocalDate date);    
 
@@ -109,7 +119,6 @@ Schedule findRecurringSchedules(
     @Param("dayOfWeek") int dayOfWeek,
     @Param("date") LocalDate date
 );
-
 
 }
 

@@ -180,8 +180,13 @@ public class AuthentificationServiceImpl implements AuthentificationService{
        if(clientResponse.getEmail().isEmpty()){
             userRepo.deleteById(Long.parseLong(userDto.getId()));
        }
-        return new ClientSignupResponse(clientResponse.getEmail());
+        return new ClientSignupResponse(clientResponse.getEmail(), clientResponse.getFirstname(),
+         clientResponse.getLastname(),clientResponse.getPhone());
     }
 
 
 }
+/*private String email;
+    private String firstname;
+    private String lastname;
+    private String phone; */

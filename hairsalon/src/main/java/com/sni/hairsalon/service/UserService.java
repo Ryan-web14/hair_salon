@@ -9,10 +9,10 @@ import com.sni.hairsalon.model.User;
 public interface UserService{
     UserResponseDTO createUser(UserRequestDTO dto);
     UserResponseDTO createAdmin(UserRequestDTO dto);
-    User  createBarberUserByAdmin(BarberRequestDTO  dto);
+    Long  createBarberUserByAdmin(BarberRequestDTO  dto);
     UserResponseDTO updateUser(long id, String email);
     UserResponseDTO updatePassword(long id, String newPassword);
-    UserResponseDTO getUserById(long id);
+    User  getUserById(long id);
     User getUserByEmail(String email);
     List<UserResponseDTO> getAllUsers();
     public void updateLastLogin(long id);

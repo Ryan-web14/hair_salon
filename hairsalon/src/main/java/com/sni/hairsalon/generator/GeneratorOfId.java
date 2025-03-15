@@ -3,34 +3,31 @@ package com.sni.hairsalon.generator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;
 
 public class GeneratorOfId implements IdentifierGenerator{
     
-    private long generationId(){
-        LocalDateTime now; 
-        long seed;
+   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyMMddHHmmssSSS");
+    private static final int RANDOM_BOUND = 1000; // Adjust as needed
 
-        now = LocalDateTime.now();  
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMddHHmmssSSS");
-        String nowString = now.format(formatter);
-        long nowValue = Long.parseLong(nowString);  
-        seed = System.currentTimeMillis();
-        Random rand = new Random(seed);
-        long randomNumber = rand.nextLong();
-
-        while(randomNumber < 0){
-            randomNumber = rand.nextLong();
-        }
-        return nowValue + randomNumber;
+    @Override
+    public Serializable generate(SharedSessionContractImplementor session, Object obj) {
+        return generateId();
     }
 
-    
-    @Override
-    public Serializable generate(SharedSessionContractImplementor session, Object obj){
-        return generationId();
-      
-    } 
+    private long generateId() {
+        // Get the current timestamp
+        LocalDateTime now = LocalDateTime.now();
+        String timestamp = now.format(FORMATTER);
+        long timestampValue = Long.parseLong(timestamp);
+
+        // Generate a random number using a thread-safe random generator
+        int randomNumber = ThreadLocalRandom.current().nextInt(RANDOM_BOUND);
+
+        // Combine timestamp and random number
+        return timestampValue * RANDOM_BOUND + randomNumber;
+    }
 }

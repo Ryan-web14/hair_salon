@@ -29,11 +29,11 @@ public class BarberServiceImpl implements BarberService {
     private final BarberMapper mapper;
     
     @Override
-        public BarberResponseDTO createBarber(BarberRequestDTO dto){
+    @Transactional
+    public BarberResponseDTO createBarber(BarberRequestDTO dto){
 
-            validateField(dto);
+            validateField(dto); 
             User user = userService.getUserByEmail(dto.getEmail());
-
             Barber barber = Barber.builder()
             .user(user)
             .lastname(dto.getLastname())
@@ -46,10 +46,12 @@ public class BarberServiceImpl implements BarberService {
         }
 
      @Override
+     @Transactional
      public BarberResponseDTO createBarberByAdmin(BarberRequestDTO dto){
 
         validateField(dto);
-        User user = userService.createBarberUserByAdmin(dto);
+        Long userId = userService.createBarberUserByAdmin(dto);
+        User user = userService.getUserById(userId);
         Barber barber = Barber.builder()
         .user(user)
         .lastname(dto.getLastname())
@@ -85,6 +87,9 @@ public class BarberServiceImpl implements BarberService {
         barber.setAvailable(requestDTO.isAvailable());
         barber.setDescription(requestDTO.getDescription());
 
+        User user = userService.getUserById(barber.getUser().getId());
+        userService.updateUser(user.getId(), requestDTO.getEmail());
+ 
         barberRepo.save(barber);
 
         return mapper.toDto(barber);
@@ -116,21 +121,19 @@ public class BarberServiceImpl implements BarberService {
     }
 
         private void validateField(BarberRequestDTO requestDTO){
-        // if(requestDTO.getFirstname().isEmpty() || requestDTO.getLastname().isEmpty()){
-        //     throw new RuntimeException("Empty name");
-        // }   
+        if(requestDTO.getFirstname().isEmpty() || requestDTO.getLastname().isEmpty()){
+            throw new RuntimeException("Empty name");
+        }   
     
-        // //TODO correct this
-        // if(!ValidationUtils.isLetter(requestDTO.getFirstname()) || ValidationUtils.isLetter(requestDTO.getLastname())){
-        //     throw new RuntimeException("Names are invalid");
-          
-        // }
+        //TODO correct this
+        if(!ValidationUtils.isLetter(requestDTO.getFirstname()) || !ValidationUtils.isLetter(requestDTO.getLastname())){
+            throw new RuntimeException("Names are invalid");
+        }
        
        String phone = requestDTO.getPhone(); 
         boolean verifiedPhone = ValidationUtils.isValidPhone(phone);
         if(!verifiedPhone || phone == null){
-             throw new RuntimeException("Invalid phone number"+ phone);
-            
+             throw new RuntimeException("Invalid phone number"+ phone);      
     }
 }
 }
