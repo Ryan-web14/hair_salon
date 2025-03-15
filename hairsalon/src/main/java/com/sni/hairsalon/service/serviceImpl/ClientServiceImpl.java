@@ -39,7 +39,7 @@ public class ClientServiceImpl implements ClientService {
 
         Client client = Client.builder()
         .user(user)
-        .lastname(dto.getLastname())
+        .lastname(dto.getLastname().toUpperCase())
         .firstname(dto.getFirstname())
         .phoneNumber(Integer.parseInt(dto.getPhone()  ))
         .noShowCount(0)
@@ -62,7 +62,7 @@ public class ClientServiceImpl implements ClientService {
         .orElseThrow(()-> new ResourceNotFoundException("Client not found"));
       
         client.setFirstname(dto.getFirstname());
-        client.setLastname(dto.getLastname());
+        client.setLastname(dto.getLastname().toUpperCase());
         client.setPhoneNumber(Integer.parseInt(dto.getPhone()));
         client.setNoShowCount(dto.getNoShowCount());
         clientRepo.save(client);
@@ -79,7 +79,7 @@ public class ClientServiceImpl implements ClientService {
         .orElseThrow(()-> new ResourceNotFoundException("Client not found"));
       
         client.setFirstname(dto.getFirstname());
-        client.setLastname(dto.getLastname());
+        client.setLastname(dto.getLastname().toUpperCase());
         client.setPhoneNumber(Integer.parseInt(dto.getPhone()));
         client.setNoShowCount(dto.getNoShowCount());
         clientRepo.save(client);

@@ -36,7 +36,7 @@ public class BarberServiceImpl implements BarberService {
             User user = userService.getUserByEmail(dto.getEmail());
             Barber barber = Barber.builder()
             .user(user)
-            .lastname(dto.getLastname())
+            .lastname(dto.getLastname().toUpperCase())
             .firstname(dto.getFirstname())
             .phoneNumber(Integer.parseInt(dto.getPhone()))
             .description(dto.getDescription())
@@ -54,9 +54,10 @@ public class BarberServiceImpl implements BarberService {
         User user = userService.getUserById(userId);
         Barber barber = Barber.builder()
         .user(user)
-        .lastname(dto.getLastname())
+        .lastname(dto.getLastname().toUpperCase())
         .firstname(dto.getFirstname())
         .phoneNumber(Integer.parseInt(dto.getPhone()))
+        .available(dto.isAvailable())
         .description(dto.getDescription())
         .build();
         barberRepo.save(barber);
@@ -81,7 +82,7 @@ public class BarberServiceImpl implements BarberService {
         Barber barber = barberRepo.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Barber not found"));
 
-        barber.setLastname(requestDTO.getLastname());
+        barber.setLastname(requestDTO.getLastname().toUpperCase());
         barber.setFirstname(requestDTO.getFirstname());
         barber.setPhoneNumber(Integer.parseInt(requestDTO.getPhone()));
         barber.setAvailable(requestDTO.isAvailable());
