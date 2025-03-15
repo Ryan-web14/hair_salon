@@ -11,6 +11,7 @@ public interface SessionService {
     public void invalidateSession(String token);
     public boolean isSessionValid(String token);
     public SessionResponseDTO getCurrentSession(String token);
+    public void deleteAllSession();
     //public List<SessionResponseDTO> getAllSession();
     
 }

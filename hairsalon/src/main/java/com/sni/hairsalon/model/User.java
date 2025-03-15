@@ -1,6 +1,7 @@
 package com.sni.hairsalon.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sni.hairsalon.annotation.IdGeneration;
@@ -52,5 +53,7 @@ public class User  {
     public void onCreate(){
         created_at = LocalDateTime.now();
     }
-    
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<UserSession> sessions;
 }

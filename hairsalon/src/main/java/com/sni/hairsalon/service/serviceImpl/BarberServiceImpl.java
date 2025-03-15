@@ -125,8 +125,7 @@ public class BarberServiceImpl implements BarberService {
         if(requestDTO.getFirstname().isEmpty() || requestDTO.getLastname().isEmpty()){
             throw new RuntimeException("Empty name");
         }   
-    
-        //TODO correct this
+
         if(!ValidationUtils.isLetter(requestDTO.getFirstname()) || !ValidationUtils.isLetter(requestDTO.getLastname())){
             throw new RuntimeException("Names are invalid");
         }
