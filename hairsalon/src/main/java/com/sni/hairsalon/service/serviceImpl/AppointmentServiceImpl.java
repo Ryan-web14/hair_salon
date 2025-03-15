@@ -360,6 +360,8 @@ throw new IllegalStateException("The appointment time doesn't match the barber h
     Appointment cancelAppointment = appointmentRepo.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
     cancelAppointment.setStatus(Status.CANCELLED_BY_PROVIDER.getCode());
+    String email = cancelAppointment.getBarber().getUser().getEmail();
+    mailService.sendAppointmentCancellationToBarber(email, mapper.toDto(cancelAppointment));
     appointmentRepo.save(cancelAppointment);
 
     return;
