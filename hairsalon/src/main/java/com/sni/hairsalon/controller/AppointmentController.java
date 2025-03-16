@@ -88,7 +88,7 @@ public class AppointmentController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/checkIn")
+    @PostMapping("/checkin")
     public ResponseEntity<Void> checkInClient(@RequestParam String email){
 
         appointmentService.checkIn(email);
@@ -166,41 +166,57 @@ public class AppointmentController {
 
   @GetMapping("/run-appointment")
   @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<Void> sendAppointmentScheduleToBarber(){
-        
+  public ResponseEntity<?> sendAppointmentScheduleToBarber(@RequestParam String token){
+    
+    String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
+    if (secretToken == null || !secretToken.equals(token)) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+    }
     appointmentService.sendDailyAppointmentScheduleToBarber();
     return ResponseEntity.noContent().build();
   }
 
-  @GetMapping("/monitor-appointment")
+  @PostMapping("/monitor-appointment")
   @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<Void> monitorAppointment(){
+  public ResponseEntity<?> monitorAppointment(@RequestParam String token){
 
+    String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
+    if (secretToken == null || !secretToken.equals(token)) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+    }
     appointmentService.monitorAppointmentTime();
     return ResponseEntity.noContent().build();
 
   }
 
-  @GetMapping("/progress")
+  @PostMapping("/progress")
   @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<Void> checkProgressAppointment(){
+  public ResponseEntity<?> checkProgressAppointment(@RequestParam String token){
     
+    String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
+    if (secretToken == null || !secretToken.equals(token)) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+    }
     appointmentService.monitorCheckInAppointment();
     return ResponseEntity.noContent().build();
   }
 
-  @GetMapping("/check-completed")
+  @PostMapping("/check-completed")
   @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<Void> InprogressToCompleted(){
+  public ResponseEntity<?> InprogressToCompleted(@RequestParam String token){
 
+    String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
+    if (secretToken == null || !secretToken.equals(token)) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+    }
     appointmentService.InprogressToCompleted();
     return ResponseEntity.noContent().build();
   }  
 
   @DeleteMapping("/delete")
-  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<Void> deleteAllAppointment(){
-
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<?> deleteAllAppointment(){
+    
     appointmentService.deleteAllAppointment();
     return ResponseEntity.noContent().build();
   }

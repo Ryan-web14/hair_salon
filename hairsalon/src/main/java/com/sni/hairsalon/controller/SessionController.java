@@ -6,23 +6,23 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sni.hairsalon.service.UserService;
+import com.sni.hairsalon.service.SessionService;
 
 import lombok.RequiredArgsConstructor;
+
 @RestController
-@RequestMapping("/v1/user")
+@RequestMapping("/v1/session")
 @RequiredArgsConstructor
-public class UserController {
-  
-    private final UserService userService;
+public class SessionController {
+    
+    private final SessionService sessionService;
+
 
     @DeleteMapping("/delete")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-    public ResponseEntity<Void> deleteAllUser(){
+     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    public ResponseEntity<Void> deleteAllSession(){
         
-        userService.deleteAllUser();
+        sessionService.deleteAllSession();
         return ResponseEntity.noContent().build();
-
     }
-
 }

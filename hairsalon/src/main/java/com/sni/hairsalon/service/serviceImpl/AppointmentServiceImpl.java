@@ -362,6 +362,7 @@ throw new IllegalStateException("The appointment time doesn't match the barber h
     cancelAppointment.setStatus(Status.CANCELLED_BY_PROVIDER.getCode());
     String email = cancelAppointment.getBarber().getUser().getEmail();
     mailService.sendAppointmentCancellationToBarber(email, mapper.toDto(cancelAppointment));
+    mailService.sendAppointmentCancellationToClient(email, mapper.toDto(cancelAppointment));
     appointmentRepo.save(cancelAppointment);
 
     return;

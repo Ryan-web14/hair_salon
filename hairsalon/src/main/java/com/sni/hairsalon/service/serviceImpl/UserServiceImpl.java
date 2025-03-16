@@ -156,4 +156,10 @@ public class UserServiceImpl implements UserService{
     public boolean emailAlreadyExist(String email){
         return userRepo.findUserByEmail(email).isPresent();
     }
+
+    @Override
+    public void deleteAllUser(){
+        userRepo.deleteAll();
+        return;
+    }
 }
