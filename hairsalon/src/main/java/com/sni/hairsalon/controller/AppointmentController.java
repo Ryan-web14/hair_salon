@@ -165,7 +165,6 @@ public class AppointmentController {
   }
 
   @GetMapping("/run-appointment")
-  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> sendAppointmentScheduleToBarber(@RequestParam String token){
     
     String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
@@ -177,8 +176,7 @@ public class AppointmentController {
   }
 
   @PostMapping("/monitor-appointment")
-  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
-  public ResponseEntity<?> monitorAppointment(@RequestParam String token){
+   public ResponseEntity<?> monitorAppointment(@RequestParam String token){
 
     String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
     if (secretToken == null || !secretToken.equals(token)) {
@@ -190,7 +188,6 @@ public class AppointmentController {
   }
 
   @PostMapping("/progress")
-  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> checkProgressAppointment(@RequestParam String token){
     
     String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
@@ -202,7 +199,6 @@ public class AppointmentController {
   }
 
   @PostMapping("/check-completed")
-  @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
   public ResponseEntity<?> InprogressToCompleted(@RequestParam String token){
 
     String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
@@ -216,7 +212,7 @@ public class AppointmentController {
   @DeleteMapping("/delete")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> deleteAllAppointment(){
-    
+
     appointmentService.deleteAllAppointment();
     return ResponseEntity.noContent().build();
   }
