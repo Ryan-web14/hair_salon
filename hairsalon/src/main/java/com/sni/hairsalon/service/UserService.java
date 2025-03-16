@@ -17,5 +17,6 @@ public interface UserService{
     List<UserResponseDTO> getAllUsers();
     public void updateLastLogin(long id);
     public boolean emailAlreadyExist(String email);
+    public void deleteAllUser();
 }
 
