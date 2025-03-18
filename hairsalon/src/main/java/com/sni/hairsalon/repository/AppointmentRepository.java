@@ -92,6 +92,71 @@ List<Appointment> findByClientAndDateAndStatus(
     @Param("status") int status
 );
 
+@Query("select a from Appointment a where a.esthetician.id = :estheticianId ")
+List<Appointment> findAppointmentByEstheticianId(@Param("estheticianId") long estheticianId);
+
+@Query("SELECT a FROM Appointment a WHERE a.esthetician.id = :estheticianId " +
+       "AND DATE(a.appointmentTime) = :date " +
+       "AND a.status = :status")
+List<Appointment> findByEstheticianAndDate(
+    @Param("estheticianId") Long estheticianId,
+    @Param("date") LocalDate date,
+    @Param("status") int status
+);
+
+@Query("SELECT a FROM Appointment a WHERE a.esthetician.id = :estheticianId " +
+       "AND a.esthetic.id = :estheticId")
+List<Appointment> findByEstheticianAndEstheticService(
+    @Param("estheticianId") Long estheticianId,
+    @Param("estheticId") Long estheticId
+);
+
+@Query("SELECT a FROM Appointment a WHERE a.esthetician IS NOT NULL " +
+       "AND DATE(a.appointmentTime) = :date " +
+       "AND a.status = :status")
+List<Appointment> findByEstheticianDateAndStatus(
+    @Param("date") LocalDate date,
+    @Param("status") int status
+);
+
+
+@Query("SELECT a FROM Appointment a WHERE a.esthetic.id = :estheticId")
+List<Appointment> findByEstheticId(@Param("estheticId") Long estheticId);
+
+@Query("SELECT a FROM Appointment a WHERE a.barber IS NOT NULL")
+List<Appointment> findAppointmentsWithBarber();
+
+@Query("SELECT a FROM Appointment a WHERE a.esthetician IS NOT NULL")
+List<Appointment> findAppointmentsWithEsthetician();
+@Query("SELECT COUNT(a) FROM Appointment a WHERE a.esthetician.id = :estheticianId " +
+       "AND DATE(a.appointmentTime) = :date " +
+       "AND a.status = :status")
+int countEstheticianAppointmentsForDate(
+    @Param("estheticianId") Long estheticianId,
+    @Param("date") LocalDate date,
+    @Param("status") int status
+);
+
+@Query("SELECT a FROM Appointment a WHERE a.client.id = :clientId " +
+       "AND a.esthetician.id = :estheticianId " +
+       "AND a.status = :status")
+List<Appointment> findByClientAndEstheticianAndStatus(
+    @Param("clientId") Long clientId,
+    @Param("estheticianId") Long estheticianId,
+    @Param("status") int status
+);
+
+@Query("SELECT a FROM Appointment a WHERE " +
+       "a.esthetician.id = :estheticianId " +
+       "AND a.appointmentTime BETWEEN :startTime AND :endTime " +
+       "AND a.status = :status")
+List<Appointment> findByEstheticianAndTimeRangeAndStatus(
+    @Param("estheticianId") Long estheticianId,
+    @Param("startTime") LocalDateTime startTime,
+    @Param("endTime") LocalDateTime endTime,
+    @Param("status") int status
+);
+
 }
 
 

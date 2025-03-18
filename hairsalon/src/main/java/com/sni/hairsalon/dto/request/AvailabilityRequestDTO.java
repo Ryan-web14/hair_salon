@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(staticName = "create")
 public class AvailabilityRequestDTO {
     private String barberId;
+    private String estheticianId;
     private LocalDateTime starTime;
     private LocalDateTime endTime;
     private boolean isAvailable;

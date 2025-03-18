@@ -14,4 +14,6 @@ public interface  BarberService {
     public BarberResponseDTO getBarberById(long id);
     public BarberResponseDTO getBarberProfile(String email);
     public BarberResponseDTO createBarberByAdmin(BarberRequestDTO dto);
+    public List<BarberResponseDTO> getAllAvailableBarber();
+
 }

@@ -46,36 +46,40 @@ public class EmailServiceImpl implements EmailService{
     public CompletableFuture<Boolean> sendAppointmentConfirmation(String to, AppointmentResponseDTO appointment) {
         String subject = "Confirmation de rendez-vous";
         
+        // Détermine le type de prestataire et son nom
+        String providerType = appointment.getEstheticianId() != null ? "Esthéticienne" : "Barbier";
+        String providerName = appointment.getEstheticianId() != null ? 
+                              appointment.getEstheticianFirstname() : 
+                              appointment.getBarberFirstname();
+        
         String body = String.format("""
                     CONFIRMATION DE RENDEZ-VOUS
-            
+                    
             Bonjour Madame, Monsieur %s
-            
+                    
             Votre rendez-vous a été confirmé:
-            
+                    
             → Date: %s
             → Heure: %s
-            → Barbier: %s
+            → %s: %s
             → ID de rendez-vous: %s
-            
+                    
             Prière d'arriver 5 à 15 min en avance.
             ----------------------------------------
             Merci de nous faire confiance!
             À très bientôt!
             ----------------------------------------
-
-            IMPORTANT: En cas de reprogrammation, il est 
-            préferable de s'y prendre 12 à 24h en avance 
+            IMPORTANT: En cas de reprogrammation, il est
+            préferable de s'y prendre 12 à 24h en avance
             ou de nous contacter.
-
             Téléphone: +242 04 045 12 12
-
             Ne pas répondre. Générer automatiquement.
             """,
             appointment.getClientFirstname(),
             appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("d MMMM yyyy")),
             appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
-            appointment.getBarberFirstname(),
+            providerType,
+            providerName,
             appointment.getId()
         );
         
@@ -321,6 +325,41 @@ public class EmailServiceImpl implements EmailService{
 
      }
 
+ @Override
+@Async
+public CompletableFuture<Boolean> sendDailyScheduleToEsthetician(String estheticianEmail, 
+ List<Appointment> appointments) {
+
+    String subject = "Votre programme pour le " + 
+    LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d"));
+
+    StringBuilder schedule = new StringBuilder();
+    schedule.append("Voici votre programme de la journée: ");
+
+    appointments.stream()
+    .sorted(Comparator.comparing(Appointment::getAppointmentTime))
+    .forEach(apt -> schedule.append(String.format(
+        
+    """
+            %s - %s
+                Client: %s %s
+                Service: %s
+                Duration: %d minutes
+
+            """, 
+            apt.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+            apt.getAppointmentTime().plusMinutes(apt.getEsthetic().getDuration())
+                .format(DateTimeFormatter.ofPattern("HH:mm")),
+            apt.getClient().getLastname(),
+            apt.getClient().getFirstname(),
+            apt.getEsthetic().getType(),
+            apt.getEsthetic().getDuration())));
+
+    schedule.append("Passez une bonne journée");
+
+    return sendEmail(estheticianEmail, subject, schedule.toString());
+}
+
      @Override
      @Async
      public CompletableFuture<Boolean> sendCheckIn( Appointment appointment){
@@ -357,6 +396,160 @@ public class EmailServiceImpl implements EmailService{
      }
 
      @Override
+@Async
+public CompletableFuture<Boolean> sendCheckInToEsthetician(Appointment appointment) {
+    
+    String subject = "Notification arrivée de client";
+    String content = String.format(
+        """
+           NOTIFICATION PRESENCE DE CLIENT
+
+         Le client %s est arrivé au salon
+         pour son rendez-vous.
+
+         Détail de rendez-vous:
+         Heure: %s
+         Service: %s
+         Durée: %d minutes
+
+         ----------------------------------------
+         IMPORTANT: Respecter le temps du service.
+         En cas de dépassement notifier le manager
+         ----------------------------------------
+
+         Ne pas répondre. Générer automatiquement.   
+                """,
+                appointment.getClient().getFirstname(),
+                appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                appointment.getEsthetic().getType(),
+                appointment.getEsthetic().getDuration()
+    );
+
+    String email = appointment.getEsthetician().getUser().getEmail();
+
+    return sendEmail(email, subject, content);
+}
+
+ @Override
+    @Async
+    public CompletableFuture<Boolean> sendRescheduleAppointmentToClient(String to, AppointmentResponseDTO appointment){
+
+        String subject = "Reprogrammation de rendez-vous";
+        String content = String.format(
+            """
+            REPROGRAMMATION DE RENDEZ-VOUS
+
+            Madame, Monsieur %s
+
+            Votre rendez-vous a été reprogrammé:
+
+            → Nouvelle Date: %s
+            → Nouvelle Heure: %s
+            → Barbier: %s
+            → ID de rendez-vous: %s
+
+            Prière d'arriver 5 à 15 min en avance.
+            ----------------------------------------
+            Merci de nous faire confiance!
+            À très bientôt!
+            ----------------------------------------
+
+            IMPORTANT: En cas de reprogrammation, il est 
+            préferable de s'y prendre 12 à 24h en avance 
+            ou de nous contacter.
+
+            Téléphone: +242 04 045 12 12
+
+            Ne pas répondre. Générer automatiquement.
+            """,
+            appointment.getClientFirstname(),
+            appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("d MMMM yyyy")),
+            appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+            appointment.getBarberFirstname(),
+            appointment.getId()
+        );
+
+        return sendEmail(to, subject, content);
+    }
+
+
+    public CompletableFuture<Boolean> sendRescheduleAppointmentToBarber(String to, Appointment appointment){
+
+        String subject = "Reprogrammation de rendez-vous";
+        String content = String.format(
+            """
+            REPROGRAMMATION DE RENDEZ-VOUS
+
+            Cher Barbier,
+
+            Le rendez-vous avec %s %s a été reprogrammé:
+
+            → Nouvelle Date: %s
+            → Nouvelle Heure: %s
+            → Service: %s
+            → Durée: %d minutes
+            → ID de rendez-vous: %s
+
+            Merci de prendre note de ce changement.
+            ----------------------------------------
+            Cordialement,
+            L'équipe de L'HOMME
+
+            Téléphone: +242 04 045 12 12
+
+            Ne pas répondre. Générer automatiquement.
+            """,
+            appointment.getClient().getFirstname(),
+            appointment.getClient().getLastname(),
+            appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("d MMMM yyyy")),
+            appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+            appointment.getHaircut().getType(),
+            appointment.getHaircut().getDuration(),
+            appointment.getId()
+        );
+
+        return sendEmail(to, subject, content);
+    }
+
+    public CompletableFuture<Boolean> sendRescheduleAppointmentToEsthetician(String to, Appointment appointment) {
+        String subject = "Reprogrammation de rendez-vous";
+        String content = String.format(
+            """
+            REPROGRAMMATION DE RENDEZ-VOUS
+    
+            Chère Esthéticienne,
+    
+            Le rendez-vous avec %s %s a été reprogrammé:
+    
+            → Nouvelle Date: %s
+            → Nouvelle Heure: %s
+            → Service: %s
+            → Durée: %d minutes
+            → ID de rendez-vous: %s
+    
+            Merci de prendre note de ce changement.
+            ----------------------------------------
+            Cordialement,
+            L'équipe de L'HOMME
+    
+            Téléphone: +242 04 045 12 12
+    
+            Ne pas répondre. Générer automatiquement.
+            """,
+            appointment.getClient().getFirstname(),
+            appointment.getClient().getLastname(),
+            appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("d MMMM yyyy")),
+            appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+            appointment.getEsthetic().getType(),
+            appointment.getEsthetic().getDuration(),
+            appointment.getId()
+        );
+    
+        return sendEmail(to, subject, content);
+    }
+
+
+     @Override
      @Async
      public CompletableFuture<Boolean> sendBarberNotificationOfNewAppointment(String barberEmail, Appointment appointment){
         String subject = "Nouveau rendez-vous";
@@ -387,6 +580,38 @@ public class EmailServiceImpl implements EmailService{
 
         return sendEmail(barberEmail, subject, content);
      }
+
+     @Override
+@Async
+public CompletableFuture<Boolean> sendEstheticianNotificationOfNewAppointment(String estheticianEmail, Appointment appointment) {
+    String subject = "Nouveau rendez-vous";
+    String content = String.format(
+        """
+        Bonjour,
+
+        Vous avez un nouveau rendez-vous avec le client %s %s.
+
+        Détail de rendez-vous:
+        Date: %s
+        Heure: %s
+        Service: %s
+        Durée: %d minutes
+
+        Cordialement,
+        L'équipe de L'HOMME
+
+        Ne pas répondre. Générer automatiquement.
+        """,
+        appointment.getClient().getFirstname(),
+        appointment.getClient().getLastname(),
+        appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("d MMMM yyyy")),
+        appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+        appointment.getEsthetic().getType(),
+        appointment.getEsthetic().getDuration()
+    );
+
+    return sendEmail(estheticianEmail, subject, content);
+}
 
 
     @Override
@@ -479,6 +704,31 @@ public class EmailServiceImpl implements EmailService{
 
         return sendEmail(email, subject, content);
         }
+
+        @Async
+public CompletableFuture<Boolean> sendEstheticianAccountInformation(String email, UserResponseDTO dto, String randomPassword) {
+    String subject = "Informations de compte";
+    String content = String.format(
+        """
+        Bonjour,
+
+        Votre compte a été créé avec succès. Voici vos informations de connexion :
+
+        Email : %s
+        Mot de passe temporaire : %s
+
+        Veuillez vous connecter et changer votre mot de passe dès que possible.
+
+        Cordialement,
+        L'équipe de L'HOMME
+
+        Ne pas répondre. Générer automatiquement.
+        """,
+        dto.getEmail(), randomPassword
+    );
+
+    return sendEmail(email, subject, content);
+}
 
         @Async
         private CompletableFuture<Boolean> sendEmail(String to, String subject, String body) {

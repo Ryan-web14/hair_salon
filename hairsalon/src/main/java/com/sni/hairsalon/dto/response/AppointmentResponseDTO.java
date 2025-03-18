@@ -7,9 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
- @Data
- @Builder
- @NoArgsConstructor
+@Data
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor(staticName = "create")
 public class AppointmentResponseDTO {
     private String id;
@@ -21,9 +21,14 @@ public class AppointmentResponseDTO {
     private String barberLastname;
     private String barberFirstname;
     private String barberEmail;
-   private LocalDateTime appointmentTime;
+    private String estheticianId;
+    private String estheticianLastname;
+    private String estheticianFirstname;
+    private String estheticianEmail;
+    private LocalDateTime appointmentTime;
     private LocalDateTime bookedTime;
     private String haircutType;
+    private String estheticType;
     private int price;
     private String status;
 }

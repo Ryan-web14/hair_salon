@@ -37,8 +37,12 @@ public class Schedule {
     private long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "barber_id", nullable = false)
+    @JoinColumn(name = "barber_id", nullable = true)
     private Barber barber;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "esthetician_id", nullable = true)
+    private Esthetician esthetician;
 
     @Column(name = "day_of_week", nullable = false)
     private int dayOfWeek;

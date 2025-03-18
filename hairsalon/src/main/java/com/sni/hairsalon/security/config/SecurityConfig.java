@@ -3,7 +3,6 @@ package com.sni.hairsalon.security.config;
 
 import java.util.Arrays;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -54,9 +53,8 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/v1/auth/**").permitAll()
-                .requestMatchers("/v1/role/**").permitAll()
-                .requestMatchers("/v1/availability/barber/**").permitAll()
                 .requestMatchers("/v1/haircut/all").permitAll()
+                .requestMatchers("/v1/esthetic/all").permitAll()
                 .requestMatchers("/v1/haircut/all/repo").permitAll()
                 .requestMatchers("/v1/appointment/checkin").permitAll()
                 .requestMatchers("/v1/appointment/run-appointment").permitAll()

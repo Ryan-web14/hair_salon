@@ -11,9 +11,10 @@ public interface AvailabilityService {
     public List<AvailabilityResponseDTO> createAvailability(AvailabilityRequestDTO request);
     public AvailabilityResponseDTO updateAvailabilityStatus(long id, boolean status);
     public List<AvailabilityResponseDTO>getBarberAvailability(long barberId, LocalDate date);
-   // public Boolean isAvailableSlot(long id, LocalDateTime startTime, int duration);
-    public void makeSlotUnavailable(long barberId, LocalDateTime startTime, int duration);
-    public void deleteAllAvailability();
+    public List<AvailabilityResponseDTO> getEstheticianAvailability(long estheticianId, LocalDate date);
+    public Boolean isAvailableSlot(String providerType, long providerId, LocalDateTime startTime, int duration);
+   public void makeProviderSlotUnavailable(String providerType, long providerId, LocalDateTime startTime, int duration);
+   public void deleteAllAvailability();
 }
 
 
