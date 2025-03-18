@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,7 +25,6 @@ import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
 import com.sni.hairsalon.exception.BadRequestException;
 import com.sni.hairsalon.model.UserPrincipal;
 import com.sni.hairsalon.service.AppointmentService;
-
 
 import lombok.RequiredArgsConstructor;
 
@@ -176,11 +176,12 @@ public ResponseEntity<List<AppointmentResponseDTO>> getAllEstheticianAppointment
     return ResponseEntity.ok().body(appointmentService.updateAppointmentByAdmin(appointmentId, request));
   }
   @GetMapping("/run-appointment")
-  public ResponseEntity<?> sendAppointmentSchedules(@RequestParam String token) {
-      String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
-      if (secretToken == null || !secretToken.equals(token)) {
-          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-      }
+  public ResponseEntity<?> sendAppointmentSchedules() {
+    //(@RequestParam String token
+    //   String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
+    //   if (secretToken == null || !secretToken.equals(token)) {
+    //       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+    //   }
       
       appointmentService.sendDailyAppointmentScheduleToBarber();
       
@@ -188,37 +189,39 @@ public ResponseEntity<List<AppointmentResponseDTO>> getAllEstheticianAppointment
       
       return ResponseEntity.noContent().build();
   }
+  @RequestMapping(value = "/monitor-appointment", method = {RequestMethod.GET, RequestMethod.POST})
+   public ResponseEntity<?> monitorAppointment(){
 
-  @PostMapping("/monitor-appointment")
-   public ResponseEntity<?> monitorAppointment(@RequestParam String token){
-
-    String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
-    if (secretToken == null || !secretToken.equals(token)) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-    }
+    //(@RequestParam String token
+    // String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
+    // if (secretToken == null || !secretToken.equals(token)) {
+    //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+    // }
     appointmentService.monitorAppointmentTime();
     return ResponseEntity.noContent().build();
 
   }
 
-  @PostMapping("/progress")
-  public ResponseEntity<?> checkProgressAppointment(@RequestParam String token){
-    
-    String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
-    if (secretToken == null || !secretToken.equals(token)) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-    }
+  @RequestMapping(value = "/progress", method = {RequestMethod.GET, RequestMethod.POST})
+  public ResponseEntity<?> checkProgressAppointment(){
+
+    //(@RequestParam String token
+    // String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
+    // if (secretToken == null || !secretToken.equals(token)) {
+    //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+    // }
     appointmentService.monitorCheckInAppointment();
     return ResponseEntity.noContent().build();
   }
 
-  @PostMapping("/check-completed")
-  public ResponseEntity<?> InprogressToCompleted(@RequestParam String token){
+  @RequestMapping(value = "/check-completed", method = {RequestMethod.GET, RequestMethod.POST})
+  public ResponseEntity<?> InprogressToCompleted(){
 
-    String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
-    if (secretToken == null || !secretToken.equals(token)) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-    }
+    //(@RequestParam String token
+    // String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
+    // if (secretToken == null || !secretToken.equals(token)) {
+    //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+    // }
     appointmentService.InprogressToCompleted();
     return ResponseEntity.noContent().build();
   }  
