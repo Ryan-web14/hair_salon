@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sni.hairsalon.exception.InvalidTokenException;
-import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.model.PasswordResetToken;
 import com.sni.hairsalon.repository.PasswordResetTokenRepository;
 import com.sni.hairsalon.service.PasswordResetTokenService;

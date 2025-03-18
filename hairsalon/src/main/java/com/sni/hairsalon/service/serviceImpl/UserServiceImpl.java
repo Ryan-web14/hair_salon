@@ -1,6 +1,5 @@
 package com.sni.hairsalon.service.serviceImpl;
 
-import org.apache.commons.validator.EmailValidator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.sni.hairsalon.dto.request.BarberRequestDTO;
+import com.sni.hairsalon.dto.request.EstheticianRequestDTO;
 import com.sni.hairsalon.dto.request.UserRequestDTO;
 import com.sni.hairsalon.dto.response.UserResponseDTO;
 import com.sni.hairsalon.exception.ResourceAlreadyExistException;
@@ -98,6 +98,24 @@ public class UserServiceImpl implements UserService{
         return barberUser.getId();
 
     }
+
+    @Override
+@Transactional
+public Long createEstheticianUserByAdmin(EstheticianRequestDTO dto) {
+    UserRole role = roleRepo.findUserRoleByName("ESTHETICIAN")
+        .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+
+    String randomPassword = random.generateRandomAlphaNumeric(6);
+    User estheticianUser = User.builder()
+        .email(dto.getEmail())
+        .role(role)
+        .passwordHash(passwordEncoder.encode(randomPassword))
+        .build();
+    UserResponseDTO response = userMapper.toDto(estheticianUser);
+    userRepo.save(estheticianUser);
+    mailService.sendEstheticianAccountInformation(estheticianUser.getEmail(), response, randomPassword);
+    return estheticianUser.getId();
+}
 
     @Override
     public User getUserById(long id){

@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class AvailabilityResponseDTO {
     private long id;
     private String barberId;
+    private String estheticianId;
     private String firstname;
     private String lastName;
     private LocalDateTime starTime;

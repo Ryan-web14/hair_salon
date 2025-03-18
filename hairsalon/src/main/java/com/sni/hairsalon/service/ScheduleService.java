@@ -12,10 +12,12 @@ public interface ScheduleService {
 
     public ScheduleResponseDTO createSchedule(ScheduleRequestDTO request);
     public List<ScheduleResponseDTO> getBarberSchedule(long barberId);
+    public List<ScheduleResponseDTO> getEstheticianSchedule(long estheticianId);
     public ScheduleResponseDTO updateSchedule(long id, ScheduleRequestDTO request);
     public List<ScheduleResponseDTO> createTemplateSchedule(ScheduleTemplateRequestDTO request);
     public List<ScheduleResponseDTO> bulkCreateSchedules(BulkScheduleRequestDTO request);
     public  ScheduleResponseDTO getBarberScheduleForDate(Long barberId, LocalDate date);
+    public ScheduleResponseDTO getEstheticianScheduleForDate(Long barberId, LocalDate date);
     public List<ScheduleResponseDTO> getAllCurrentSchedule(LocalDate date);
     public ScheduleResponseDTO getBarBerTodayCurrentSchedule(long barberId);
     public void deleteSchedule(Long id);

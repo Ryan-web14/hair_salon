@@ -20,7 +20,6 @@ import com.sni.hairsalon.dto.request.BulkScheduleRequestDTO;
 import com.sni.hairsalon.dto.request.ScheduleRequestDTO;
 import com.sni.hairsalon.dto.request.ScheduleTemplateRequestDTO;
 import com.sni.hairsalon.dto.response.ScheduleResponseDTO;
-import com.sni.hairsalon.repository.ScheduleRepository;
 import com.sni.hairsalon.service.ScheduleService;
 
 import lombok.RequiredArgsConstructor;
@@ -52,6 +51,11 @@ public class ScheduleController {
 
         return ResponseEntity.ok(scheduleService.updateSchedule(barberId, request));
     }
+
+    @GetMapping("/{id}/esthetician")
+    public ResponseEntity<List<ScheduleResponseDTO>> getEstheticianSchedule(@PathVariable Long id) {
+    return ResponseEntity.ok(scheduleService.getEstheticianSchedule(id));
+}
 
     @DeleteMapping("/{scheduleId}/delete")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")

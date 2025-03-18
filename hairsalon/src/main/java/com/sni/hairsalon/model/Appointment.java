@@ -34,12 +34,20 @@ public class Appointment {
     private Client client;
 
     @ManyToOne
-    @JoinColumn(name = "barber_id")
+    @JoinColumn(name = "barber_id", nullable = true)
     private Barber barber;
 
     @ManyToOne
-    @JoinColumn(name = "haircut_id")
+    @JoinColumn(name = "esthetician_id", nullable = true)
+    private Esthetician esthetician;
+
+    @ManyToOne
+    @JoinColumn(name = "haircut_id", nullable = true)
     private Haircut haircut;
+
+    @ManyToOne
+    @JoinColumn(name = "esthetic_id", nullable = true)
+    private Esthetic esthetic;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "appointment_time", nullable = false)

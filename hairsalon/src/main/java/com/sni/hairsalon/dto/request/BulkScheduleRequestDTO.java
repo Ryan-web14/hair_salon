@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(staticName = "create")
 public class BulkScheduleRequestDTO {
     private String barberId;
+    private String estheticianId;
     private List<Integer> workingDays;
     private LocalDateTime startTime;
     private LocalDateTime endTime;

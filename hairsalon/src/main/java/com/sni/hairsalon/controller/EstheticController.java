@@ -14,41 +14,41 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sni.hairsalon.dto.request.HaircutRequestDTO;
-import com.sni.hairsalon.dto.response.HaircutResponseDTO;
-import com.sni.hairsalon.service.HaircutService;
+import com.sni.hairsalon.dto.request.EstheticRequestDTO;
+import com.sni.hairsalon.dto.response.EstheticResponseDTO;
+import com.sni.hairsalon.service.EstheticService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/v1/haircut")
+@RequestMapping("/v1/esthetic")
 @RequiredArgsConstructor
-public class HaircutController {
+public class EstheticController {
     
-    private final HaircutService haircutService;
+    private final EstheticService estheticService;
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<HaircutResponseDTO> createHaircut(@RequestBody HaircutRequestDTO dto){
+    public ResponseEntity<EstheticResponseDTO> createEsthetic(@RequestBody EstheticRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
-        .body(haircutService.createHaircut(dto));
+            .body(estheticService.createEsthetic(dto));
     }
 
     @PutMapping("/{id}/update")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<HaircutResponseDTO> updateHaircut(@PathVariable Long id, @RequestBody HaircutRequestDTO dto){
-        return ResponseEntity.ok(haircutService.updateHaircut(id, dto));
+    public ResponseEntity<EstheticResponseDTO> updateEsthetic(@PathVariable Long id, @RequestBody EstheticRequestDTO dto) {
+        return ResponseEntity.ok(estheticService.updateEsthetic(id, dto));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<HaircutResponseDTO>> getAllHaircuts(){
-        return ResponseEntity.ok(haircutService.getAllHaircut());
+    public ResponseEntity<List<EstheticResponseDTO>> getAllEsthetics() {
+        return ResponseEntity.ok(estheticService.getAllEsthetics());
     }
     
     @DeleteMapping("/{id}/delete")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteHaircut(@PathVariable Long id){
-        haircutService.deleteHaircut(id);
+    public ResponseEntity<Void> deleteEsthetic(@PathVariable Long id) {
+        estheticService.deleteEsthetic(id);
         return ResponseEntity.noContent().build();
     }
 }

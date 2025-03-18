@@ -24,7 +24,7 @@ import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
 import com.sni.hairsalon.exception.BadRequestException;
 import com.sni.hairsalon.model.UserPrincipal;
 import com.sni.hairsalon.service.AppointmentService;
-import com.twilio.http.Response;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -51,6 +51,18 @@ public class AppointmentController {
         return ResponseEntity.ok().body(appointmentService.getAllAppointment());
         
     }
+
+    @GetMapping("/barber/all")
+@PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+public ResponseEntity<List<AppointmentResponseDTO>> getAllBarberAppointments() {
+    return ResponseEntity.ok().body(appointmentService.getAllBarberAppointments());
+}
+
+@GetMapping("/esthetician/all")
+@PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+public ResponseEntity<List<AppointmentResponseDTO>> getAllEstheticianAppointments() {
+    return ResponseEntity.ok().body(appointmentService.getAllEstheticianAppointments());
+}
 
     @GetMapping("/completed")
     public ResponseEntity<List<AppointmentResponseDTO>> getMyCompletedAppointment(@AuthenticationPrincipal 
@@ -163,16 +175,18 @@ public class AppointmentController {
     
     return ResponseEntity.ok().body(appointmentService.updateAppointmentByAdmin(appointmentId, request));
   }
-
   @GetMapping("/run-appointment")
-  public ResponseEntity<?> sendAppointmentScheduleToBarber(@RequestParam String token){
-    
-    String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
-    if (secretToken == null || !secretToken.equals(token)) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-    }
-    appointmentService.sendDailyAppointmentScheduleToBarber();
-    return ResponseEntity.noContent().build();
+  public ResponseEntity<?> sendAppointmentSchedules(@RequestParam String token) {
+      String secretToken = System.getenv("SCHEDULER_SECRET_TOKEN");
+      if (secretToken == null || !secretToken.equals(token)) {
+          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+      }
+      
+      appointmentService.sendDailyAppointmentScheduleToBarber();
+      
+      appointmentService.sendDailyAppointmentScheduleToEsthetician();
+      
+      return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/monitor-appointment")

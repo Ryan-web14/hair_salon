@@ -38,14 +38,5 @@ public class Barber {
     
     @Column(name = "available", nullable = false)
     private boolean available;
-    
-  /*   @OneToMany(mappedBy = "barber")
-    private List<Appointment> appointments; 
-
-    @OneToMany(mappedBy = "barber")
-    private List <Schedule> schedule;
-    
-    public Barber (String email, String passwordHash, UserRole role){
-        super(email, passwordHash,role);
-    }*/
+  
 }

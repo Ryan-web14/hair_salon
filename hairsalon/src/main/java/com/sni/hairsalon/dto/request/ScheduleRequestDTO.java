@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(staticName = "create")
 public class  ScheduleRequestDTO {
     private String id;
+    private String estheticianId;
     private int dayOfWeek; 
     private LocalDateTime startTime;
     private LocalDateTime endTime;

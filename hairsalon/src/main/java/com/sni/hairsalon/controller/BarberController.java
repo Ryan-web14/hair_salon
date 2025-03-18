@@ -40,6 +40,11 @@ public class BarberController {
         return ResponseEntity.ok().body(barberService.getAllBarber());
      }
 
+     @GetMapping("/available")
+     public ResponseEntity <List<BarberResponseDTO>> getAllAvailableBarber(){
+        return ResponseEntity.ok().body(barberService.getAllAvailableBarber());
+     }
+
      @PutMapping("/{id}/admin/update")
      @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
      public ResponseEntity<BarberResponseDTO> updateBarberByAdmin(@PathVariable Long id,@RequestBody BarberRequestDTO request){

@@ -85,7 +85,6 @@
     		<version>1.18.34</version>
     		<scope>provided</scope>
         </dependency>
-
 		<dependency>
   			<groupId>com.auth0</groupId>
  			<artifactId>java-jwt</artifactId>
@@ -110,6 +109,14 @@
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.12.6</version>
 		</dependency>
+		<dependency>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-core</artifactId>
+	</dependency>
+	<dependency>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-database-postgresql</artifactId>
+	</dependency>
 	
 		
 <dependency>

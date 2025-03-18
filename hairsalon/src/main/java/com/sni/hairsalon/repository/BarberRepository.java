@@ -30,6 +30,8 @@ public interface BarberRepository extends JpaRepository<Barber, Long>{
 
     @Query("SELECT b FROM Barber b where b.user.id = :userId")
     Optional<Barber> findByUserId(long userId);
+
+    List<Barber> findByAvailable(boolean available);
     @Query("""
         SELECT DISTINCT b FROM Barber b 
         JOIN Schedule s ON s.barber.id = b.id 

@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class ScheduleResponseDTO {
     private String id;
     private String barberId;
+    private String esthecianId;
     private int dayOfWeek; 
     private LocalDateTime startTime;
     private LocalDateTime endTime;

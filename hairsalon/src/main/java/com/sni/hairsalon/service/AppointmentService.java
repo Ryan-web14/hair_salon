@@ -15,8 +15,12 @@ public interface AppointmentService {
     public void cancelAppointmentByClient(long id, String clientEmail);
     public void cancelAppointment(long id);
     public List<AppointmentResponseDTO> getAllAppointment();
+    public List<AppointmentResponseDTO> getAllEstheticianAppointments();
+    public List<AppointmentResponseDTO> getAllBarberAppointments();
     public List<AppointmentResponseDTO> getAllBarberAppointment(LocalDate date);
+    public List<AppointmentResponseDTO> getAllEstheticianAppointment(LocalDate date);
     public List<AppointmentResponseDTO> getBarberAppointment(long barberId);
+    public List<AppointmentResponseDTO> getEstheticianAppointment(long estheticianId);
     public List<AppointmentResponseDTO> getMyBarberAppointment(String email);
     public List<AppointmentResponseDTO> getClientAppointment(long clientId);
     public List<AppointmentResponseDTO> getCompletedAppointment();
@@ -27,6 +31,7 @@ public interface AppointmentService {
     public int clientCount();
     public int countAppointmentForTheDay();
     public void sendDailyAppointmentScheduleToBarber(); 
+    public void sendDailyAppointmentScheduleToEsthetician();
     public void monitorAppointmentTime();
     public void monitorCheckInAppointment();
     public void InprogressToCompleted();

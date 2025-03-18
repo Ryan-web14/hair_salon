@@ -12,11 +12,13 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor(staticName = "create")
 public class AppointmentUpdateRequestDTO {
-    private String email;
-    private String barberId; 
-    private String haircutType;
-    private LocalDateTime appointmentTime;
-    
-    @Builder.Default
-    private Status status = Status.PENDING;
+   private String email;
+   private String barberId;
+   private String estheticianId;
+   private String haircutType;
+   private String estheticType;
+   private LocalDateTime appointmentTime;
+   
+   @Builder.Default
+   private Status status = Status.PENDING;
 }

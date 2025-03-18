@@ -52,6 +52,16 @@ public class AvailabilityController {
             
             return ResponseEntity.ok(availabilityService.getBarberAvailability(barberId, date));
         } 
+
+        @GetMapping("/esthetician/{estheticianId}/slot")
+public ResponseEntity<List<AvailabilityResponseDTO>> getEstheticianAvailability(
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+    @PathVariable Long estheticianId) {
+        
+    return ResponseEntity.ok(availabilityService.getEstheticianAvailability(estheticianId, date));
+}
+
+
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<Void> deleteAllAvailability(){

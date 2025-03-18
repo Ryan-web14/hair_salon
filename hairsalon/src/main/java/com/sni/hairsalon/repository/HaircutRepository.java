@@ -15,9 +15,9 @@ public interface HaircutRepository extends JpaRepository<Haircut,Long>{
     Optional<Haircut> findHaircutById(long id);
 
 
-    @Query("SELECT h FROM Haircut h WHERE REPLACE(LOWER(h.type), ' ', '') = REPLACE(LOWER(:type), ' ', '')")
-    Optional<Haircut> findHaircutByType(String type); 
-    
+        @Query("SELECT h FROM Haircut h WHERE REPLACE(LOWER(h.type), ' ', '') = REPLACE(LOWER(:type), ' ', '')")
+        Optional<Haircut> findHaircutByType(String type); 
+        
     List<Haircut> findHaircutByDuration(int duration);
     List<Haircut> findHaircutByPrice(int price);
     Void deleteById(long id);
