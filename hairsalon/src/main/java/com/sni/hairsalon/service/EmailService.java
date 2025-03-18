@@ -31,4 +31,5 @@ public interface EmailService {
     public CompletableFuture<Boolean> sendEstheticianNotificationOfNewAppointment(String estheticianEmail, Appointment appointment);
     public CompletableFuture<Boolean> sendRescheduleAppointmentToEsthetician(String to, Appointment appointment);
     public CompletableFuture<Boolean> sendEstheticianAccountInformation(String email, UserResponseDTO dto, String randomPassword);
+    public CompletableFuture<Boolean> sendAppointmentCancellationToEsthetician(String estheticianEmail,AppointmentResponseDTO appointment);
 }
