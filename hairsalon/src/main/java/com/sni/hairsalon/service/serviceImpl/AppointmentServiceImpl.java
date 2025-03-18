@@ -483,20 +483,34 @@ public List<AppointmentResponseDTO> getEstheticianAppointment(long estheticianId
       throw new IllegalStateException("Too late to check in");
   }
   }
-
   @Override
   public void cancelAppointment(long id) {
-
-    Appointment cancelAppointment = appointmentRepo.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
-    cancelAppointment.setStatus(Status.CANCELLED_BY_PROVIDER.getCode());
-    String email = cancelAppointment.getBarber().getUser().getEmail();
-    String clientEmail = cancelAppointment.getClient().getUser().getEmail();
-    mailService.sendAppointmentCancellationToBarber(email, mapper.toDto(cancelAppointment));
-    mailService.sendAppointmentCancellationToClient(clientEmail, mapper.toDto(cancelAppointment));
-    appointmentRepo.save(cancelAppointment);
-
-    return;
+      // Find the appointment by ID or throw exception if not found
+      Appointment cancelAppointment = appointmentRepo.findById(id)
+          .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+      
+      // Update the appointment status to cancelled
+      cancelAppointment.setStatus(Status.CANCELLED_BY_PROVIDER.getCode());
+      
+      // Get the client's email
+      String clientEmail = cancelAppointment.getClient().getUser().getEmail();
+      
+      // Check if this is a barber appointment or an esthetician appointment
+      if (cancelAppointment.getBarber() != null) {
+          // For barber appointments, send notification to the barber
+          String barberEmail = cancelAppointment.getBarber().getUser().getEmail();
+          mailService.sendAppointmentCancellationToBarber(barberEmail, mapper.toDto(cancelAppointment));
+      } else if (cancelAppointment.getEsthetician() != null) {
+          // For esthetician appointments, send notification to the esthetician
+          String estheticianEmail = cancelAppointment.getEsthetician().getUser().getEmail();
+          mailService.sendAppointmentCancellationToEsthetician(estheticianEmail, mapper.toDto(cancelAppointment));
+      }
+      
+      // Always send cancellation notification to the client
+      mailService.sendAppointmentCancellationToClient(clientEmail, mapper.toDto(cancelAppointment));
+      
+      // Save the updated appointment
+      appointmentRepo.save(cancelAppointment);
   }
 
   @Override

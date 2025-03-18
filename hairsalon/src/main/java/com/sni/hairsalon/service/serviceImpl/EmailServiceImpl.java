@@ -262,32 +262,57 @@ public class EmailServiceImpl implements EmailService{
     return sendEmail(to, subject, content);
      }
 
+     @Override
+@Async
+public CompletableFuture<Boolean> sendAppointmentCancellationToEsthetician(String estheticianEmail,
+ AppointmentResponseDTO appointment) {
 
-    @Override
-    @Async
-    public CompletableFuture<Boolean> sendAppointmentCancellationToBarber(String barberEamil,
-     AppointmentResponseDTO appointment){
+    String subject = "Notification d'annulation de rendez-vous";
+    String content = String.format(
+        """
+        NOTIFICATION D'ANNULATION DE RENDEZ-VOUS
 
-        String subject = "Notification d'annulation de rendez-vous";
-        String content = String.format(
-            """
-            NOTIFICATION D'ANNULATION DE RENDEZ-VOUS
-   
-             Votre rendez-vous avec %s %s
-             pour %s du %s a été annulé,
+         Votre rendez-vous avec %s %s
+         pour %s du %s a été annulé,
 
-             Cordialement,
-             L'équipe de L'HOMME
+         Cordialement,
+         L'équipe de L'HOMME
 
-             Ne pas répondre. Générer automatiquement.        
-                    """, 
-                    appointment.getClientLastname(),
-                    appointment.getClientFirstname(),
-                    appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
-                    appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("d MMMM yyyy")));
+         Ne pas répondre. Générer automatiquement.        
+                """, 
+                appointment.getClientLastname(),
+                appointment.getClientFirstname(),
+                appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("d MMMM yyyy")));
 
-            return sendEmail(barberEamil, subject, content);
-     }
+        return sendEmail(estheticianEmail, subject, content);
+ }
+
+     @Override
+     @Async
+     public CompletableFuture<Boolean> sendAppointmentCancellationToBarber(String barberEamil,
+      AppointmentResponseDTO appointment){
+ 
+         String subject = "Notification d'annulation de rendez-vous";
+         String content = String.format(
+             """
+             NOTIFICATION D'ANNULATION DE RENDEZ-VOUS
+ 
+              Votre rendez-vous avec %s %s
+              pour %s du %s a été annulé,
+ 
+              Cordialement,
+              L'équipe de L'HOMME
+ 
+              Ne pas répondre. Générer automatiquement.        
+                     """, 
+                     appointment.getClientLastname(),
+                     appointment.getClientFirstname(),
+                     appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                     appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("d MMMM yyyy")));
+ 
+             return sendEmail(barberEamil, subject, content);
+      }
 
      @Override
      @Async
@@ -430,7 +455,7 @@ public CompletableFuture<Boolean> sendCheckInToEsthetician(Appointment appointme
     return sendEmail(email, subject, content);
 }
 
- @Override
+    @Override
     @Async
     public CompletableFuture<Boolean> sendRescheduleAppointmentToClient(String to, AppointmentResponseDTO appointment){
 
@@ -472,7 +497,8 @@ public CompletableFuture<Boolean> sendCheckInToEsthetician(Appointment appointme
         return sendEmail(to, subject, content);
     }
 
-
+    @Override
+    @Async
     public CompletableFuture<Boolean> sendRescheduleAppointmentToBarber(String to, Appointment appointment){
 
         String subject = "Reprogrammation de rendez-vous";
@@ -511,6 +537,8 @@ public CompletableFuture<Boolean> sendCheckInToEsthetician(Appointment appointme
         return sendEmail(to, subject, content);
     }
 
+    @Override
+    @Async
     public CompletableFuture<Boolean> sendRescheduleAppointmentToEsthetician(String to, Appointment appointment) {
         String subject = "Reprogrammation de rendez-vous";
         String content = String.format(
