@@ -92,6 +92,22 @@ public ResponseEntity<List<AppointmentResponseDTO>> getAllEstheticianAppointment
 
     }
 
+    @GetMapping("/barber/completed/all")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    public ResponseEntity<List<AppointmentResponseDTO>> getBarberCompletedAppointment(){
+
+        return ResponseEntity.ok().body(appointmentService.getAllBarberCompletedAppointments());
+
+    }
+
+    @GetMapping("/esthetician/completed/all")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    public ResponseEntity<List<AppointmentResponseDTO>> getEstheticianCompletedAppointment(){
+
+        return ResponseEntity.ok().body(appointmentService.getAllEstheticianCompletedAppointments());
+
+    }
+
     @PostMapping("/{appointmentId}/status/completed")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<Void> completeAppointment(@PathVariable long appointmentId){
