@@ -126,8 +126,17 @@ List<Appointment> findByEstheticId(@Param("estheticId") Long estheticId);
 @Query("SELECT a FROM Appointment a WHERE a.barber IS NOT NULL")
 List<Appointment> findAppointmentsWithBarber();
 
+@Query("SELECT a FROM Appointment a WHERE a.barber IS NOT NULL " +
+"AND status = :status")
+List<Appointment> findAppointmentsWithBarberAndCompleted(int status);
+
 @Query("SELECT a FROM Appointment a WHERE a.esthetician IS NOT NULL")
 List<Appointment> findAppointmentsWithEsthetician();
+
+
+@Query("SELECT a FROM Appointment a WHERE a.esthetician IS NOT NULL " +
+"AND status = :status")
+List<Appointment> findAppointmentsWithEstheticianAndCompleted(int status);
 @Query("SELECT COUNT(a) FROM Appointment a WHERE a.esthetician.id = :estheticianId " +
        "AND DATE(a.appointmentTime) = :date " +
        "AND a.status = :status")

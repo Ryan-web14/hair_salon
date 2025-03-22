@@ -19,7 +19,9 @@ public interface AppointmentService {
     public List<AppointmentResponseDTO> getAllBarberAppointments();
     public List<AppointmentResponseDTO> getAllBarberAppointment(LocalDate date);
     public List<AppointmentResponseDTO> getAllEstheticianAppointment(LocalDate date);
+    public List<AppointmentResponseDTO> getAllEstheticianCompletedAppointments();
     public List<AppointmentResponseDTO> getBarberAppointment(long barberId);
+    public List<AppointmentResponseDTO> getAllBarberCompletedAppointments();
     public List<AppointmentResponseDTO> getEstheticianAppointment(long estheticianId);
     public List<AppointmentResponseDTO> getMyBarberAppointment(String email);
     public List<AppointmentResponseDTO> getClientAppointment(long clientId);

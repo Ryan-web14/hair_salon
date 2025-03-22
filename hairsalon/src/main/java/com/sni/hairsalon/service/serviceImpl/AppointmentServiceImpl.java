@@ -111,14 +111,14 @@ public AppointmentResponseDTO createAppointment(AppointmentRequestDTO request) {
         schedule = scheduleService.getEstheticianScheduleForDate(Long.parseLong(request.getEstheticianId()), appointmentDate);
         serviceDuration = appointment.getEsthetic().getDuration();
         
-        // Vérifier disponibilité et rendre indisponible
+        // check for availability and make them unavailable
         availabilityService.makeProviderSlotUnavailable("esthetician", esthetician.getId(), appointmentDateTime, serviceDuration);
         
     } else {
         throw new IllegalArgumentException("Un prestataire (barbier ou esthéticienne) doit être spécifié");
     }
     
-    // Vérification de l'horaire
+    // checking of hours
     LocalTime startSchedule = schedule.getStartTime().toLocalTime();
     LocalTime endSchedule = schedule.getEndTime().toLocalTime();
     
@@ -298,8 +298,26 @@ public List<AppointmentResponseDTO> getAllBarberAppointments() {
 
 @Override
 @Transactional
+public List<AppointmentResponseDTO> getAllBarberCompletedAppointments() {
+    List<Appointment> appointments = appointmentRepo.findAppointmentsWithBarberAndCompleted(Status.COMPLETED.getCode());
+    return appointments.stream()
+        .map(appointment -> mapper.toDto(appointment))
+        .collect(Collectors.toList());
+}
+
+@Override
+@Transactional
 public List<AppointmentResponseDTO> getAllEstheticianAppointments() {
     List<Appointment> appointments = appointmentRepo.findAppointmentsWithEsthetician();
+    return appointments.stream()
+        .map(appointment -> mapper.toDto(appointment))
+        .collect(Collectors.toList());
+}
+
+@Override
+@Transactional
+public List<AppointmentResponseDTO> getAllEstheticianCompletedAppointments() {
+    List<Appointment> appointments = appointmentRepo.findAppointmentsWithEstheticianAndCompleted(Status.COMPLETED.getCode());
     return appointments.stream()
         .map(appointment -> mapper.toDto(appointment))
         .collect(Collectors.toList());
@@ -697,58 +715,36 @@ public List<AppointmentResponseDTO> getMyEstheticianAppointment(String email) {
 }
 
 private Appointment checkAppointmentTodayDate(Appointment appointment) {
-  LocalDateTime now = LocalDateTime.now().plusHours(1);
+    LocalDateTime now = LocalDateTime.now().plusHours(1);
   
-  if(appointment.getAppointmentTime().toLocalDate().equals(now.toLocalDate())) {
-      LocalDateTime eveningStart = now.toLocalDate().atTime(17, 00);
-      if(now.isAfter(eveningStart.minusHours(4))) {
-          throw new IllegalStateException("Appointment taken the same day must be 4 hours prior to 17h00");
-      }
-      
-      int duration;
-      String providerType;
-      long providerId;
-      
-      if (appointment.getBarber() != null) {
-          providerType = "barber";
-          providerId = appointment.getBarber().getId();
-          duration = appointment.getHaircut().getDuration();
-      } else if (appointment.getEsthetician() != null) {
-          providerType = "esthetician";
-          providerId = appointment.getEsthetician().getId();
-          duration = appointment.getEsthetic().getDuration();
-      } else {
-          throw new IllegalStateException("Appointment must have either a barber or an esthetician");
-      }
-      
-      // We look for slot available between 17h-19h for the date of the appointment
-      LocalDateTime startSlot = eveningStart;
-      LocalDateTime eveningEnd = now.toLocalDate().atTime(19, 00);
-      
-      boolean slotFound = false;
-      
-      while(startSlot.plusMinutes(duration).isBefore(eveningEnd) || 
-            startSlot.isBefore(eveningEnd)) {
-          //TODO reuse it after fixing the function in availability
-          if(availabilityService.isAvailableSlot(providerType, providerId, startSlot, duration)) {
-            appointment.setAppointmentTime(startSlot);
-            availabilityService.makeProviderSlotUnavailable(providerType, providerId, startSlot, duration);
-            slotFound = true;
-            break;
-          }
-          
-          //Move to next slot
-          startSlot = startSlot.plusMinutes(30);
-      }
-      
-      if(slotFound == false) {
-          throw new ResourceNotFoundException("No slot found for 17h to 19h");
-      }
-  }
+    if(appointment.getAppointmentTime().toLocalDate().equals(now.toLocalDate())) {
+        //appointment must be taken at least 30 minute before the appointment time  
+        if(now.plusMinutes(30).isAfter(appointment.getAppointmentTime())) {
+            throw new IllegalStateException("Le rendez-vous doit être pris au moins 30 minutes à l'avance");
+        }
+       
+        int duration;
+        String providerType;
+        long providerId;
+       
+        if (appointment.getBarber() != null) {
+            providerType = "barber";
+            providerId = appointment.getBarber().getId();
+            duration = appointment.getHaircut().getDuration();
+        } else if (appointment.getEsthetician() != null) {
+            providerType = "esthetician";
+            providerId = appointment.getEsthetician().getId();
+            duration = appointment.getEsthetic().getDuration();
+        } else {
+            throw new IllegalStateException("Le rendez-vous doit avoir soit un barbier soit une esthéticienne");
+        }
+       
+        LocalDateTime appointmentTime = appointment.getAppointmentTime();
+        availabilityService.makeProviderSlotUnavailable(providerType, providerId, appointmentTime, duration);
+    }
   
-  return appointment;
+    return appointment;
 }
-
 
 }
 
