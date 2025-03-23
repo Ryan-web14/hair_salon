@@ -1,5 +1,4 @@
 package com.sni.hairsalon.service;
-
 import com.sni.hairsalon.dto.request.ClientSignupRequest;
 import com.sni.hairsalon.dto.request.UserRequestDTO;
 import com.sni.hairsalon.dto.response.AuthResponse;
@@ -15,6 +14,7 @@ public interface AuthentificationService {
     public ClientSignupResponse signupClient(ClientSignupRequest request);  
     public ClientSignupResponse signupClientByAdmin(ClientSignupRequest request, String link);
     public UserResponseDTO signupAdmin(UserRequestDTO request);
+    public AuthResponse loginAdmin(UserRequestDTO dto, HttpServletRequest request);
     //public void validateUserEmail(String email);
 }
 //TODO create a specific login for admin and mananger 

@@ -308,6 +308,13 @@ public List<ScheduleResponseDTO> bulkCreateSchedules(BulkScheduleRequestDTO requ
     }
 
     @Override
+    public void deleteScheduleByBarberId(Long barberId){
+
+        scheduleRepo.deleteByBarberId(barberId);
+        return;
+    }
+
+    @Override
     public List<ScheduleResponseDTO> createTemplateSchedule(ScheduleTemplateRequestDTO request) {
 
         Barber barber = barberRepo.findById(Long.parseLong(request.getBarberId()))

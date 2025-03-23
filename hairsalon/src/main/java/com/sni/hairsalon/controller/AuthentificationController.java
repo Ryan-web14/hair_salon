@@ -40,6 +40,11 @@ public class AuthentificationController {
         return ResponseEntity.ok(authService.login(loginRequest, request));
     }
 
+    @PostMapping("/login/admin")
+    public ResponseEntity<AuthResponse> loginAdmin(@Validated @RequestBody UserRequestDTO dto, HttpServletRequest request){
+        return ResponseEntity.ok(authService.loginAdmin(dto,request));
+    }
+
     @PostMapping("/signup/client")
     public ResponseEntity<ClientSignupResponse> signup(
      @RequestBody ClientSignupRequest signupRequest){

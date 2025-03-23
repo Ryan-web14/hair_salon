@@ -3,6 +3,7 @@ package com.sni.hairsalon.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.hibernate.sql.Delete;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -113,6 +114,15 @@ public class ScheduleController {
         return ResponseEntity.noContent().build();
 
     }
+
+    @DeleteMapping("/{id}/delete/barber")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    public ResponseEntity<Void> deleteBarberSchedule(@PathVariable long id){
+
+        scheduleService.deleteScheduleByBarberId(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
 
 
