@@ -104,7 +104,7 @@ public class AuthentificationController {
     }
 
     
-    @PostMapping("/signup/admin")
+    @PostMapping("/signup/manager")
     public ResponseEntity<UserResponseDTO> signupManager(@RequestBody UserRequestDTO request){
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(authService.signupManager(request));
