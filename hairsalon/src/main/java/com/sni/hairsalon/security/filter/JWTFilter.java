@@ -37,6 +37,7 @@ public class JWTFilter extends OncePerRequestFilter {
     
     private final List<String> EXCLUDE_PATH = Arrays.asList(
         "/v1/auth/login",
+        "/v1/auth/login/admin",
          "/v1/auth/signup/client"
     );
 
@@ -87,9 +88,9 @@ public class JWTFilter extends OncePerRequestFilter {
 
     private void processToken(String token){
 
-        if(sessionService.isSessionValid(token) == false){
-            throw new IllegalAccessError("Not valid session");
-        }
+        // if(sessionService.isSessionValid(token) == false){
+        //     throw new IllegalAccessError("Not valid session");
+        // }
         String email = jwtUtils.validateTokenAndRetrieveSubject(token);
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserPrincipal userDetails = (UserPrincipal) userDetailsService.loadUserByUsername(email);

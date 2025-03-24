@@ -74,7 +74,7 @@ public class AuthentificationServiceImpl implements AuthentificationService{
         .orElseThrow(()-> new UsernameNotFoundException("No user found"));
 
         Boolean hasCorrectRole = user.getRole().getName().equals("ADMIN") ||
-        user.getRole().getName().equals("ADMIN");
+        user.getRole().getName().equals("MANAGER");
 
         if(!hasCorrectRole){
 
@@ -168,6 +168,17 @@ public class AuthentificationServiceImpl implements AuthentificationService{
     public UserResponseDTO signUp(UserRequestDTO user){
        UserResponseDTO dto = userService.createUser(user);
        return dto;
+    }
+
+    @Override
+    public UserResponseDTO signupManager(UserRequestDTO request){
+        if (!request.getRole().isEmpty()) {
+            request.setRole("");
+        }
+
+        request.setRole("MANAGER");
+
+        return userService.createAdmin(request);
     }
 
     @Override

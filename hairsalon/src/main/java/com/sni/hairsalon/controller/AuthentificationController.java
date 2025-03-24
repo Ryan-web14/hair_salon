@@ -103,6 +103,14 @@ public class AuthentificationController {
             .body(authService.signupAdmin(request));
     }
 
+    
+    @PostMapping("/signup/admin")
+    public ResponseEntity<UserResponseDTO> signupManager(@RequestBody UserRequestDTO request){
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(authService.signupManager(request));
+    }
+
+
     @PostMapping("/change-password")
     public ResponseEntity<?> changeTemporaryPassword(@RequestBody ResetPasswordRequestDTO resetRequest){
         String token = resetRequest.getToken();
