@@ -1,6 +1,8 @@
 package com.sni.hairsalon.model;
 
 
+import java.util.List;
+
 import com.sni.hairsalon.annotation.IdGeneration;
 
 import jakarta.persistence.*;
@@ -38,5 +40,13 @@ public class Barber {
     
     @Column(name = "available", nullable = false)
     private boolean available;
-  
+    
+    @OneToMany(mappedBy = "barber", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Appointment> appointments;
+
+    @OneToMany(mappedBy = "barber", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Schedule> schedules;
+
+    @OneToMany(mappedBy = "barber", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Availability> availabilities;
 }

@@ -502,6 +502,7 @@ public List<AppointmentResponseDTO> getEstheticianAppointment(long estheticianId
   }
   }
   @Override
+  @Transactional
   public void cancelAppointment(long id) {
       // Find the appointment by ID or throw exception if not found
       Appointment cancelAppointment = appointmentRepo.findById(id)

@@ -1,12 +1,16 @@
 package com.sni.hairsalon.service.serviceImpl;
 
+import java.nio.file.AccessDeniedException;
+import java.nio.file.attribute.UserPrincipal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +65,40 @@ public class AuthentificationServiceImpl implements AuthentificationService{
         user.setLast_login(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
         userRepo.save(user);
         return new AuthResponse(createdSession.getToken(), userDto.getEmail());
+    }
+
+    @Override
+    public AuthResponse loginAdmin(UserRequestDTO dto, HttpServletRequest request){
+        
+        User user =  userRepo.findUserByEmail(dto.getEmail())
+        .orElseThrow(()-> new UsernameNotFoundException("No user found"));
+
+        Boolean hasCorrectRole = user.getRole().getName().equals("ADMIN") ||
+        user.getRole().getName().equals("MANAGER");
+
+        if(!hasCorrectRole){
+
+            try{
+                throw new AccessDeniedException("UNAUTHORIZED");
+            }catch(AccessDeniedException e){
+
+                throw new RuntimeException("Access denied: " + e.getFile()); 
+            }
+               
+        }
+
+        Authentication authentication  = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                dto.getEmail(),
+            dto.getPassword()
+            ));     
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        UserResponseDTO userDto = mapper.toDto(user);
+        SessionResponseDTO createdSession = sessionService.createSession(request, userDto);
+        user.setLast_login(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
+        userRepo.save(user);
+        return new AuthResponse(createdSession.getToken(), userDto.getEmail());
+
     }
 
     @Override
@@ -130,6 +168,17 @@ public class AuthentificationServiceImpl implements AuthentificationService{
     public UserResponseDTO signUp(UserRequestDTO user){
        UserResponseDTO dto = userService.createUser(user);
        return dto;
+    }
+
+    @Override
+    public UserResponseDTO signupManager(UserRequestDTO request){
+        if (!request.getRole().isEmpty()) {
+            request.setRole("");
+        }
+
+        request.setRole("MANAGER");
+
+        return userService.createAdmin(request);
     }
 
     @Override

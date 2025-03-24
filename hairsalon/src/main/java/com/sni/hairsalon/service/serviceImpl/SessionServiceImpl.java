@@ -3,6 +3,7 @@ package com.sni.hairsalon.service.serviceImpl;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class SessionServiceImpl implements SessionService {
     private final JWTUtils jwtUtils;
     private final UserSessionRepository sessionRepo;
 
-    @Value("${sessionTimeout:86400000}")
+    @Value("${sessionTimeout:2880}")
     private long sessionTimeout;
 
 
@@ -40,6 +41,15 @@ public class SessionServiceImpl implements SessionService {
         User userFound = userRepo.findUserById(Long.parseLong(user.getId()))
         .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+            String clientIp = getClientIP(request);
+
+        //check if there's a user session with the same ip address
+        Optional<UserSession> existingSession = sessionRepo. findByUserIdAndIpAddressAndActive(userFound.getId(),  clientIp); 
+
+        //if so return the session 
+        if(existingSession.isPresent()){
+            return mapper.toDto(existingSession.get());
+        }
         List<UserSession> ActiveSessions = sessionRepo.findByUser_IdAndIsActiveTrue(userFound.getId());
         if(ActiveSessions.size() >= 3){
             UserSession oldSession =  ActiveSessions.stream()

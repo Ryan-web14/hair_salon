@@ -10,6 +10,7 @@ import com.sni.hairsalon.model.User;
 public interface UserService{
     UserResponseDTO createUser(UserRequestDTO dto);
     UserResponseDTO createAdmin(UserRequestDTO dto);
+    UserResponseDTO createManager(UserRequestDTO dto);
     Long  createBarberUserByAdmin(BarberRequestDTO  dto);
     UserResponseDTO updateUser(long id, String email);
     UserResponseDTO updatePassword(long id, String newPassword);

@@ -280,6 +280,7 @@ public List<ScheduleResponseDTO> bulkCreateSchedules(BulkScheduleRequestDTO requ
     }
 
     @Override
+    @Transactional
     public void deleteSchedule(Long id){
         
         Schedule schedule = scheduleRepo.findById(id)
@@ -291,6 +292,7 @@ public List<ScheduleResponseDTO> bulkCreateSchedules(BulkScheduleRequestDTO requ
     }
 
     @Override
+    @Transactional
     public void deleteAllSchedule(){
 
         scheduleRepo.deleteAll();
@@ -298,6 +300,7 @@ public List<ScheduleResponseDTO> bulkCreateSchedules(BulkScheduleRequestDTO requ
     }
 
     @Override
+    @Transactional
     public List<ScheduleResponseDTO> getAllCurrentSchedule(LocalDate date) {
 
         List<Schedule> schedules = scheduleRepo.findCurrentSchedules(date);
@@ -305,6 +308,14 @@ public List<ScheduleResponseDTO> bulkCreateSchedules(BulkScheduleRequestDTO requ
                 .stream()
                 .map(schedule -> mapper.toDto(schedule))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteScheduleByBarberId(Long barberId){
+
+        scheduleRepo.deleteByBarberId(barberId);
+        return;
     }
 
     @Override

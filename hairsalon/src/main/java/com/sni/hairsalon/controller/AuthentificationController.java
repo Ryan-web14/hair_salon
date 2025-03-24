@@ -40,6 +40,11 @@ public class AuthentificationController {
         return ResponseEntity.ok(authService.login(loginRequest, request));
     }
 
+    @PostMapping("/login/admin")
+    public ResponseEntity<AuthResponse> loginAdmin(@Validated @RequestBody UserRequestDTO dto, HttpServletRequest request){
+        return ResponseEntity.ok(authService.loginAdmin(dto,request));
+    }
+
     @PostMapping("/signup/client")
     public ResponseEntity<ClientSignupResponse> signup(
      @RequestBody ClientSignupRequest signupRequest){
@@ -97,6 +102,14 @@ public class AuthentificationController {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(authService.signupAdmin(request));
     }
+
+    
+    @PostMapping("/signup/admin")
+    public ResponseEntity<UserResponseDTO> signupManager(@RequestBody UserRequestDTO request){
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(authService.signupManager(request));
+    }
+
 
     @PostMapping("/change-password")
     public ResponseEntity<?> changeTemporaryPassword(@RequestBody ResetPasswordRequestDTO resetRequest){

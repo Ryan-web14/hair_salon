@@ -80,6 +80,27 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional 
+    public UserResponseDTO createManager(UserRequestDTO dto){
+      
+        if (emailAlreadyExist(dto.getEmail())) {
+            throw new ResourceAlreadyExistException("user already exist");
+        }
+
+        UserRole role = roleRepo.findUserRoleByName("MANAGER")
+            .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+
+        User newManager = User.builder()
+            .email(dto.getEmail())
+            .role(role)
+            .passwordHash(passwordEncoder.encode(dto.getPassword()))
+            .build();
+        userRepo.save(newManager);
+
+        return userMapper.toDto(newManager);
+    }
+
+    @Override
     @Transactional
     public Long createBarberUserByAdmin(BarberRequestDTO dto){
 
