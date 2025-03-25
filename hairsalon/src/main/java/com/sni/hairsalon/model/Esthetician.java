@@ -1,5 +1,7 @@
 package com.sni.hairsalon.model;
 
+import java.util.List;
+
 import com.sni.hairsalon.annotation.IdGeneration;
 
 import jakarta.persistence.CascadeType;
@@ -9,6 +11,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,6 +50,18 @@ public class Esthetician {
 
     @Column(name = "available", nullable = false)
     private boolean available;
+
+    @OneToMany(mappedBy = "esthetician", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Schedule> schedules;
+
+    @OneToMany(mappedBy = "esthetician", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Appointment> appointments;
+
     
+    @OneToMany(mappedBy = "esthetician", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Availability> availabilities;
 }
+
+    
+
     

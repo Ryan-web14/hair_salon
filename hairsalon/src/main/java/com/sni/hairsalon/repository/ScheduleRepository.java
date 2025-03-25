@@ -20,6 +20,9 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long > {
     List<Schedule> findByDayOfWeek(DayOfWeek dayOfWeek);
 
     void deleteByBarberId(Long barberId);
+
+    void deleteByEstheticianId(Long estheticianId);
+    
     @Query("select s from Schedule s where s.barber.id = :barberId " +
     "and s.dayOfWeek = :dayOfWeek " +
     "and s.effectiveFrom <= :date "+

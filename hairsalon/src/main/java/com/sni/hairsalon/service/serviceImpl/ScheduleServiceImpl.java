@@ -318,6 +318,12 @@ public List<ScheduleResponseDTO> bulkCreateSchedules(BulkScheduleRequestDTO requ
         return;
     }
 
+    public void deleteScheduleByEstheticianId(long estheticianId){
+        scheduleRepo.deleteByEstheticianId(estheticianId);
+
+        return;
+    }
+
     @Override
     public List<ScheduleResponseDTO> createTemplateSchedule(ScheduleTemplateRequestDTO request) {
 
