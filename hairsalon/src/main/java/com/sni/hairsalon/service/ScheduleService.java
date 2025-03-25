@@ -22,6 +22,7 @@ public interface ScheduleService {
     public ScheduleResponseDTO getBarBerTodayCurrentSchedule(long barberId);
     public void deleteSchedule(Long id);
     public void deleteScheduleByBarberId(Long barberId);
+    public void deleteScheduleByEstheticianId(long estheticianId);
     public void deleteAllSchedule();
 
 }

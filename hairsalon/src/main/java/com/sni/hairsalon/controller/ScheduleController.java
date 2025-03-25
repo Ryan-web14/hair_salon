@@ -123,6 +123,15 @@ public class ScheduleController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{id}/delete/esthetician")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    public ResponseEntity<Void> deleteEstheticianSchedule(@PathVariable long id){
+
+        scheduleService.deleteScheduleByEstheticianId(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
 
 
