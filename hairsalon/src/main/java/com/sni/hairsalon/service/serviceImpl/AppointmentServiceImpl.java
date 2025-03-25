@@ -593,7 +593,7 @@ public List<AppointmentResponseDTO> getEstheticianAppointment(long estheticianId
   public void InprogressToCompleted(){
 
     List<Appointment> appointments = appointmentRepo.findAppointmentByStatus(5);
-    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime now = LocalDateTime.now().plusHours(1);
 
     for(Appointment apt : appointments){
 

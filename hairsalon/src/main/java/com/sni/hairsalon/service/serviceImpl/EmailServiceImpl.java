@@ -129,7 +129,7 @@ public class EmailServiceImpl implements EmailService{
 
         String subject = "Rappel de rendez-vous";
         String text = String.format ( """
-   RAPPEL DE RENDEZ-VOUS URGE
+   RAPPEL DE RENDEZ-VOUS 
    
    Bonjour Madame, Monsieur %s
    
@@ -167,7 +167,7 @@ public class EmailServiceImpl implements EmailService{
         String content = String.format(
             """
                     
-    RAPPEL DE RENDEZ-VOUS URGE
+    RAPPEL DE RENDEZ-VOUS 
    
     Madame, Monsieur %s
    
@@ -203,7 +203,7 @@ public class EmailServiceImpl implements EmailService{
         String subject = "Annulation de rendez-vous";
         String content = String.format(
             """
-    ANNULATION DE RENDEZ-VOUS URGENT
+    ANNULATION DE RENDEZ-VOUS 
    
     Madame, Monsieur %s
    
