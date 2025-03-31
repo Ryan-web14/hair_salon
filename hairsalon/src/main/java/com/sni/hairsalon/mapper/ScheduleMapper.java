@@ -49,6 +49,34 @@ public class ScheduleMapper {
         return scheduleBuilder.build();
     }
 
+    public Schedule FromResponse(ScheduleResponseDTO dto) {
+        Schedule.ScheduleBuilder scheduleBuilder = Schedule.builder()
+            .dayOfWeek(dto.getDayOfWeek())
+            .startTime(dto.getStartTime())
+            .endTime(dto.getEndTime())
+            .is_recurring(dto.isRecurring())
+            .effectiveFrom(Date.valueOf(dto.getEffectiveFrom()))
+            .effectiveTo(Date.valueOf(dto.getEffectiveTo()));
+        
+        // Check if barberId (id) is provided
+        if (dto.getId() != null && !dto.getId().isEmpty()) {
+            Barber barber = barberRepo.findBarberById(Long.parseLong(dto.getId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Barber not found")); 
+            scheduleBuilder.barber(barber);
+        } 
+        // Check if estheticianId is provided
+        else if (dto.getBarberId() != null && !dto.getEsthecianId().isEmpty()) {
+            Esthetician esthetician = estheticianRepo.findEstheticianById(Long.parseLong(dto.getEsthecianId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Esthetician not found"));
+            scheduleBuilder.esthetician(esthetician);
+        } else {
+            throw new IllegalArgumentException("Either barber id or esthetician id must be provided");
+        }
+        
+        return scheduleBuilder.build();
+    }
+
+
     public ScheduleResponseDTO toDto(Schedule schedule) {
         ScheduleResponseDTO responseBuilder = ScheduleResponseDTO.builder()
             .id(String.valueOf(schedule.getId()))

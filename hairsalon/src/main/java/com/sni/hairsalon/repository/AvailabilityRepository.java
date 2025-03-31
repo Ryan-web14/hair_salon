@@ -38,14 +38,15 @@ List<Availability> findByEstheticianIdAndDateAndIsAvailableTrue(
     @Query("select a from Availability a where a.barber.id = :barberId")
     List<Availability> findAvailabilityByBarberId(@Param("barberId") long barberId);
 
-    @Query("Select a from Availability a where a.barber.id = :barberId " +
-    "and a.startTime = :startTime "+
-    "and a.endTime = :endTime " +
-    "and isAvailable = true")
-    List<Availability> findByStartAndEndTimeAndBarber(
-        @Param("barberId") long barberId,
-        @Param("startTime") LocalDateTime starTime,
-        @Param("endTime") LocalDateTime endTime);
+    @Query("SELECT a FROM Availability a WHERE " +
+    "a.barber.id = :barberId " +
+    "AND a.startTime < :endTime " +   // Slot starts before the requested end time
+    "AND a.endTime > :startTime " +   // Slot ends after the requested start time
+    "AND a.isAvailable = true")       // Slot is available
+List<Availability> findByStartAndEndTimeAndBarber(
+ @Param("barberId") long barberId,
+ @Param("startTime") LocalDateTime startTime,
+ @Param("endTime") LocalDateTime endTime);
 
         @Query("SELECT a FROM Availability a WHERE a.barber.id = :barberId " +
        "AND ((a.startTime < :endTime AND a.endTime > :startTime))")
@@ -90,15 +91,15 @@ boolean existsByEstheticianIdAndStartTimeAndEndTime(
 @Param("estheticianId") Long estheticianId, 
 @Param("startTime") LocalDateTime startTime,
 @Param("endTime") LocalDateTime endTime);
- @Query("Select a from Availability a where a.esthetician.id = :estheticianId " +
- "and a.startTime = :startTime "+
- "and a.endTime = :endTime " +
-    "and isAvailable = true")
-List<Availability> findByStartAndEndTimeAndEsthetician(
+@Query("SELECT a FROM Availability a WHERE " +
+       "a.esthetician.id = :estheticianId " +
+       "AND a.startTime < :endTime " +  // Slot starts before the requested end time
+       "AND a.endTime > :startTime " +   // Slot ends after the requested start time
+       "AND a.isAvailable = true")       // Slot is available
+List<Availability> findByStartAndEndTimeAndEsthecian(
     @Param("estheticianId") long estheticianId,
-    @Param("startTime") LocalDateTime starTime,
+    @Param("startTime") LocalDateTime startTime,
     @Param("endTime") LocalDateTime endTime);
-
     @Query("SELECT a FROM Availability a WHERE a.esthetician.id = :estheticianId " +
        "AND NOT (a.endTime <= :startTime OR a.startTime >= :endTime)")
 List<Availability> findOverlappingEstheticianSlots(
@@ -106,4 +107,29 @@ List<Availability> findOverlappingEstheticianSlots(
     @Param("startTime") LocalDateTime startTime,
     @Param("endTime") LocalDateTime endTime
 );
+
+
+@Query("SELECT a FROM Availability a WHERE a.barber.id = :barberId " +
+       "AND a.startTime >= :startTimeMin AND a.startTime < :startTimeMax " +
+       "AND a.endTime >= :endTimeMin AND a.endTime < :endTimeMax " +
+       "AND a.isAvailable = true")
+List<Availability> findByBarberIdAndTimeRange(
+    @Param("barberId") long barberId,
+    @Param("startTimeMin") LocalDateTime startTimeMin,
+    @Param("startTimeMax") LocalDateTime startTimeMax,
+    @Param("endTimeMin") LocalDateTime endTimeMin,
+    @Param("endTimeMax") LocalDateTime endTimeMax);
+
+@Query("SELECT a FROM Availability a WHERE a.esthetician.id = :estheticianId " +
+       "AND a.startTime >= :startTimeMin AND a.startTime < :startTimeMax " +
+       "AND a.endTime >= :endTimeMin AND a.endTime < :endTimeMax " +
+       "AND a.isAvailable = true")
+List<Availability> findByEstheticianIdAndTimeRange(
+    @Param("estheticianId") long estheticianId,
+    @Param("startTimeMin") LocalDateTime startTimeMin,
+    @Param("startTimeMax") LocalDateTime startTimeMax,
+    @Param("endTimeMin") LocalDateTime endTimeMin,
+    @Param("endTimeMax") LocalDateTime endTimeMax);
+
+
 }

@@ -24,6 +24,7 @@ import com.sni.hairsalon.repository.BarberRepository;
 import com.sni.hairsalon.repository.EstheticianRepository;
 import com.sni.hairsalon.repository.ScheduleRepository;
 import com.sni.hairsalon.service.AvailabilityService;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AvailabilityServiceImpl implements AvailabilityService {
 
-    
     private final AvailabilityRepository availabilityRepo;
     private final ScheduleRepository scheduleRepo;
     private final BarberRepository barberRepo;
@@ -123,48 +123,123 @@ public List<AvailabilityResponseDTO> getEstheticianAvailability(long esthetician
         .collect(Collectors.toList());
 }
 
+// @Override
+// public void makeProviderSlotUnavailable(String providerType, long providerId, LocalDateTime startTime, int duration) {
+//     //startTime = startTime.truncatedTo(ChronoUnit.MINUTES);
+   
+//     // Calculate each needed slots
+//     int slotDuration = 30;
+//     int numSlots = (int) Math.ceil((double) duration / slotDuration);
+   
+//     for (int i = 0; i < numSlots; i++) {
+//         LocalDateTime currentSlotStart = startTime.plusMinutes(i * slotDuration);
+//         LocalDateTime currentSlotEnd = currentSlotStart.plusMinutes(slotDuration);
+//         System.out.println("Searching for slot: start=" + currentSlotStart + 
+//         ", end=" + currentSlotEnd);
+//         try {
+//             List<Availability> availabilities;
+            
+//             if ("barber".equalsIgnoreCase(providerType)) {
+//                 availabilities = availabilityRepo.findByStartAndEndTimeAndBarber(
+//                     providerId, currentSlotStart, currentSlotEnd);
+//             } else if ("esthetician".equalsIgnoreCase(providerType)) {
+//                 availabilities = availabilityRepo.findByStartAndEndTimeAndEsthecian(
+//                     providerId, currentSlotStart, currentSlotEnd);
+//             } else {
+//                 throw new IllegalArgumentException("Type de prestataire non reconnu: " + providerType);
+//             }
+           
+//             if (availabilities.isEmpty()) {
+
+//             }
+            
+//             Availability firstAvailability = availabilities.get(0);
+//             firstAvailability.setAvailable(false);
+//             availabilityRepo.save(firstAvailability);
+            
+//             if (availabilities.size() > 1) {
+//                 List<Availability> duplicates = availabilities.subList(1, availabilities.size());
+//                 availabilityRepo.deleteAll(duplicates);
+                
+//             }
+//         } catch (ResourceNotFoundException e) {
+//             throw e;
+//         }
+//     }
+// }
+
 @Override
 public void makeProviderSlotUnavailable(String providerType, long providerId, LocalDateTime startTime, int duration) {
-    startTime = startTime.truncatedTo(ChronoUnit.MINUTES);
-   
-    // Calculate each needed slots
+    // Fetch the schedule for the appointment date
+    LocalDate appointmentDate = startTime.toLocalDate();
+    Schedule schedule;
+
+    if ("barber".equalsIgnoreCase(providerType)) {
+        schedule = scheduleRepo
+        .findCurrentSchedulesForBarber(providerId, appointmentDate, appointmentDate.getDayOfWeek().getValue())
+        .orElseThrow(() -> new ResourceNotFoundException("No found schedule"));    
+    } else if ("esthetician".equalsIgnoreCase(providerType)) {
+        schedule = scheduleRepo
+        .findCurrentSchedulesForEsthetician(providerId, appointmentDate, appointmentDate.getDayOfWeek().getValue())
+        .orElseThrow(() -> new ResourceNotFoundException("No found schedule"));    
+    } else {
+        throw new IllegalArgumentException("Invalid provider type: " + providerType);
+    }
+    
+    if (schedule == null) {
+        throw new ResourceNotFoundException("No schedule found for " + providerType + " on " + appointmentDate);
+    }
+
     int slotDuration = 30;
     int numSlots = (int) Math.ceil((double) duration / slotDuration);
-   
+
     for (int i = 0; i < numSlots; i++) {
         LocalDateTime currentSlotStart = startTime.plusMinutes(i * slotDuration);
         LocalDateTime currentSlotEnd = currentSlotStart.plusMinutes(slotDuration);
-       
-        try {
-            List<Availability> availabilities;
+
+        // Query for overlapping slots tied to the schedule
+        List<Availability> availabilities;
+        if ("barber".equalsIgnoreCase(providerType)) {
+            availabilities = availabilityRepo.findByStartAndEndTimeAndBarber(
+                    providerId, currentSlotStart, currentSlotEnd);
+        } else {
+            availabilities = availabilityRepo.findByStartAndEndTimeAndEsthecian(
+                    providerId, currentSlotStart, currentSlotEnd);
+        }
+
+        // Create slot if none exists
+        if (availabilities.isEmpty()) {
+            Availability newSlot = new Availability();
+            newSlot.setStartTime(currentSlotStart);
+            newSlot.setEndTime(currentSlotEnd);
+            newSlot.setAvailable(false);
+            newSlot.setNote("Same day creation");
+            newSlot.setSchedule(schedule);
             
             if ("barber".equalsIgnoreCase(providerType)) {
-                availabilities = availabilityRepo.findByStartAndEndTimeAndBarber(
-                    providerId, currentSlotStart, currentSlotEnd);
-            } else if ("esthetician".equalsIgnoreCase(providerType)) {
-                availabilities = availabilityRepo.findByStartAndEndTimeAndEsthetician(
-                    providerId, currentSlotStart, currentSlotEnd);
+                Barber barber = barberRepo.findById(providerId).orElseThrow();
+                newSlot.setBarber(barber);
             } else {
-                throw new IllegalArgumentException("Type de prestataire non reconnu: " + providerType);
-            }
-           
-            if (availabilities.isEmpty()) {
-                throw new IllegalAccessError("Pas de disponibilité pour ce créneau");
+                Esthetician esthetician = estheticianRepo.findById(providerId).orElseThrow();
+                newSlot.setEsthetician(esthetician);
             }
             
-            Availability firstAvailability = availabilities.get(0);
-            firstAvailability.setAvailable(false);
-            availabilityRepo.save(firstAvailability);
-            
-            if (availabilities.size() > 1) {
-                List<Availability> duplicates = availabilities.subList(1, availabilities.size());
-                availabilityRepo.deleteAll(duplicates);
-            }
-        } catch (ResourceNotFoundException e) {
-            throw e;
+            availabilityRepo.save(newSlot);
+            availabilities = List.of(newSlot);
+        }
+
+        // Mark slot as unavailable
+        Availability firstAvailability = availabilities.get(0);
+        firstAvailability.setAvailable(false);
+        availabilityRepo.save(firstAvailability);
+
+        // Delete duplicates
+        if (availabilities.size() > 1) {
+            availabilityRepo.deleteAll(availabilities.subList(1, availabilities.size()));
         }
     }
 }
+
 @Override
 public void deleteAllAvailability(){
 
