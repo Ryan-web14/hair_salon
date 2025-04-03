@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -317,7 +318,7 @@ public CompletableFuture<Boolean> sendAppointmentCancellationToEsthetician(Strin
      @Override
      @Async
      public CompletableFuture<Boolean> sendDailyScheduleToBarber(String barberEmail,
-      List<Appointment> appointments){
+      Set<Appointment> appointments){
 
         String subject = "Votre programme pour le " + 
         LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d"));

@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -602,6 +604,7 @@ public List<AppointmentResponseDTO> getEstheticianAppointment(long estheticianId
 
   }
 
+  //TODO apporter une correction sur cette methode
   @Scheduled(fixedRate = 300000)
   public void monitorAppointmentTime() {
     LocalDateTime now = LocalDateTime.now().plusHours(1);
@@ -621,8 +624,10 @@ public List<AppointmentResponseDTO> getEstheticianAppointment(long estheticianId
     List<Barber> barbers = barberRepo.findAll();
 
     for (Barber barber : barbers) {
-      List<Appointment> appointments = appointmentRepo.findByBarberAndDate(barber.getId(),
+      List<Appointment> appointmentList = appointmentRepo.findByBarberAndDate(barber.getId(),
           today, Status.CONFIRMED.getCode());
+      Set<Appointment> appointments = new HashSet<>();
+      appointments.addAll(appointmentList);
 
       if (!appointments.isEmpty()) {
         mailService.sendDailyScheduleToBarber(barber.getUser().getEmail(), appointments);
