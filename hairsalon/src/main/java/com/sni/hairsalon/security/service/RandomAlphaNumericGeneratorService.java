@@ -1,8 +1,6 @@
 package com.sni.hairsalon.security.service;
 
 import java.security.SecureRandom;
-import java.util.Random;
-
 import org.springframework.stereotype.Service;
 
 @Service

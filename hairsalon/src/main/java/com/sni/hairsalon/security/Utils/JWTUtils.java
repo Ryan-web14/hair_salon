@@ -22,18 +22,20 @@ public class JWTUtils {
     @Value("${jwt_secret}")
     private String secret;
 
-    @Value("${jwt_expiration}")
+    @Value("${jwt.expiration}")
     private long jwt_expiration;
 
+    
     public String generateToken(User user) throws IllegalArgumentException, JWTCreationException{
         Map<String,String> claims = new HashMap<>();
         claims.put("role", user.getRole().getName());
-
+        
+        long currentTimeMillis = new Date().getTime();
         return JWT.create()
             .withClaim("user info", claims)
             .withSubject( user.getEmail())
             .withIssuedAt(new Date())
-            .withExpiresAt(new Date(jwt_expiration + System.currentTimeMillis()))
+            .withExpiresAt(new Date(currentTimeMillis + jwt_expiration))
             .sign(Algorithm.HMAC256(secret));
     }
 
