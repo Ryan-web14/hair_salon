@@ -1,5 +1,9 @@
 package com.sni.hairsalon.service.serviceImpl;
 
+import java.time.LocalDate;
+import java.time.Year;
+import java.time.YearMonth;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -178,6 +182,17 @@ public class ClientServiceImpl implements ClientService {
     }
 
  }
+
+    @Transactional
+    public List<ClientResponseDTO> getUniqueClientsWithAppointment() {
+
+        LocalDate startOfMonth = YearMonth.now().atDay(1);
+        LocalDate endOfMonth = YearMonth.now().atEndOfMonth();
+        return clientRepo.findUniqueClientWithAppointment(startOfMonth, endOfMonth)
+        .stream()
+        .map(client->mapper.toDto(client))
+        .collect(Collectors.toList()); 
+    }
 
 }
 

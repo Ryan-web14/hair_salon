@@ -16,6 +16,7 @@ public interface ClientService {
     public List<ClientResponseDTO> searchClient(String lastname, String firstname);
     public ClientResponseDTO getClientProfile(String email);  
     public ClientResponseDTO updateAdminClient(long clientId, ClientRequestDTO dto);
+    public List<ClientResponseDTO> getUniqueClientsWithAppointment();
     public void deleteAllClient();
 
     
