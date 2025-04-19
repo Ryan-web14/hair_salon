@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.Builder;
 
+import java.util.Set;
+
 import com.sni.hairsalon.annotation.IdGeneration;
  
 @Data
@@ -35,4 +37,7 @@ public class Client{
     //Number of time the client hasn't show themselve to an appointment
     @Column(name = "no_show_count", nullable = false)
     @Builder.Default private int noShowCount = 0;
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Appointment> appointments;
 }

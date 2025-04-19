@@ -105,6 +105,11 @@
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.12.6</version>
 		</dependency>
+		<dependency>
+			<groupId>com.infobip</groupId>
+			<artifactId>infobip-api-java-client</artifactId>
+			<version>6.1.0</version>
+	  </dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

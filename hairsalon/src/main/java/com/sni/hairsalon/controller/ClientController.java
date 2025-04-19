@@ -59,6 +59,12 @@ public class ClientController {
         return ResponseEntity.ok().body(clientService.getAllClient());
     }
 
+    @GetMapping("/unique")
+    @PreAuthorize( "hasRole('ADMIN') or hasRole('MANAGER')")
+    public ResponseEntity<List<ClientResponseDTO>> getAllUniqueClient(){
+        return ResponseEntity.ok().body(clientService.getUniqueClientsWithAppointment());
+    }
+
     @DeleteMapping("/{clientId}/delete")
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Void> deleteClient(@PathVariable long clientId){
@@ -73,5 +79,6 @@ public class ClientController {
         clientService.deleteAllClient();;
         return ResponseEntity.noContent().build();
     }
+
 
 }
