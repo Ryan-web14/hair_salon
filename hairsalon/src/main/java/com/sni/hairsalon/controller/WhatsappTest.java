@@ -30,8 +30,8 @@ public class WhatsappTest {
 
     @PostMapping("/send")
     ResponseEntity<Void> sendWhatsapp() throws ApiException{
-        ApiClient apiClient = ApiClient.forApiKey(ApiKey.from("7a8f567cee1b03a35a5c65f377acce9e-6cbe8780-9d73-471d-a573-6aea186bbdb4"))
-        .withBaseUrl(BaseUrl.from("https://e5lx33.api.infobip.com"))
+        ApiClient apiClient = ApiClient.forApiKey(ApiKey.from(""))
+        .withBaseUrl(BaseUrl.from(""))
         .build();
         WhatsAppApi whatsAppApi = new WhatsAppApi(apiClient);
         
