@@ -5,6 +5,9 @@ import com.sni.hairsalon.dto.response.ClientResponseDTO;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface ClientService {
     
     public ClientResponseDTO createClient(ClientRequestDTO dto);
@@ -18,6 +21,7 @@ public interface ClientService {
     public ClientResponseDTO updateAdminClient(long clientId, ClientRequestDTO dto);
     public List<ClientResponseDTO> getUniqueClientsWithAppointment();
     public void deleteAllClient();
+    public Page<ClientResponseDTO> getPaginatedClient(Pageable page);
 
     
 /* 

@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.sni.hairsalon.dto.request.ClientRequestDTO;
@@ -192,6 +194,17 @@ public class ClientServiceImpl implements ClientService {
         .stream()
         .map(client->mapper.toDto(client))
         .collect(Collectors.toList()); 
+    }
+
+    @Transactional
+    public Page<ClientResponseDTO> getPaginatedClient(Pageable page){
+
+        Page<Client> paginatedClient =  clientRepo.findAll(page);
+
+        Page<ClientResponseDTO> clientPageResponse = paginatedClient.map(mapper::toDto);
+
+        return clientPageResponse;
+
     }
 
 }

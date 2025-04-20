@@ -5,13 +5,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.sni.hairsalon.model.Client;
-import com.twilio.rest.api.v2010.account.availablephonenumbercountry.Local;
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long>{
@@ -43,5 +44,7 @@ public interface ClientRepository extends JpaRepository<Client, Long>{
     , nativeQuery= true)
     List<Client> findUniqueClientWithAppointment(@Param("startOfMonth") LocalDate startOfMonth,
     @Param("endOfMonth") LocalDate endOfMonth);
+
+    Page<Client> findAll(Pageable page);
 
 }
