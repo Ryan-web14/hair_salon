@@ -1,7 +1,14 @@
 package com.sni.hairsalon.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sni.hairsalon.dto.request.ClientRequestDTO;
 import com.sni.hairsalon.dto.response.ClientResponseDTO;
+import com.sni.hairsalon.dto.response.PaginatedResponse;
+import com.sni.hairsalon.model.Client;
 import com.sni.hairsalon.model.UserPrincipal;
 import com.sni.hairsalon.service.ClientService;
 
@@ -65,6 +74,32 @@ public class ClientController {
         return ResponseEntity.ok().body(clientService.getUniqueClientsWithAppointment());
     }
 
+
+
+    @GetMapping("/admin/all/paginated")
+    @PreAuthorize( "hasRole('ADMIN') or hasRole('MANAGER')")
+    public ResponseEntity<PaginatedResponse<ClientResponseDTO>> getAllPaginatedClient(){
+
+        int page = 0;
+        int size = 15;
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ClientResponseDTO> clientPage = clientService.getPaginatedClient(pageable); 
+        
+        List<ClientResponseDTO> content = clientPage.getContent();
+         
+        Map<String, Object> pagination = new HashMap<>();
+        pagination.put("totalItems", clientPage.getTotalElements());
+        pagination.put("totalPages", clientPage.getTotalPages());
+        pagination.put("currentPage", clientPage.getNumber());
+        pagination.put("itemsPerPage", clientPage.getSize());
+        pagination.put("hasNextPage", clientPage.hasNext());
+        pagination.put("hasPrevPage", clientPage.hasPrevious());
+        
+        PaginatedResponse<ClientResponseDTO> response = new PaginatedResponse<>(content, pagination);
+        
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @DeleteMapping("/{clientId}/delete")
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<Void> deleteClient(@PathVariable long clientId){
@@ -79,6 +114,8 @@ public class ClientController {
         clientService.deleteAllClient();;
         return ResponseEntity.noContent().build();
     }
+
+
 
 
 }
