@@ -34,7 +34,7 @@ import lombok.RequiredArgsConstructor;
 public class WhatsappServiceImpl implements WhatsappService {
     
     @Value("${infobip.api.key}")
-    private final String API_KEY;
+    private String API_KEY;
 
     public void sendAppointmentConfirmation(AppointmentResponseDTO appointment) throws ApiException{
 
