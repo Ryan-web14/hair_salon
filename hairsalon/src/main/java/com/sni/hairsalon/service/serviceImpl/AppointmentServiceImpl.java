@@ -144,12 +144,12 @@ public AppointmentResponseDTO createAppointment(AppointmentRequestDTO request) {
     } else if (appointment.getEsthetician() != null) {
         mailService.sendEstheticianNotificationOfNewAppointment(response.getEstheticianEmail(), verifiedAppointment);
     }
-    try{
+    // try{
 
-        whatsappService.sendAppointmentConfirmation(response);
-    }catch(ApiException e ){
-        e.printStackTrace();
-    }
+    //     whatsappService.sendAppointmentConfirmation(response);
+    // }catch(ApiException e ){
+    //     e.printStackTrace();
+    // }
 
     return response;
 }
