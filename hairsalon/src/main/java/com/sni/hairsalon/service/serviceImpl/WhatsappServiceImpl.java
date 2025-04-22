@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +25,21 @@ import com.infobip.model.WhatsAppTemplateDataContent;
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
 import com.sni.hairsalon.service.WhatsappService;
 
+import lombok.RequiredArgsConstructor;
+
+
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class WhatsappServiceImpl implements WhatsappService {
+    
+    @Value("${infobip.api.key}")
+    private final String API_KEY;
 
     public void sendAppointmentConfirmation(AppointmentResponseDTO appointment) throws ApiException{
 
-        ApiClient apiClient = ApiClient.forApiKey(ApiKey.from("7a8f567cee1b03a35a5c65f377acce9e-6cbe8780-9d73-471d-a573-6aea186bbdb4"))
+
+        ApiClient apiClient = ApiClient.forApiKey(ApiKey.from(API_KEY))
         .withBaseUrl(BaseUrl.from("https://e5lx33.api.infobip.com"))
         .build();
         WhatsAppApi whatsAppApi = new WhatsAppApi(apiClient);
