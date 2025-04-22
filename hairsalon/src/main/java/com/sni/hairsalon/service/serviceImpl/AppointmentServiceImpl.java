@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+
+import com.infobip.ApiException;
 import com.sni.hairsalon.dto.request.AppointmentRequestDTO;
 import com.sni.hairsalon.dto.request.AppointmentUpdateRequestDTO;
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
@@ -37,7 +39,7 @@ import com.sni.hairsalon.service.AppointmentService;
 import com.sni.hairsalon.service.AvailabilityService;
 import com.sni.hairsalon.service.EmailService;
 import com.sni.hairsalon.service.ScheduleService;
-import com.sni.hairsalon.service.SmsService;
+import com.sni.hairsalon.service.WhatsappService;
 import com.sni.hairsalon.model.Status;
 import com.sni.hairsalon.model.User;
 
@@ -56,11 +58,11 @@ public class AppointmentServiceImpl implements AppointmentService {
   private final HaircutRepository haircutRepo;
   private final AppointmentRepository appointmentRepo;
   private final AppointmentMapper mapper;
-  private final SmsService smsService;
   private final UserRepository userRepo;
   private final EstheticianRepository estheticianRepo;
   private final ClientRepository clientRepo;
   private final EstheticRepository estheticRepo;
+  private final WhatsappService whatsappService;
 
   
  @Transactional
@@ -142,8 +144,13 @@ public AppointmentResponseDTO createAppointment(AppointmentRequestDTO request) {
     } else if (appointment.getEsthetician() != null) {
         mailService.sendEstheticianNotificationOfNewAppointment(response.getEstheticianEmail(), verifiedAppointment);
     }
-    
-    // smsService.sendConfirmationSms(appointment);
+    try{
+
+        whatsappService.sendAppointmentConfirmation(response);
+    }catch(ApiException e ){
+        e.printStackTrace();
+    }
+
     return response;
 }
 
