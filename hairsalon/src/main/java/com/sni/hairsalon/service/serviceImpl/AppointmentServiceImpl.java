@@ -730,10 +730,10 @@ public List<AppointmentResponseDTO> getMyEstheticianAppointment(String email) {
 @Scheduled(fixedRate = 3600000)
 public void remindAppointment(){
 
-    List<Appointment> appointments = appointmentRepo.findByDate(LocalDate.now(), 30);
+    List<Appointment> appointments = appointmentRepo.findByDate(LocalDate.now(), 3);
 
     for(Appointment appointment : appointments){
-        if(appointment.getAppointmentTime().isAfter(LocalDateTime.now().minusHours(1)))
+        if(appointment.getAppointmentTime().isAfter(LocalDateTime.now().plusHours(1)))
         mailService.sendAppointmentReminder(appointment);
     }
 
