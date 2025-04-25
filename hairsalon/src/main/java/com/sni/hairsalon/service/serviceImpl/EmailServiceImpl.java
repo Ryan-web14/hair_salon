@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import org.checkerframework.checker.units.qual.s;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -734,7 +735,7 @@ public CompletableFuture<Boolean> sendEstheticianNotificationOfNewAppointment(St
         return sendEmail(email, subject, content);
         }
 
-        @Async
+@Async
 public CompletableFuture<Boolean> sendEstheticianAccountInformation(String email, UserResponseDTO dto, String randomPassword) {
     String subject = "Informations de compte";
     String content = String.format(
@@ -758,6 +759,33 @@ public CompletableFuture<Boolean> sendEstheticianAccountInformation(String email
 
     return sendEmail(email, subject, content);
 }
+
+@Async
+public CompletableFuture<Boolean> sendAppointmentReminder(Appointment appointment){
+    String subject = "Rappel de rendez-vous";
+    String content = String.format("""
+            Rappel: Vous avez un rendez-vous aujourd'hui à %s.
+
+             Prière d'arriver 5 à 15 min en avance.
+            ----------------------------------------
+            Merci de nous faire confiance!
+            À très bientôt!
+            ----------------------------------------
+
+            IMPORTANT: En cas de reprogrammation, il est 
+            préferable de s'y prendre 12 à 24h en avance 
+            ou de nous contacter.
+            
+            Cordialement,
+            L'équipe de L'HOMME
+
+            Ne pas répondre. Générer automatiquement.
+            """,
+            appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("'HH''h''mm'")));
+    return sendEmail(content, subject, content);
+
+}
+
 
         @Async
         private CompletableFuture<Boolean> sendEmail(String to, String subject, String body) {

@@ -38,5 +38,6 @@ public interface AppointmentService {
     public void monitorCheckInAppointment();
     public void InprogressToCompleted();
     public void deleteAllAppointment();
+    public void remindAppointment();
         
 }
