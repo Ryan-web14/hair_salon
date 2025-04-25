@@ -242,6 +242,12 @@ public ResponseEntity<List<AppointmentResponseDTO>> getAllEstheticianAppointment
     return ResponseEntity.noContent().build();
   }  
 
+  @RequestMapping(value = "/remind", method = {RequestMethod.POST, RequestMethod.GET})
+  public ResponseEntity<?> remindAppointment(){
+    appointmentService.remindAppointment();
+    return ResponseEntity.noContent().build();
+  }
+
   @DeleteMapping("/delete")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> deleteAllAppointment(){

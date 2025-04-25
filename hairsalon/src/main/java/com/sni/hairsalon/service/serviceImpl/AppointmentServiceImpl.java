@@ -643,7 +643,7 @@ public List<AppointmentResponseDTO> getEstheticianAppointment(long estheticianId
 
   }
 
-  @Scheduled(cron = "0 0 7 * * *", zone = "Africa/Lagos")
+@Scheduled(cron = "0 0 7 * * *", zone = "Africa/Lagos")
 public void sendDailyAppointmentScheduleToEsthetician() {
     LocalDate today = LocalDate.now();
     List<Esthetician> estheticians = estheticianRepo.findAll();
@@ -725,6 +725,18 @@ public List<AppointmentResponseDTO> getMyEstheticianAppointment(String email) {
   private boolean isWithinOneMinute(LocalDateTime time1, LocalDateTime time2) {
     long diffInSeconds = Math.abs(time1.until(time2, ChronoUnit.SECONDS));
     return diffInSeconds <= 60; // 1 minute = 60 seconds
+}
+
+@Scheduled(fixedRate = 3600000)
+public void remindAppointment(){
+
+    List<Appointment> appointments = appointmentRepo.findByDate(LocalDate.now(), 30);
+
+    for(Appointment appointment : appointments){
+        if(appointment.getAppointmentTime().isAfter(LocalDateTime.now().minusHours(1)))
+        mailService.sendAppointmentReminder(appointment);
+    }
+
 }
 
 private Appointment checkAppointmentTodayDate(Appointment appointment) {
