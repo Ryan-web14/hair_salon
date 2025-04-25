@@ -45,7 +45,7 @@ public class WhatsappServiceImpl implements WhatsappService {
         WhatsAppApi whatsAppApi = new WhatsAppApi(apiClient);
         WhatsAppTemplateContent content = new WhatsAppTemplateContent();
 
-        if(!appointment.getBarberId().isEmpty()){
+        if(appointment.getBarberId() != null){
             
         content.language("fr")
         .templateName("appointment_confirmation")
@@ -53,14 +53,14 @@ public class WhatsappServiceImpl implements WhatsappService {
         .body(new WhatsAppTemplateBodyContent()
         .addPlaceholdersItem(appointment.getClientFirstname())
         .addPlaceholdersItem(formatDateTime(appointment.getAppointmentTime(),"EEEE dd MMM yyyy" ))
-        .addPlaceholdersItem(formatDateTime(appointment.getAppointmentTime(), "'HH''h''mm'"))
+        .addPlaceholdersItem(formatDateTime(appointment.getAppointmentTime(), "HH:mm"))
         .addPlaceholdersItem("Barbier")
         .addPlaceholdersItem(appointment.getBarberFirstname())
         .addPlaceholdersItem(appointment.getId())
         ));
         }
 
-        if(!appointment.getEstheticianId().isEmpty()){
+        if(appointment.getEstheticianId() != null){
             content.language("fr")
         .templateName("appointment_confirmation")
         .templateData(new WhatsAppTemplateDataContent()
@@ -87,15 +87,17 @@ public class WhatsappServiceImpl implements WhatsappService {
         @Override
         public void onSuccess(WhatsAppBulkMessageInfo result, int responseStatusCode,
                 Map<String, List<String>> responseHeaders) {
-            // TODO Auto-generated method stub
+                System.out.print(responseHeaders.keySet().iterator().next() + responseHeaders.values());
             
         }
 
         @Override
         public void onFailure(ApiException exception, int responseStatusCode,
                 Map<String, List<String>> responseHeaders) {
-            // TODO Auto-generated method stub
-            
+            exception.printStackTrace();
+            System.out.print(responseHeaders.keySet().iterator().next() + responseHeaders.values());
+            System.out.println(responseStatusCode);
+            System.out.println(exception.rawResponseBody());
         }
        });
         return;
