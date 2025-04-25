@@ -90,7 +90,7 @@ public class AppointmentMapper {
             dto.setClientFirstname(appointment.getClient().getFirstname());
             dto.setClientLastname(appointment.getClient().getLastname());
             dto.setClientEmail(appointment.getClient().getUser().getEmail());
-            dto.setClientPhone(String.valueOf(appointment.getClient().getPhoneNumber()));
+            dto.setClientPhone("0"+String.valueOf(appointment.getClient().getPhoneNumber()));
         }
         
         // Set barber details if present
@@ -98,7 +98,7 @@ public class AppointmentMapper {
             dto.setBarberId(String.valueOf(appointment.getBarber().getId()));
             dto.setBarberFirstname(appointment.getBarber().getFirstname());
             dto.setBarberLastname(appointment.getBarber().getLastname());
-            dto.setBarberPhone(String.valueOf(appointment.getBarber().getPhoneNumber()));
+            dto.setBarberPhone("0"+String.valueOf(appointment.getBarber().getPhoneNumber()));
             
             if (appointment.getBarber().getUser() != null) {
                 dto.setBarberEmail(appointment.getBarber().getUser().getEmail());
@@ -116,7 +116,7 @@ public class AppointmentMapper {
             dto.setEstheticianId(String.valueOf(appointment.getEsthetician().getId()));
             dto.setEstheticianFirstname(appointment.getEsthetician().getFirstname());
             dto.setEstheticianLastname(appointment.getEsthetician().getLastname());
-            dto.setEstheticianPhone(String.valueOf(appointment.getEsthetician().getPhoneNumber()));
+            dto.setEstheticianPhone("0"+String.valueOf(appointment.getEsthetician().getPhoneNumber()));
             
             if (appointment.getEsthetician().getUser() != null) {
                 dto.setEstheticianEmail(appointment.getEsthetician().getUser().getEmail());
