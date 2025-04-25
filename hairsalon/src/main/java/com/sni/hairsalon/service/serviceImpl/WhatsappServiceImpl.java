@@ -78,7 +78,7 @@ public class WhatsappServiceImpl implements WhatsappService {
         WhatsAppBulkMessage bulkMessage = new WhatsAppBulkMessage()
         .addMessagesItem(new WhatsAppMessage()
                 .from("242040451212")
-                .to("242055645569")
+                .to("242"+appointment.getClientPhone())
                 .content(content)
         );
 

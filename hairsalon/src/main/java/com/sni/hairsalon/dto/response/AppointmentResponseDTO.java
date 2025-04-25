@@ -17,14 +17,17 @@ public class AppointmentResponseDTO {
     private String clientLastname;
     private String clientFirstname;
     private String clientEmail;
+    private String clientPhone;
     private String barberId;
     private String barberLastname;
     private String barberFirstname;
     private String barberEmail;
+    private String barberPhone;
     private String estheticianId;
     private String estheticianLastname;
     private String estheticianFirstname;
     private String estheticianEmail;
+    private String estheticianPhone;
     private LocalDateTime appointmentTime;
     private LocalDateTime bookedTime;
     private String haircutType;
