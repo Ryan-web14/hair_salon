@@ -1,5 +1,6 @@
 package com.sni.hairsalon.controller;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import com.sni.hairsalon.dto.request.AppointmentRequestDTO;
 import com.sni.hairsalon.dto.request.AppointmentUpdateRequestDTO;
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
 import com.sni.hairsalon.exception.BadRequestException;
+import com.sni.hairsalon.exception.ResourceNotFoundException;
 import com.sni.hairsalon.model.UserPrincipal;
 import com.sni.hairsalon.service.AppointmentService;
 
@@ -255,6 +257,20 @@ public ResponseEntity<List<AppointmentResponseDTO>> getAllEstheticianAppointment
     appointmentService.deleteAllAppointment();
     return ResponseEntity.noContent().build();
   }
+
+  @GetMapping("/provider")
+  public ResponseEntity<List<AppointmentResponseDTO>> getProviderSpecificAppointment(
+    @AuthenticationPrincipal UserPrincipal authenticatedUser, 
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
+        try{
+
+            return ResponseEntity.ok().body(appointmentService.getProviderSpecificAppointment(authenticatedUser, date));
+        }catch(ResourceNotFoundException e){
+            throw new RuntimeException("Resource not found " + e.getMessage());
+        }catch(AccessDeniedException e){
+            throw new RuntimeException("AccessDenied " + e.getFile());
+        }
+    }
 
 }
 

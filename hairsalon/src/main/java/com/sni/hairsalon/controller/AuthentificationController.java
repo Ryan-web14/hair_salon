@@ -45,13 +45,18 @@ public class AuthentificationController {
         return ResponseEntity.ok(authService.loginAdmin(dto,request));
     }
 
+    @PostMapping("/login/staff")
+    public ResponseEntity<AuthResponse> loginStaff(@Validated @RequestBody UserRequestDTO dto, HttpServletRequest request){
+        return ResponseEntity.ok(authService.loginStaff(dto, request));
+    }
+
     @PostMapping("/signup/client")
     public ResponseEntity<ClientSignupResponse> signup(
      @RequestBody ClientSignupRequest signupRequest){
             return  ResponseEntity.status(HttpStatus.CREATED)
             .body(authService.signupClient(signupRequest));
         }
-    
+     
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
         @RequestHeader("Authorization") String bearerToken){

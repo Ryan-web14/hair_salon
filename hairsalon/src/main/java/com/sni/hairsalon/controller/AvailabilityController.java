@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sni.hairsalon.dto.request.AvailabilityRequestDTO;
 import com.sni.hairsalon.dto.response.AvailabilityResponseDTO;
+import com.sni.hairsalon.model.UserPrincipal;
 import com.sni.hairsalon.service.AvailabilityService;
+import com.twilio.rest.api.v2010.account.availablephonenumbercountry.Local;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -61,6 +65,12 @@ public ResponseEntity<List<AvailabilityResponseDTO>> getEstheticianAvailability(
     return ResponseEntity.ok(availabilityService.getEstheticianAvailability(estheticianId, date));
 }
 
+    @GetMapping("provider")
+    public ResponseEntity<List<AvailabilityResponseDTO>> getProviderAvailability(
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @AuthenticationPrincipal UserPrincipal authenticatedUSer
+    ){
+        return ResponseEntity.ok().body(availabilityService.getProviderAvailability(authenticatedUSer, date));
+    }
 
     @DeleteMapping("/delete")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")

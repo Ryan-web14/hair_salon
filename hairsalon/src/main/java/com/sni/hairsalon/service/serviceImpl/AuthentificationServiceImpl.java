@@ -1,13 +1,11 @@
 package com.sni.hairsalon.service.serviceImpl;
 
 import java.nio.file.AccessDeniedException;
-import java.nio.file.attribute.UserPrincipal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -99,6 +97,36 @@ public class AuthentificationServiceImpl implements AuthentificationService{
         userRepo.save(user);
         return new AuthResponse(createdSession.getToken(), userDto.getEmail());
 
+    }
+
+    public AuthResponse loginStaff(UserRequestDTO dto, HttpServletRequest request){
+
+        User user = userRepo.findUserByEmail(dto.getEmail())
+        .orElseThrow(()-> new ResourceNotFoundException("User not found"));
+
+        Boolean hasCorrectRole = user.getRole().getName().equals("BARBER") ||
+        user.getRole().getName().equals("ESTHETICIAN");
+        try{
+        
+            if(!hasCorrectRole){
+                throw new AccessDeniedException("UNHAUTORIZED");
+        }
+    }catch(AccessDeniedException e){
+        throw new RuntimeException("Access denied" + e.getFile());
+    }
+
+    Authentication authentication = authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(
+        dto.getEmail(),
+        dto.getPassword()
+    ));
+    
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+    UserResponseDTO userDto = mapper.toDto(user);
+        SessionResponseDTO createdSession = sessionService.createSession(request, userDto);
+        user.setLast_login(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
+        userRepo.save(user);
+    return new AuthResponse(createdSession.getToken(), user.getEmail(), user.getRole().getName());
     }
 
     @Override

@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.sni.hairsalon.dto.request.AvailabilityRequestDTO;
 import com.sni.hairsalon.dto.response.AvailabilityResponseDTO;
+import com.sni.hairsalon.model.UserPrincipal;
 
 public interface AvailabilityService {
     public List<AvailabilityResponseDTO> createAvailability(AvailabilityRequestDTO request);
@@ -15,6 +16,7 @@ public interface AvailabilityService {
     public Boolean isAvailableSlot(String providerType, long providerId, LocalDateTime startTime, int duration);
    public void makeProviderSlotUnavailable(String providerType, long providerId, LocalDateTime startTime, int duration);
    public void deleteAllAvailability();
+   public List<AvailabilityResponseDTO> getProviderAvailability(UserPrincipal authenticatedUser, LocalDate date);
 }
 
 

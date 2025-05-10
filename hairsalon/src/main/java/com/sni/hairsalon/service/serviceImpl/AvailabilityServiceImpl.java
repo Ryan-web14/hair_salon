@@ -19,12 +19,14 @@ import com.sni.hairsalon.model.Availability;
 import com.sni.hairsalon.model.Barber;
 import com.sni.hairsalon.model.Esthetician;
 import com.sni.hairsalon.model.Schedule;
+import com.sni.hairsalon.model.UserPrincipal;
 import com.sni.hairsalon.repository.AvailabilityRepository;
 import com.sni.hairsalon.repository.BarberRepository;
 import com.sni.hairsalon.repository.EstheticianRepository;
 import com.sni.hairsalon.repository.ScheduleRepository;
 import com.sni.hairsalon.service.AvailabilityService;
 
+import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +70,7 @@ public class AvailabilityServiceImpl implements AvailabilityService {
     .collect(Collectors.toList()); 
     }
 
+
     @Override
     public AvailabilityResponseDTO updateAvailabilityStatus(long id, boolean status){
         Availability updatedavailability = availabilityRepo.findById(id)
@@ -76,6 +79,31 @@ public class AvailabilityServiceImpl implements AvailabilityService {
         availabilityRepo.save(updatedavailability);
         return mapper.toDto(updatedavailability);
     }
+
+
+    @Override
+    @Transactional
+    public List<AvailabilityResponseDTO> getProviderAvailability(UserPrincipal authenticatedUser, LocalDate date){
+        
+        String role = authenticatedUser.getAuthorities().iterator().next().getAuthority();
+        List<AvailabilityResponseDTO> availabilities = new ArrayList<>();
+     
+        if(role.equals("ROLE_BARBER")){
+            Barber barber = barberRepo.findByEmail(authenticatedUser.getUsername())
+            .orElseThrow(()-> new ResourceNotFoundException("Barber not found"));
+            
+           return getBarberAvailability(barber.getId(), date);
+        }
+        else if(role.equals("ROLE_ESTHETICIAN")){
+            Esthetician esthetician = estheticianRepo.findByEmail(authenticatedUser.getUsername())
+            .orElseThrow(()-> new ResourceNotFoundException("Esthetician not found"));
+
+            return getEstheticianAvailability(esthetician.getId(), date);
+        }
+
+        //no availbaility if this is return 
+        return availabilities;
+     }
 
         @Override
         @Transactional

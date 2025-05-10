@@ -125,6 +125,7 @@
         }
 
         @Override
+        @Transactional(readOnly = true)
         public BarberResponseDTO getBarberProfile(String email){
                 User user = userService.getUserByEmail(email);
 

@@ -69,7 +69,7 @@ public class WhatsappServiceImpl implements WhatsappService {
         .addPlaceholdersItem(formatDateTime(appointment.getAppointmentTime(),"EEEE dd MMM yyyy" ))
         .addPlaceholdersItem(formatDateTime(appointment.getAppointmentTime(), "'HH''h''mm'"))
         .addPlaceholdersItem("Esthéticienne")
-        .addPlaceholdersItem(appointment.getBarberFirstname())
+        .addPlaceholdersItem(appointment.getEstheticianFirstname())
         .addPlaceholdersItem(appointment.getId())
         ));
         }
@@ -103,6 +103,143 @@ public class WhatsappServiceImpl implements WhatsappService {
         return;
 }
 
+
+    public void sendAppointmentConfirmationToProvider(AppointmentResponseDTO appointment)throws ApiException{
+
+        
+        ApiClient apiClient = ApiClient.forApiKey(ApiKey.from(API_KEY))
+        .withBaseUrl(BaseUrl.from("https://e5lx33.api.infobip.com"))
+        .build();
+        WhatsAppApi whatsAppApi = new WhatsAppApi(apiClient);
+        WhatsAppTemplateContent content = new WhatsAppTemplateContent();
+        String providerPhone = null;
+
+        if(appointment.getBarberId() != null){
+            
+        content.language("fr")
+        .templateName("new_appointment_barber")
+        .templateData(new WhatsAppTemplateDataContent()
+        .body(new WhatsAppTemplateBodyContent()
+        .addPlaceholdersItem(appointment.getClientFirstname())
+        .addPlaceholdersItem(appointment.getClientLastname())
+        .addPlaceholdersItem(formatDateTime(appointment.getAppointmentTime(),"EEEE dd MMM yyyy" ))
+        .addPlaceholdersItem(formatDateTime(appointment.getAppointmentTime(), "HH:mm"))
+        .addPlaceholdersItem(appointment.getHaircutType())
+        .addPlaceholdersItem(appointment.getDuration())
+        ));
+        providerPhone = appointment.getBarberPhone();
+        }
+
+        if(appointment.getEstheticianId() != null){
+            content.language("fr")
+        .templateName("new_appointment_esthetician")
+        .templateData(new WhatsAppTemplateDataContent()
+        .body(new WhatsAppTemplateBodyContent()
+        .addPlaceholdersItem(appointment.getClientFirstname())
+        .addPlaceholdersItem(appointment.getClientLastname())
+        .addPlaceholdersItem(formatDateTime(appointment.getAppointmentTime(),"EEEE dd MMM yyyy" ))
+        .addPlaceholdersItem(formatDateTime(appointment.getAppointmentTime(), "'HH''h''mm'"))
+        .addPlaceholdersItem(appointment.getEstheticType())
+        .addPlaceholdersItem(appointment.getDuration())
+        ));
+        providerPhone = appointment.getEstheticianPhone();
+        }
+    
+        
+        WhatsAppBulkMessage bulkMessage = new WhatsAppBulkMessage()
+        .addMessagesItem(new WhatsAppMessage()
+                .from("242040451212")
+                .to("242"+ providerPhone)
+                .content(content)
+        );
+
+       whatsAppApi.sendWhatsAppTemplateMessage(bulkMessage)
+       .executeAsync(new ApiCallback<WhatsAppBulkMessageInfo>() {
+        @Override
+        public void onSuccess(WhatsAppBulkMessageInfo result, int responseStatusCode,
+                Map<String, List<String>> responseHeaders) {
+                System.out.print(responseHeaders.keySet().iterator().next() + responseHeaders.values());
+            
+        }
+
+        @Override
+        public void onFailure(ApiException exception, int responseStatusCode,
+                Map<String, List<String>> responseHeaders) {
+            exception.printStackTrace();
+            System.out.print(responseHeaders.keySet().iterator().next() + responseHeaders.values());
+            System.out.println(responseStatusCode);
+            System.out.println(exception.rawResponseBody());
+        }
+       });
+        return;
+    }
+
+
+    public void sendCheckinToProvider(AppointmentResponseDTO appointment)throws ApiException{
+
+        
+        ApiClient apiClient = ApiClient.forApiKey(ApiKey.from(API_KEY))
+        .withBaseUrl(BaseUrl.from("https://e5lx33.api.infobip.com"))
+        .build();
+        WhatsAppApi whatsAppApi = new WhatsAppApi(apiClient);
+        WhatsAppTemplateContent content = new WhatsAppTemplateContent();
+        String providerPhone = null;
+
+        if(appointment.getBarberId() != null){
+            
+        content.language("fr")
+        .templateName("check_in")
+        .templateData(new WhatsAppTemplateDataContent()
+        .body(new WhatsAppTemplateBodyContent()
+        .addPlaceholdersItem(appointment.getClientFirstname())
+        .addPlaceholdersItem(formatDateTime(appointment.getAppointmentTime(), "HH:mm"))
+        .addPlaceholdersItem(appointment.getHaircutType())
+        .addPlaceholdersItem(appointment.getDuration())
+        ));
+        providerPhone = appointment.getBarberPhone();
+        }
+
+        if(appointment.getEstheticianId() != null){
+            content.language("fr")
+        .templateName("checkin_esthetician")
+        .templateData(new WhatsAppTemplateDataContent()
+        .body(new WhatsAppTemplateBodyContent()
+        .addPlaceholdersItem(appointment.getClientFirstname())
+        .addPlaceholdersItem(formatDateTime(appointment.getAppointmentTime(), "'HH''h''mm'"))
+        .addPlaceholdersItem(appointment.getEstheticType())
+        .addPlaceholdersItem(appointment.getDuration())
+        ));
+        providerPhone = appointment.getEstheticianPhone();
+        }
+    
+        
+        WhatsAppBulkMessage bulkMessage = new WhatsAppBulkMessage()
+        .addMessagesItem(new WhatsAppMessage()
+                .from("242040451212")
+                .to("242"+ providerPhone)
+                .content(content)
+        );
+
+       whatsAppApi.sendWhatsAppTemplateMessage(bulkMessage)
+       .executeAsync(new ApiCallback<WhatsAppBulkMessageInfo>() {
+        @Override
+        public void onSuccess(WhatsAppBulkMessageInfo result, int responseStatusCode,
+                Map<String, List<String>> responseHeaders) {
+                System.out.print(responseHeaders.keySet().iterator().next() + responseHeaders.values());
+            
+        }
+
+        @Override
+        public void onFailure(ApiException exception, int responseStatusCode,
+                Map<String, List<String>> responseHeaders) {
+            exception.printStackTrace();
+            System.out.print(responseHeaders.keySet().iterator().next() + responseHeaders.values());
+            System.out.println(responseStatusCode);
+            System.out.println(exception.rawResponseBody());
+        }
+       });
+        return;
+    }
  /**
      * Format a LocalDateTime to string using the specified pattern
      * 
