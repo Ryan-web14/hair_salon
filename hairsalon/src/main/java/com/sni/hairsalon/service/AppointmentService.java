@@ -1,12 +1,16 @@
 package com.sni.hairsalon.service;
 
 
+import com.sni.hairsalon.model.UserPrincipal;
+
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.util.List;
 
 import com.sni.hairsalon.dto.request.AppointmentRequestDTO;
 import com.sni.hairsalon.dto.request.AppointmentUpdateRequestDTO;
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
+import com.sni.hairsalon.exception.ResourceNotFoundException;
 public interface AppointmentService {
     
     public AppointmentResponseDTO createAppointment(AppointmentRequestDTO request);
@@ -39,5 +43,5 @@ public interface AppointmentService {
     public void InprogressToCompleted();
     public void deleteAllAppointment();
     public void remindAppointment();
-        
+    public List<AppointmentResponseDTO> getProviderSpecificAppointment(UserPrincipal authenticatedUser, LocalDate date) throws AccessDeniedException, ResourceNotFoundException;        
 }

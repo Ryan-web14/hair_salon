@@ -118,6 +118,7 @@ public class EstheticianServiceImpl implements EstheticianService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public EstheticianResponseDTO getEstheticianProfile(String email) {
         User user = userService.getUserByEmail(email);
 

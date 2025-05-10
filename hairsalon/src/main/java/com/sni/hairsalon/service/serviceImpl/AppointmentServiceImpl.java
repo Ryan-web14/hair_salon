@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +43,7 @@ import com.sni.hairsalon.service.ScheduleService;
 import com.sni.hairsalon.service.WhatsappService;
 import com.sni.hairsalon.model.Status;
 import com.sni.hairsalon.model.User;
+import com.sni.hairsalon.model.UserPrincipal;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -147,6 +149,8 @@ public AppointmentResponseDTO createAppointment(AppointmentRequestDTO request) {
     try{
 
         whatsappService.sendAppointmentConfirmation(response);
+        whatsappService.sendAppointmentConfirmationToProvider(response);
+        
     }catch(ApiException e ){
         e.printStackTrace();
     }
@@ -186,6 +190,7 @@ private Esthetic findEstheticByTypeFlexible(String requestType) {
       .orElseThrow(() -> new ResourceNotFoundException("Esthetic service not found: " + requestType));
 }
 
+//TODO make slot available when updating
 @Override
 public AppointmentResponseDTO updateAppointmentByAdmin(long id, AppointmentUpdateRequestDTO request) {
    Appointment appointment = appointmentRepo.findById(id)
@@ -494,9 +499,18 @@ public List<AppointmentResponseDTO> getEstheticianAppointment(long estheticianId
       // Notify the appropriate service provider
       if (appointment.getBarber() != null) {
           notifyBarber(appointment);
+         
       } else if (appointment.getEsthetician() != null) {
           notifyEsthetician(appointment);
       }
+
+      try{
+
+        whatsappService.sendCheckinToProvider(mapper.toDto(appointment));
+        
+    }catch(ApiException e ){
+        e.printStackTrace();
+    }
   
       return mapper.toDto(appointment);
   }
@@ -510,6 +524,8 @@ public List<AppointmentResponseDTO> getEstheticianAppointment(long estheticianId
       throw new IllegalStateException("Too late to check in");
   }
   }
+
+  //TODO update the availability to make it available again when cancelling an appointment
   @Override
   @Transactional
   public void cancelAppointment(long id) {
@@ -771,7 +787,59 @@ private Appointment checkAppointmentTodayDate(Appointment appointment) {
     return appointment;
 }
 
+public List<AppointmentResponseDTO> getProviderSpecificAppointment(UserPrincipal authenticatedUser, LocalDate date) throws AccessDeniedException, 
+ResourceNotFoundException {
+    
+    String email = authenticatedUser.getUsername();
+    String role = authenticatedUser.getAuthorities().iterator().next().getAuthority();
+    Boolean hasCorrectRole = role.equals("ROLE_BARBER") ||
+    role.equals("ROLE_ESTHETICIAN");
+    User user = userRepo.findUserByEmail(email)
+    .orElseThrow(()-> new ResourceNotFoundException("No User Found"));
+    
+    if(!hasCorrectRole){
+        throw new AccessDeniedException("Access Denied");
+    }
+
+    List<Appointment> appointments = new ArrayList<>();
+
+    if(role.equals("ROLE_BARBER")){
+
+        Barber barber = barberRepo.findByEmail(email)
+        .orElseThrow(()->new ResourceNotFoundException("Barber not found " + email));
+        appointments.addAll(appointmentRepo.findByBarberAndDate(barber.getId(), date, 3));
+    }
+
+    if(role.equals("ROLE_ESTHETICIAN")){
+
+        Esthetician esthetician = estheticianRepo.findByEmail(email)
+        .orElseThrow(()-> new ResourceNotFoundException("Esthetician not found" + email));
+        appointments.addAll(appointmentRepo.findByEstheticianAndDate(esthetician.getId(), date, 3));
+    }
+
+    return appointments.stream()
+    .map(mapper::toDto)
+    .collect(Collectors.toList());
+ }   
+
 }
+
+/*
+ * 
+ * List<Appointment> findByEstheticianAndDate(
+    @Param("estheticianId") Long estheticianId,
+    @Param("date") LocalDate date,
+    @Param("status") int status
+
+        List<Appointment> findByBarberAndDate(
+        @Param("barberId") Long barberId,
+        @Param("date") LocalDate date,
+        @Param("status") int status
+    );
+
+
+ */
+
 
 /*
     PENDING(1),

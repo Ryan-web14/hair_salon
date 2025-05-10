@@ -31,6 +31,7 @@ public class AppointmentResponseDTO {
     private LocalDateTime appointmentTime;
     private LocalDateTime bookedTime;
     private String haircutType;
+    private String duration;
     private String estheticType;
     private int price;
     private String status;

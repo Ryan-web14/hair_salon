@@ -12,5 +12,6 @@ public interface EstheticService {
     EstheticResponseDTO updateEsthetic(long id, EstheticRequestDTO dto);
     public List<EstheticResponseDTO> getAllEsthetics();
     public void deleteEsthetic(long id);
+    public EstheticianResponseDTO getEstheticianProfile(String email);
 
 }

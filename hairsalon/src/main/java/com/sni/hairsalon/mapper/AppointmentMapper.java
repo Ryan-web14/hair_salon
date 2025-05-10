@@ -108,6 +108,7 @@ public class AppointmentMapper {
             if (appointment.getHaircut() != null) {
                 dto.setHaircutType(appointment.getHaircut().getType());
                 dto.setPrice(appointment.getHaircut().getPrice());
+                dto.setDuration(String.valueOf(appointment.getHaircut().getDuration()));
             }
         }
         
@@ -126,6 +127,7 @@ public class AppointmentMapper {
             if (appointment.getEsthetic() != null) {
                 dto.setEstheticType(appointment.getEsthetic().getType());
                 dto.setPrice(appointment.getEsthetic().getPrice());
+                dto.setDuration(String.valueOf(appointment.getEsthetic().getDuration()));
             }
         }
         
