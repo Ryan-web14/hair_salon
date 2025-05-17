@@ -17,6 +17,7 @@ public interface AvailabilityService {
    public void makeProviderSlotUnavailable(String providerType, long providerId, LocalDateTime startTime, int duration);
    public void deleteAllAvailability();
    public List<AvailabilityResponseDTO> getProviderAvailability(UserPrincipal authenticatedUser, LocalDate date);
+   public void resetAvailability(String providerType, long providerId, LocalDateTime startTime, int duration);
 }
 
 

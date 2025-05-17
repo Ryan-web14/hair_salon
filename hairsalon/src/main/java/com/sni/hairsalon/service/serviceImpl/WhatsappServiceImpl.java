@@ -22,6 +22,8 @@ import com.infobip.model.WhatsAppMessage;
 import com.infobip.model.WhatsAppTemplateBodyContent;
 import com.infobip.model.WhatsAppTemplateContent;
 import com.infobip.model.WhatsAppTemplateDataContent;
+import com.infobip.model.WhatsAppTemplateHeaderContent;
+import com.infobip.model.WhatsAppTemplateTextHeaderContent;
 import com.sni.hairsalon.dto.response.AppointmentResponseDTO;
 import com.sni.hairsalon.service.WhatsappService;
 
@@ -119,6 +121,8 @@ public class WhatsappServiceImpl implements WhatsappService {
         content.language("fr")
         .templateName("new_appointment_barber")
         .templateData(new WhatsAppTemplateDataContent()
+        .header(new WhatsAppTemplateTextHeaderContent()
+        .placeholder(appointment.getBarberFirstname()))
         .body(new WhatsAppTemplateBodyContent()
         .addPlaceholdersItem(appointment.getClientFirstname())
         .addPlaceholdersItem(appointment.getClientLastname())
@@ -134,6 +138,8 @@ public class WhatsappServiceImpl implements WhatsappService {
             content.language("fr")
         .templateName("new_appointment_esthetician")
         .templateData(new WhatsAppTemplateDataContent()
+        .header(new WhatsAppTemplateTextHeaderContent()
+        .placeholder(appointment.getEstheticianFirstname()))
         .body(new WhatsAppTemplateBodyContent()
         .addPlaceholdersItem(appointment.getClientFirstname())
         .addPlaceholdersItem(appointment.getClientLastname())
