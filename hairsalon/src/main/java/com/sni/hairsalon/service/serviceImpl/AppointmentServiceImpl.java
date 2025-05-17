@@ -48,6 +48,7 @@ import com.sni.hairsalon.model.UserPrincipal;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+//TODO implémenter fonction no show
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -190,7 +191,6 @@ private Esthetic findEstheticByTypeFlexible(String requestType) {
       .orElseThrow(() -> new ResourceNotFoundException("Esthetic service not found: " + requestType));
 }
 
-//TODO make slot available when updating
 @Override
 public AppointmentResponseDTO updateAppointmentByAdmin(long id, AppointmentUpdateRequestDTO request) {
    Appointment appointment = appointmentRepo.findById(id)
@@ -224,7 +224,8 @@ public AppointmentResponseDTO updateAppointmentByAdmin(long id, AppointmentUpdat
            throw new IllegalStateException("The appointment time doesn't match the barber hour" + 
                "startTime: " + schedule.getStartTime() + " endTime: " + schedule.getEndTime());
        }
-       
+
+       availabilityService.resetAvailability("barber", barber.getId(), appointment.getAppointmentTime(), appointment.getHaircut().getDuration());
        availabilityService.makeProviderSlotUnavailable("barber", barber.getId(), appointmentDateTime, haircut.getDuration());
        
        appointment.setBarber(barber);
@@ -251,7 +252,8 @@ public AppointmentResponseDTO updateAppointmentByAdmin(long id, AppointmentUpdat
            throw new IllegalStateException("The appointment time doesn't match the esthetician hour" + 
                "startTime: " + schedule.getStartTime() + " endTime: " + schedule.getEndTime());
        }
-       
+
+       availabilityService.resetAvailability("esthetician", esthetician.getId(), appointment.getAppointmentTime(), appointment.getEsthetic().getDuration());
        availabilityService.makeProviderSlotUnavailable("esthetician", esthetician.getId(), appointmentDateTime, esthetic.getDuration());
        
        appointment.setEsthetician(esthetician);
@@ -525,7 +527,7 @@ public List<AppointmentResponseDTO> getEstheticianAppointment(long estheticianId
   }
   }
 
-  //TODO update the availability to make it available again when cancelling an appointment
+  /////TODO update the availability to make it available again when cancelling an appointment
   @Override
   @Transactional
   public void cancelAppointment(long id) {

@@ -26,7 +26,6 @@ import com.sni.hairsalon.repository.EstheticianRepository;
 import com.sni.hairsalon.repository.ScheduleRepository;
 import com.sni.hairsalon.service.AvailabilityService;
 
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -257,6 +256,7 @@ public void makeProviderSlotUnavailable(String providerType, long providerId, Lo
         }
 
         // Mark slot as unavailable
+        //each time get the first value of the list 
         Availability firstAvailability = availabilities.get(0);
         firstAvailability.setAvailable(false);
         availabilityRepo.save(firstAvailability);
@@ -267,6 +267,70 @@ public void makeProviderSlotUnavailable(String providerType, long providerId, Lo
         }
     }
 }
+
+/***
+ * 
+ * Use to make availability available again after cancelling or updating an appointment
+ */
+@Override
+   public void resetAvailability(String providerType, long providerId, LocalDateTime startTime, int duration){
+
+          LocalDate appointmentDate = startTime.toLocalDate();
+          Schedule schedule;
+
+          if ("barber".equalsIgnoreCase(providerType)) {
+              schedule = scheduleRepo
+                      .findCurrentSchedulesForBarber(providerId, appointmentDate,
+                              appointmentDate.getDayOfWeek().getValue())
+                      .orElseThrow(() -> new ResourceNotFoundException("No found schedule"));
+          } else if ("esthetician".equalsIgnoreCase(providerType)) {
+              schedule = scheduleRepo
+                      .findCurrentSchedulesForEsthetician(providerId, appointmentDate,
+                              appointmentDate.getDayOfWeek().getValue())
+                      .orElseThrow(() -> new ResourceNotFoundException("No found schedule"));
+          } else {
+              throw new IllegalArgumentException("Invalid provider type: " + providerType);
+          }
+
+          if (schedule == null) {
+              throw new ResourceNotFoundException("No schedule found for " + providerType + " on " + appointmentDate);
+          }
+
+          //in minute
+          int slotSize = 30;
+
+          int numberOfSlot = (int) Math.ceil((double) duration/slotSize);
+
+          for (int i = 0; i < numberOfSlot; i++) {
+              LocalDateTime currentSlotStart = startTime.plusMinutes(i * slotSize);
+              LocalDateTime currentSlotEnd = currentSlotStart.plusMinutes(slotSize);
+
+              // Query for overlapping slots tied to the schedule
+              List<Availability> availabilities;
+              if ("barber".equalsIgnoreCase(providerType)) {
+                  availabilities = availabilityRepo.findByStartAndEndTimeAndBarber(
+                          providerId, currentSlotStart, currentSlotEnd);
+              } else {
+                  availabilities = availabilityRepo.findByStartAndEndTimeAndEsthecian(
+                          providerId, currentSlotStart, currentSlotEnd);
+              }
+
+              Availability availability = availabilities.get(0);
+              availability.setAvailable(true);
+              availabilityRepo.save(availability);
+
+               if (availabilities.size() > 1) {
+            availabilityRepo.deleteAll(availabilities.subList(1, availabilities.size()));
+
+          }
+
+          
+   }
+
+}
+
+
+
 
 @Override
 public void deleteAllAvailability(){
