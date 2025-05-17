@@ -56,7 +56,6 @@ public class SecurityConfig {
                 .requestMatchers("/v1/role/**").permitAll()
                 .requestMatchers("/v1/haircut/all").permitAll()
                 .requestMatchers("/v1/esthetic/all").permitAll()
-                .requestMatchers("/v1/haircut/all/repo").permitAll()
                 .requestMatchers("/v1/appointment/checkin").permitAll()
                 .requestMatchers("/v1/appointment/run-appointment").permitAll()
                 .requestMatchers("/v1/appointment/monitor-appointment").permitAll()
